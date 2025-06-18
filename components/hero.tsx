@@ -98,6 +98,7 @@ export default function Hero({ geo }: HeroProps) {
   const [cursorPosition, setCursorPosition] = useState({ x: 0.5, y: 0.5 })
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [isClient, setIsClient] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Set isClient to true when component mounts
   useEffect(() => {
@@ -108,10 +109,10 @@ export default function Hero({ geo }: HeroProps) {
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
-        setDimensions({
-          width: window.innerWidth,
-          height: window.innerHeight,
-        })
+        const width = window.innerWidth
+        const height = window.innerHeight
+        setDimensions({ width, height })
+        setIsMobile(width <= 768)
       }
     }
 
@@ -151,7 +152,7 @@ export default function Hero({ geo }: HeroProps) {
   return (
     <section
       id="home"
-      className="min-h-[90vh] flex items-center justify-center relative overflow-hidden"
+      className="min-h-[90vh] sm:min-h-[95vh] flex items-center justify-center relative overflow-hidden px-2 sm:px-0"
       ref={containerRef}
     >
       {/* Matrix Background - only render on client side */}
@@ -239,7 +240,7 @@ export default function Hero({ geo }: HeroProps) {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 relative z-50">
+      <div className="container mx-auto px-4 sm:px-6 relative z-50">
         <div className="grid lg:grid-cols-2 gap-6 items-center">
           {/* Left side - Text content */}
           <motion.div
@@ -248,7 +249,7 @@ export default function Hero({ geo }: HeroProps) {
             transition={{ duration: 0.8 }}
             className="text-center lg:text-left"
           >
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-4 relative">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-4 relative">
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -256,10 +257,10 @@ export default function Hero({ geo }: HeroProps) {
                 className="block text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-slate-400 to-slate-500 relative"
                 style={{
                   textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
-                  transform: "perspective(1000px) rotateX(2deg)",
+                  transform: isMobile ? "none" : "perspective(1000px) rotateX(2deg)",
                 }}
               >
-                Visionary Developer
+               Full-Stack Developer
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
@@ -267,7 +268,7 @@ export default function Hero({ geo }: HeroProps) {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="block mt-1 relative"
                 style={{
-                  transform: "perspective(1000px) rotateX(-2deg)",
+                  transform: isMobile ? "none" : "perspective(1000px) rotateX(-2deg)",
                 }}
               >
                 & Digital{" "}
@@ -275,22 +276,22 @@ export default function Hero({ geo }: HeroProps) {
                   className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 animate-gradient-x relative inline-block"
                   style={{
                     textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
-                    transform: "translateZ(20px)",
+                    transform: isMobile ? "none" : "translateZ(20px)",
                   }}
                 >
-                  Architect
+                Architect
                 </span>
               </motion.span>
-              {/* 3D Decorative Elements */}
-              <div className="absolute -inset-4 bg-gradient-to-b from-slate-800/20 to-transparent rounded-lg blur-xl -z-10"></div>
-              <div className="absolute -inset-2 bg-gradient-to-r from-slate-700/10 to-slate-900/10 rounded-lg blur-lg -z-10"></div>
+              {/* 3D Decorative Elements - reduced size on mobile */}
+              <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-b from-slate-800/20 to-transparent rounded-lg blur-xl -z-10"></div>
+              <div className="absolute -inset-1 sm:-inset-2 bg-gradient-to-r from-slate-700/10 to-slate-900/10 rounded-lg blur-lg -z-10"></div>
             </h1>
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="text-base md:text-lg text-gray-300/90 mb-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed relative"
+              className="text-sm sm:text-base md:text-lg text-gray-300/90 mb-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed relative px-2 sm:px-0"
               style={{
                 textShadow: "0 1px 2px rgba(0,0,0,0.2)",
               }}
@@ -301,7 +302,7 @@ export default function Hero({ geo }: HeroProps) {
               <span 
                 className="text-transparent bg-clip-text bg-gradient-to-r from-slate-300 to-slate-500 relative inline-block"
                 style={{
-                  transform: "translateZ(10px)",
+                  transform: isMobile ? "none" : "translateZ(10px)",
                 }}
               >
                 digital masterpieces
@@ -312,7 +313,7 @@ export default function Hero({ geo }: HeroProps) {
               <span 
                 className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 to-slate-600 relative inline-block"
                 style={{
-                  transform: "translateZ(15px)",
+                  transform: isMobile ? "none" : "translateZ(15px)",
                 }}
               >
                 elegant code
@@ -323,7 +324,7 @@ export default function Hero({ geo }: HeroProps) {
               <span 
                 className="text-transparent bg-clip-text bg-gradient-to-r from-slate-500 to-slate-700 relative inline-block"
                 style={{
-                  transform: "translateZ(20px)",
+                  transform: isMobile ? "none" : "translateZ(20px)",
                 }}
               >
                 visionary design
@@ -337,11 +338,11 @@ export default function Hero({ geo }: HeroProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start relative"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start relative px-2 sm:px-0"
             >
               <a
                 href="#projects"
-                className="btn-primary group relative px-6 py-3 text-white rounded-md transition-all duration-300 font-medium text-base overflow-hidden"
+                className="btn-primary group relative px-4 sm:px-6 py-2.5 sm:py-3 text-white rounded-md transition-all duration-300 font-medium text-sm sm:text-base overflow-hidden"
               >
                 <span className="relative z-10">View My Work</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-600/20 to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -349,7 +350,7 @@ export default function Hero({ geo }: HeroProps) {
               </a>
               <a
                 href="#about"
-                className="btn-secondary group relative px-6 py-3 text-white rounded-md transition-all duration-300 font-medium text-base overflow-hidden"
+                className="btn-secondary group relative px-4 sm:px-6 py-2.5 sm:py-3 text-white rounded-md transition-all duration-300 font-medium text-sm sm:text-base overflow-hidden"
               >
                 <span className="relative z-10">About Me</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-900/20 to-slate-800/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -371,9 +372,9 @@ export default function Hero({ geo }: HeroProps) {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
         <a href="#about" className="text-white/50 hover:text-red-500 transition-colors">
-          <ArrowDown className="h-6 w-6" />
+          <ArrowDown className="h-5 w-5 sm:h-6 sm:w-6" />
         </a>
       </div>
     </section>
