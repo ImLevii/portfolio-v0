@@ -1480,6 +1480,7 @@ export default function TerminalEffect({
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
                   className="absolute inset-0 bg-transparent text-transparent font-mono outline-none border-none caret-transparent"
+                  style={{ fontSize: '16px' }}
                   placeholder=""
                   autoFocus
                   autoComplete="off"
