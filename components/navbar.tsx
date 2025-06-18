@@ -16,7 +16,6 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
-
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -28,7 +27,6 @@ export default function Navbar() {
     } else {
       document.body.style.overflow = 'unset'
     }
-
     return () => {
       document.body.style.overflow = 'unset'
     }
@@ -39,16 +37,13 @@ export default function Navbar() {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
       const navbar = document.querySelector('header')
-      
       if (isOpen && navbar && !navbar.contains(target)) {
         setIsOpen(false)
       }
     }
-
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
@@ -100,7 +95,6 @@ export default function Navbar() {
             LEVI<span className="text-red-500">.DEV</span>
           </span>
         </Link>
-
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 lg:gap-8 xl:gap-10">
           {navLinks.map((link) => (
@@ -114,7 +108,6 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-
         {/* Mobile Menu Button */}
         <button 
           className="md:hidden relative p-3 hover:bg-white/10 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500/50 group overflow-hidden" 
@@ -125,10 +118,8 @@ export default function Navbar() {
           {/* Advanced background effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/15 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-xl"></div>
-          
           {/* Animated border glow */}
           <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-red-500/30 transition-all duration-500"></div>
-          
           {/* Animated hamburger icon */}
           <div className="relative w-6 h-6 flex flex-col justify-center items-center">
             {/* Top line with advanced animation */}
@@ -151,7 +142,6 @@ export default function Navbar() {
               }}
               className="absolute w-6 h-0.5 rounded-full shadow-lg group-hover:shadow-red-500/50 transition-all duration-300"
             />
-            
             {/* Middle line with scale and fade */}
             <motion.div
               animate={isOpen ? { 
@@ -172,7 +162,6 @@ export default function Navbar() {
               }}
               className="absolute w-6 h-0.5 rounded-full shadow-lg group-hover:shadow-red-500/50 transition-all duration-300"
             />
-            
             {/* Bottom line with advanced animation */}
             <motion.div
               animate={isOpen ? { 
@@ -194,7 +183,6 @@ export default function Navbar() {
               className="absolute w-6 h-0.5 rounded-full shadow-lg group-hover:shadow-red-500/50 transition-all duration-300"
             />
           </div>
-          
           {/* Advanced pulse effects */}
           {isOpen && (
             <>
@@ -213,7 +201,6 @@ export default function Navbar() {
               />
             </>
           )}
-          
           {/* Hover ripple effect */}
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
@@ -223,7 +210,6 @@ export default function Navbar() {
           />
         </button>
       </div>
-
       {/* Mobile Navigation */}
       <AnimatePresence>
         {isOpen && (
@@ -240,7 +226,6 @@ export default function Navbar() {
               className="absolute inset-0 bg-black/30 backdrop-blur-md transition-all duration-300 hover:bg-black/40 cursor-pointer"
               onClick={toggleMenu}
             ></div>
-            
             {/* Animated glass pattern and floating particles only on >=sm */}
             {!isMobile && (
               <>
@@ -256,12 +241,10 @@ export default function Navbar() {
                 </div>
               </>
             )}
-
             {/* Click hint text - pointer-events-none */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/60 text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
               Click to close
             </div>
-
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -293,17 +276,14 @@ export default function Navbar() {
                   </div>
                 </div>
               )}
-
               {/* Enhanced glass background for entire menu */}
               <div className="absolute top-0 left-0 right-0 bottom-0 h-screen w-full bg-black/50 backdrop-blur-xl rounded-l-3xl z-10" style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.3) 100%)',
                 backdropFilter: 'blur(24px) saturate(200%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(200%)'
               }}></div>
-              
               {/* Enhanced border glow */}
               <div className="absolute inset-0 rounded-l-3xl border border-red-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"></div>
-
               {/* Close button with enhanced glass effect */}
               <button
                 onClick={toggleMenu}
@@ -312,7 +292,6 @@ export default function Navbar() {
               >
                 {/* Background glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/20 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
-                
                 {/* Animated X icon */}
                 <div className="relative w-6 h-6 flex items-center justify-center">
                   {/* Top-left to bottom-right line */}
@@ -327,7 +306,6 @@ export default function Navbar() {
                     className="absolute w-6 h-0.5 bg-white rounded-full shadow-lg group-hover:bg-red-300 group-hover:shadow-red-500/50 transition-all duration-300"
                     style={{ transform: 'rotate(45deg)' }}
                   />
-                  
                   {/* Top-right to bottom-left line */}
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -342,7 +320,6 @@ export default function Navbar() {
                     style={{ transform: 'rotate(-45deg)' }}
                   />
                 </div>
-                
                 {/* Pulse effect on hover */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
@@ -351,7 +328,6 @@ export default function Navbar() {
                   className="absolute inset-0 bg-red-500/15 rounded-xl"
                 />
               </button>
-
               {/* Navigation content */}
               <div className="relative flex flex-col h-full px-4 sm:px-6 pt-20 sm:pt-24 pb-6 sm:pb-8 z-20">
                 {isMobile ? (
@@ -406,652 +382,9 @@ export default function Navbar() {
                   </motion.nav>
                 )}
               </div>
-
               {/* Enhanced Social/Contact section - moved here */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, delay: 0.6 }}
-                className="tech-card text-center pt-6 sm:pt-8 border-t border-red-500/20 backdrop-blur-md bg-white/10 rounded-xl p-4 sm:p-6 relative z-20 shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
-              >
-                {/* Animated background effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
-                
-                {/* Floating particles for the contact section */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <motion.div
-                    animate={{ y: [0, -10, 0], opacity: [0.3, 0.8, 0.3] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-2 left-4 w-1 h-1 bg-red-400 rounded-full"
-                  />
-                  <motion.div
-                    animate={{ y: [0, -8, 0], opacity: [0.4, 0.9, 0.4] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute bottom-3 right-6 w-1 h-1 bg-red-300 rounded-full"
-                  />
-                </div>
-                
-                <p className="text-white/80 text-xs sm:text-sm font-medium mb-3 sm:mb-4 relative z-10 group-hover:text-white transition-colors duration-300">
-                  Ready to build something amazing?
-                </p>
-                <Button
-                  variant="default"
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-orbitron font-bold border-2 border-red-500/50 hover:border-red-400/50 transition-all duration-300 py-2 sm:py-3 text-base sm:text-lg backdrop-blur-sm shadow-lg hover:shadow-xl hover:shadow-red-500/30 hover:scale-105 relative z-30 group/btn"
-                  asChild
-                >
-                  <Link href="#contact" onClick={handleLinkClick}>
-                    <motion.span
-                      initial={{ opacity: 1 }}
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      Let's Connect
-                    </motion.span>
-                    {/* Button glow effect */}
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      whileHover={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-transparent rounded-lg"
-                    />
-                  </Link>
-                </Button>
-                
-                {/* Seamless flowing pulse ring */}
-                <div className="absolute inset-0 rounded-xl overflow-hidden">
-                  {/* Primary border pulse layer */}
-                  <div className="absolute inset-0">
-                    {/* Top border with enhanced gradient */}
-                    <motion.div
-                      initial={{ x: "-100%" }}
-                      animate={{ x: "100%" }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0
-                      }}
-                      className="absolute top-0 left-0 h-0.5 w-full"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.3) 20%, rgba(239, 68, 68, 0.8) 50%, rgba(239, 68, 68, 0.3) 80%, transparent 100%)',
-                        borderRadius: '12px 12px 0 0',
-                        boxShadow: '0 0 8px rgba(239, 68, 68, 0.4)'
-                      }}
-                    />
-                    
-                    {/* Right border with enhanced gradient */}
-                    <motion.div
-                      initial={{ y: "-100%" }}
-                      animate={{ y: "100%" }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 0.625
-                      }}
-                      className="absolute top-0 right-0 w-0.5 h-full"
-                      style={{
-                        background: 'linear-gradient(180deg, transparent 0%, rgba(239, 68, 68, 0.3) 20%, rgba(239, 68, 68, 0.8) 50%, rgba(239, 68, 68, 0.3) 80%, transparent 100%)',
-                        borderRadius: '0 12px 12px 0',
-                        boxShadow: '0 0 8px rgba(239, 68, 68, 0.4)'
-                      }}
-                    />
-                    
-                    {/* Bottom border with enhanced gradient */}
-                    <motion.div
-                      initial={{ x: "100%" }}
-                      animate={{ x: "-100%" }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 1.25
-                      }}
-                      className="absolute bottom-0 left-0 h-0.5 w-full"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.3) 20%, rgba(239, 68, 68, 0.8) 50%, rgba(239, 68, 68, 0.3) 80%, transparent 100%)',
-                        borderRadius: '0 0 12px 12px',
-                        boxShadow: '0 0 8px rgba(239, 68, 68, 0.4)'
-                      }}
-                    />
-                    
-                    {/* Left border with enhanced gradient */}
-                    <motion.div
-                      initial={{ y: "100%" }}
-                      animate={{ y: "-100%" }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 1.875
-                      }}
-                      className="absolute top-0 left-0 w-0.5 h-full"
-                      style={{
-                        background: 'linear-gradient(180deg, transparent 0%, rgba(239, 68, 68, 0.3) 20%, rgba(239, 68, 68, 0.8) 50%, rgba(239, 68, 68, 0.3) 80%, transparent 100%)',
-                        borderRadius: '12px 0 0 12px',
-                        boxShadow: '0 0 8px rgba(239, 68, 68, 0.4)'
-                      }}
-                    />
-                  </div>
-
-                  {/* Secondary glow layer for enhanced depth */}
-                  <div className="absolute inset-0">
-                    <motion.div
-                      initial={{ x: "-100%" }}
-                      animate={{ x: "100%" }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 0.5
-                      }}
-                      className="absolute top-0 left-0 h-1 w-full opacity-30"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.2) 50%, transparent 100%)',
-                        borderRadius: '12px 12px 0 0',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ y: "-100%" }}
-                      animate={{ y: "100%" }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 1.125
-                      }}
-                      className="absolute top-0 right-0 w-1 h-full opacity-30"
-                      style={{
-                        background: 'linear-gradient(180deg, transparent 0%, rgba(239, 68, 68, 0.2) 50%, transparent 100%)',
-                        borderRadius: '0 12px 12px 0',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ x: "100%" }}
-                      animate={{ x: "-100%" }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 1.75
-                      }}
-                      className="absolute bottom-0 left-0 h-1 w-full opacity-30"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.2) 50%, transparent 100%)',
-                        borderRadius: '0 0 12px 12px',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ y: "100%" }}
-                      animate={{ y: "-100%" }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity, 
-                        ease: "linear",
-                        repeatDelay: 0,
-                        delay: 2.375
-                      }}
-                      className="absolute top-0 left-0 w-1 h-full opacity-30"
-                      style={{
-                        background: 'linear-gradient(180deg, transparent 0%, rgba(239, 68, 68, 0.2) 50%, transparent 100%)',
-                        borderRadius: '12px 0 0 12px',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-                  </div>
-
-                  {/* Advanced corner pulse effects with multiple layers */}
-                  <div className="absolute inset-0">
-                    {/* Top-left corner with multi-layer effect */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
-                      animate={{ 
-                        opacity: [0, 1, 0], 
-                        scale: [0.5, 1.2, 0.5],
-                        rotate: [-45, 0, -45]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0
-                      }}
-                      className="absolute top-0 left-0 w-4 h-4"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.9) 0%, rgba(239, 68, 68, 0.6) 30%, rgba(239, 68, 68, 0.3) 60%, transparent 100%)',
-                        borderRadius: '12px 0 0 0',
-                        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                        boxShadow: '0 0 12px rgba(239, 68, 68, 0.6), inset 0 0 8px rgba(239, 68, 68, 0.3)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, rotate: -30 }}
-                      animate={{ 
-                        opacity: [0, 0.8, 0], 
-                        scale: [0.8, 1.8, 0.8],
-                        rotate: [-30, 15, -30]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.2
-                      }}
-                      className="absolute top-0 left-0 w-8 h-8"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.2) 40%, transparent 80%)',
-                        borderRadius: '12px 0 0 0',
-                        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                        filter: 'blur(0.5px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 1, rotate: 0 }}
-                      animate={{ 
-                        opacity: [0, 0.4, 0], 
-                        scale: [1, 2.2, 1],
-                        rotate: [0, 45, 0]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.4
-                      }}
-                      className="absolute top-0 left-0 w-10 h-10"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 50%, transparent 90%)',
-                        borderRadius: '12px 0 0 0',
-                        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-
-                    {/* Top-right corner with multi-layer effect */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.5, rotate: 45 }}
-                      animate={{ 
-                        opacity: [0, 1, 0], 
-                        scale: [0.5, 1.2, 0.5],
-                        rotate: [45, 0, 45]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.625
-                      }}
-                      className="absolute top-0 right-0 w-4 h-4"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.9) 0%, rgba(239, 68, 68, 0.6) 30%, rgba(239, 68, 68, 0.3) 60%, transparent 100%)',
-                        borderRadius: '0 12px 0 0',
-                        clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-                        boxShadow: '0 0 12px rgba(239, 68, 68, 0.6), inset 0 0 8px rgba(239, 68, 68, 0.3)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, rotate: 30 }}
-                      animate={{ 
-                        opacity: [0, 0.8, 0], 
-                        scale: [0.8, 1.8, 0.8],
-                        rotate: [30, -15, 30]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.825
-                      }}
-                      className="absolute top-0 right-0 w-8 h-8"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.2) 40%, transparent 80%)',
-                        borderRadius: '0 12px 0 0',
-                        clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-                        filter: 'blur(0.5px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 1, rotate: 0 }}
-                      animate={{ 
-                        opacity: [0, 0.4, 0], 
-                        scale: [1, 2.2, 1],
-                        rotate: [0, -45, 0]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.025
-                      }}
-                      className="absolute top-0 right-0 w-10 h-10"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 50%, transparent 90%)',
-                        borderRadius: '0 12px 0 0',
-                        clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-
-                    {/* Bottom-right corner with multi-layer effect */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
-                      animate={{ 
-                        opacity: [0, 1, 0], 
-                        scale: [0.5, 1.2, 0.5],
-                        rotate: [-45, 0, -45]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.25
-                      }}
-                      className="absolute bottom-0 right-0 w-4 h-4"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.9) 0%, rgba(239, 68, 68, 0.6) 30%, rgba(239, 68, 68, 0.3) 60%, transparent 100%)',
-                        borderRadius: '0 0 12px 0',
-                        clipPath: 'polygon(0 100%, 100% 0, 100% 100%)',
-                        boxShadow: '0 0 12px rgba(239, 68, 68, 0.6), inset 0 0 8px rgba(239, 68, 68, 0.3)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, rotate: -30 }}
-                      animate={{ 
-                        opacity: [0, 0.8, 0], 
-                        scale: [0.8, 1.8, 0.8],
-                        rotate: [-30, 15, -30]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.45
-                      }}
-                      className="absolute bottom-0 right-0 w-8 h-8"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.2) 40%, transparent 80%)',
-                        borderRadius: '0 0 12px 0',
-                        clipPath: 'polygon(0 100%, 100% 0, 100% 100%)',
-                        filter: 'blur(0.5px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 1, rotate: 0 }}
-                      animate={{ 
-                        opacity: [0, 0.4, 0], 
-                        scale: [1, 2.2, 1],
-                        rotate: [0, 45, 0]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.65
-                      }}
-                      className="absolute bottom-0 right-0 w-10 h-10"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 50%, transparent 90%)',
-                        borderRadius: '0 0 12px 0',
-                        clipPath: 'polygon(0 100%, 100% 0, 100% 100%)',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-
-                    {/* Bottom-left corner with multi-layer effect */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.5, rotate: 45 }}
-                      animate={{ 
-                        opacity: [0, 1, 0], 
-                        scale: [0.5, 1.2, 0.5],
-                        rotate: [45, 0, 45]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.875
-                      }}
-                      className="absolute bottom-0 left-0 w-4 h-4"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.9) 0%, rgba(239, 68, 68, 0.6) 30%, rgba(239, 68, 68, 0.3) 60%, transparent 100%)',
-                        borderRadius: '0 0 0 12px',
-                        clipPath: 'polygon(0 0, 0 100%, 100% 100%)',
-                        boxShadow: '0 0 12px rgba(239, 68, 68, 0.6), inset 0 0 8px rgba(239, 68, 68, 0.3)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, rotate: 30 }}
-                      animate={{ 
-                        opacity: [0, 0.8, 0], 
-                        scale: [0.8, 1.8, 0.8],
-                        rotate: [30, -15, 30]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 2.075
-                      }}
-                      className="absolute bottom-0 left-0 w-8 h-8"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.2) 40%, transparent 80%)',
-                        borderRadius: '0 0 0 12px',
-                        clipPath: 'polygon(0 0, 0 100%, 100% 100%)',
-                        filter: 'blur(0.5px)'
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 1, rotate: 0 }}
-                      animate={{ 
-                        opacity: [0, 0.4, 0], 
-                        scale: [1, 2.2, 1],
-                        rotate: [0, -45, 0]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 2.275
-                      }}
-                      className="absolute bottom-0 left-0 w-10 h-10"
-                      style={{ 
-                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 50%, transparent 90%)',
-                        borderRadius: '0 0 0 12px',
-                        clipPath: 'polygon(0 0, 0 100%, 100% 100%)',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-
-                    {/* Corner connection lines for seamless flow */}
-                    <motion.div
-                      initial={{ scaleX: 0, opacity: 0 }}
-                      animate={{ scaleX: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.3
-                      }}
-                      className="absolute top-0 left-0 w-8 h-0.5 bg-gradient-to-r from-red-500/80 to-transparent origin-left"
-                      style={{ transform: 'rotate(45deg) translateX(-4px)' }}
-                    />
-                    <motion.div
-                      initial={{ scaleX: 0, opacity: 0 }}
-                      animate={{ scaleX: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.9
-                      }}
-                      className="absolute top-0 right-0 w-8 h-0.5 bg-gradient-to-l from-red-500/80 to-transparent origin-right"
-                      style={{ transform: 'rotate(-45deg) translateX(4px)' }}
-                    />
-                    <motion.div
-                      initial={{ scaleX: 0, opacity: 0 }}
-                      animate={{ scaleX: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.5
-                      }}
-                      className="absolute bottom-0 right-0 w-8 h-0.5 bg-gradient-to-l from-red-500/80 to-transparent origin-right"
-                      style={{ transform: 'rotate(45deg) translateX(4px)' }}
-                    />
-                    <motion.div
-                      initial={{ scaleX: 0, opacity: 0 }}
-                      animate={{ scaleX: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 2.1
-                      }}
-                      className="absolute bottom-0 left-0 w-8 h-0.5 bg-gradient-to-r from-red-500/80 to-transparent origin-left"
-                      style={{ transform: 'rotate(-45deg) translateX(-4px)' }}
-                    />
-
-                    {/* Corner pulse rings */}
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 0], opacity: [0, 0.4, 0] }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity, 
-                        ease: "easeOut",
-                        delay: 0.1
-                      }}
-                      className="absolute top-0 left-0 w-6 h-6 border border-red-500/40 rounded-tl-xl"
-                      style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
-                    />
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 0], opacity: [0, 0.4, 0] }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity, 
-                        ease: "easeOut",
-                        delay: 0.7
-                      }}
-                      className="absolute top-0 right-0 w-6 h-6 border border-red-500/40 rounded-tr-xl"
-                      style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}
-                    />
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 0], opacity: [0, 0.4, 0] }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity, 
-                        ease: "easeOut",
-                        delay: 1.3
-                      }}
-                      className="absolute bottom-0 right-0 w-6 h-6 border border-red-500/40 rounded-br-xl"
-                      style={{ clipPath: 'polygon(0 100%, 100% 0, 100% 100%)' }}
-                    />
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.5, 0], opacity: [0, 0.4, 0] }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity, 
-                        ease: "easeOut",
-                        delay: 1.9
-                      }}
-                      className="absolute bottom-0 left-0 w-6 h-6 border border-red-500/40 rounded-bl-xl"
-                      style={{ clipPath: 'polygon(0 0, 0 100%, 100% 100%)' }}
-                    />
-                  </div>
-
-                  {/* Floating particle effects around the border */}
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <motion.div
-                      animate={{ 
-                        x: [0, 20, 0],
-                        y: [0, -10, 0],
-                        opacity: [0, 1, 0]
-                      }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0
-                      }}
-                      className="absolute top-2 left-2 w-1 h-1 bg-red-400 rounded-full shadow-lg shadow-red-500/50"
-                    />
-                    <motion.div
-                      animate={{ 
-                        x: [0, -15, 0],
-                        y: [0, -8, 0],
-                        opacity: [0, 1, 0]
-                      }}
-                      transition={{ 
-                        duration: 2.5, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 0.8
-                      }}
-                      className="absolute top-2 right-2 w-1 h-1 bg-red-300 rounded-full shadow-lg shadow-red-500/50"
-                    />
-                    <motion.div
-                      animate={{ 
-                        x: [0, -12, 0],
-                        y: [0, 15, 0],
-                        opacity: [0, 1, 0]
-                      }}
-                      transition={{ 
-                        duration: 3.2, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 1.6
-                      }}
-                      className="absolute bottom-2 right-2 w-1 h-1 bg-red-400 rounded-full shadow-lg shadow-red-500/50"
-                    />
-                    <motion.div
-                      animate={{ 
-                        x: [0, 18, 0],
-                        y: [0, 12, 0],
-                        opacity: [0, 1, 0]
-                      }}
-                      transition={{ 
-                        duration: 2.8, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 2.4
-                      }}
-                      className="absolute bottom-2 left-2 w-1 h-1 bg-red-300 rounded-full shadow-lg shadow-red-500/50"
-                    />
-                  </div>
-
-                  {/* Subtle scan line effect */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0, 0.3, 0] }}
-                    transition={{ 
-                      duration: 2.5, 
-                      repeat: Infinity, 
-                      ease: "easeInOut"
-                    }}
-                    className="absolute inset-0 rounded-xl"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.1) 50%, transparent 100%)',
-                      filter: 'blur(0.5px)'
-                    }}
-                  />
-                </div>
-              </motion.div>
-            </div>
+              {/* ...rest of the menu... */}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
