@@ -505,52 +505,60 @@ export default function TerminalEffect({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Detect mobile device
+    const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    // Use device pixel ratio for crisp rendering
+    const dpr = window.devicePixelRatio || 1
+    // Responsive font size and density
+    const fontSize = isMobile ? 20 : 14
+    const frameInterval = isMobile ? 50 : 33 // 20fps on mobile, 30fps on desktop
+
     const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
+      // Set canvas size for device pixel ratio
+      canvas.width = Math.floor(canvas.offsetWidth * dpr)
+      canvas.height = Math.floor(canvas.offsetHeight * dpr)
+      ctx.setTransform(1, 0, 0, 1, 0, 0) // Reset transform
+      ctx.scale(dpr, dpr)
     }
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    const fontSize = 14
-    const columns = Math.floor(canvas.width / fontSize)
+    // Calculate columns based on font size and density
+    const columns = Math.floor(canvas.offsetWidth / fontSize)
     const drops: number[] = Array(columns).fill(1)
-    const speeds: number[] = Array(columns).fill(0).map(() => Math.random() * 2 + 0.5)
+    const speeds: number[] = Array(columns).fill(0).map(() => (isMobile ? Math.random() * 1.2 + 0.3 : Math.random() * 2 + 0.5))
     const opacities: number[] = Array(columns).fill(0).map(() => Math.random() * 0.8 + 0.2)
 
     const draw = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr)
 
       for (let i = 0; i < drops.length; i++) {
         const text = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)]
         const x = i * fontSize
         const y = drops[i] * fontSize
-        
         // Create gradient for each character
         const gradient = ctx.createLinearGradient(x, y - fontSize, x, y + fontSize)
         gradient.addColorStop(0, `rgba(255, 0, 0, ${opacities[i] * 0.3})`)
         gradient.addColorStop(0.5, `rgba(255, 0, 0, ${opacities[i]})`)
         gradient.addColorStop(1, `rgba(255, 0, 0, ${opacities[i] * 0.3})`)
-        
         ctx.fillStyle = gradient
         ctx.font = `${fontSize}px monospace`
         ctx.shadowColor = 'rgba(255, 0, 0, 0.8)'
         ctx.shadowBlur = 8
         ctx.fillText(text, x, y)
         ctx.shadowBlur = 0
-
         drops[i] += speeds[i]
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        if (drops[i] * fontSize > canvas.height / dpr && Math.random() > 0.975) {
           drops[i] = 0
-          speeds[i] = Math.random() * 2 + 0.5
+          speeds[i] = isMobile ? Math.random() * 1.2 + 0.3 : Math.random() * 2 + 0.5
           opacities[i] = Math.random() * 0.8 + 0.2
         }
       }
     }
 
-    const interval = setInterval(draw, 33)
+    // Use setInterval for frame rate limiting
+    const interval = setInterval(draw, frameInterval)
 
     return () => {
       clearInterval(interval)
