@@ -1193,7 +1193,7 @@ export default function TerminalEffect({
         }}
       >
         {/* Enhanced terminal header with depth */}
-        <div className="terminal-header flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-2xl relative overflow-hidden backdrop-blur-sm">
+        <div className="terminal-header flex flex-wrap items-center gap-2 sm:gap-4 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-2xl relative overflow-hidden backdrop-blur-sm">
           {/* Header background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
           
@@ -1202,12 +1202,12 @@ export default function TerminalEffect({
             <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer" title="Minimize"></div>
             <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer" title="Maximize"></div>
           </div>
-          <div className="ml-4 text-sm font-mono font-semibold tracking-wider relative z-10" style={{ color: '#cbd5e1' }}>
+          <div className="ml-2 sm:ml-4 text-xs sm:text-sm font-mono font-semibold tracking-wider relative z-10" style={{ color: '#cbd5e1' }}>
             levi@portfolio:~ <span style={{ color: '#ef4444' }}>/dev/portfolio</span>
           </div>
           
           {/* Enhanced system status indicators */}
-          <div className="ml-auto flex items-center gap-4 text-xs font-mono relative z-10" style={{ color: '#64748b' }}>
+          <div className="ml-auto flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono relative z-10" style={{ color: '#64748b' }}>
             <motion.div
               className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
               style={{ 
@@ -1384,9 +1384,9 @@ export default function TerminalEffect({
         {/* Enhanced terminal body with multiple layers */}
         <motion.div
           ref={containerRef}
-          className="terminal-body backdrop-blur-sm p-8 font-mono text-sm md:text-base rounded-b-2xl border-t overflow-y-auto relative shadow-inner scrollbar-hide"
+          className="terminal-body backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 font-mono text-xs sm:text-sm md:text-base rounded-b-2xl border-t overflow-y-auto overflow-x-auto relative shadow-inner scrollbar-hide"
           style={{ 
-            maxHeight: "700px",
+            maxHeight: "70vh",
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             color: '#f8fafc',
             borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -1438,12 +1438,8 @@ export default function TerminalEffect({
                 transition={{ duration: 0.5 }}
                 className="mt-4 flex justify-center"
               >
-                <div className="p-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 rounded-lg backdrop-blur-sm shadow-lg"
-                  style={{ 
-                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 8px 25px rgba(0, 0, 0, 0.4)'
-                  }}
-                >
-                  <XrpChart data={xrpData.history} price={xrpData.price} change24h={xrpData.change24h} width={450} height={120} />
+                <div className="p-2 sm:p-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 rounded-lg backdrop-blur-sm shadow-lg max-w-full w-full sm:w-auto">
+                  <XrpChart data={xrpData.history} price={xrpData.price} change24h={xrpData.change24h} width={Math.min(450, typeof window !== 'undefined' ? window.innerWidth - 48 : 300)} height={120} />
                 </div>
               </motion.div>
             )}
@@ -1523,11 +1519,11 @@ export default function TerminalEffect({
         </motion.div>
 
         {/* Enhanced terminal footer with depth */}
-        <div className="px-6 py-2 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-t border-white/20 rounded-b-2xl text-xs font-mono relative overflow-hidden backdrop-blur-sm">
+        <div className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-t border-white/20 rounded-b-2xl text-xs font-mono relative overflow-hidden backdrop-blur-sm">
           {/* Footer background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
           
-          <div className="flex justify-between items-center relative z-10" style={{ color: '#64748b' }}>
+          <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-4 relative z-10" style={{ color: '#64748b' }}>
             {/* Enhanced mode toggle button with Glass UI */}
             <div
               className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-white/10 border border-white/20 backdrop-blur-md hover:bg-white/15 transition-all duration-300 cursor-pointer group shadow-lg"
