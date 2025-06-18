@@ -92,7 +92,7 @@ export default function Navbar() {
             <div className="absolute inset-0 bg-red-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
           <span className="text-lg sm:text-xl lg:text-2xl font-bold font-orbitron text-white group-hover:text-red-300 transition-colors duration-300">
-            LEVI<span className="text-red-500">.DEV</span>
+            LEVIK<span className="text-red-500">.DEV</span>
           </span>
         </Link>
         {/* Desktop Navigation */}

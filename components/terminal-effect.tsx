@@ -887,10 +887,12 @@ export default function TerminalEffect({
       }
       if (cmd === 'dox') {
         setDisplayedText(prev => prev + `\nFetching IP info...\n`)
+        setDisplayedText(prev => prev + `\nFetching GEO info...\n`)
+
         fetch('https://ipinfo.io/json?token=febca1646e0805')
           .then(res => res.json())
           .then(data => {
-            const jsonStr = `// --- IPInfo Data ---\n${JSON.stringify(data, null, 2)}\n// --- End ---\n`
+            const jsonStr = `\n${JSON.stringify(data, null, 2)}\n`
             setPendingTypeQueue(jsonStr)
           })
           .catch(() => {
