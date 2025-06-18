@@ -1,0 +1,574 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #ff0000;
+  --primary-dark: #cc0000;
+  --primary-light: #ff3333;
+  --background: #000000;
+  --foreground: #ffffff;
+  --accent: #ff3333;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Matrix animation specific styles */
+@font-face {
+  font-family: "matrix";
+  src: url("https://rezmason.github.io/matrix/fonts/matrix-code.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.matrix-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
+  mix-blend-mode: screen;
+}
+
+/* Rest of your existing CSS */
+.glass-effect {
+  @apply backdrop-blur-md bg-black/35 border-b border-white/10;
+}
+
+.section-padding {
+  @apply py-16 md:py-24 px-4 md:px-8 max-w-7xl mx-auto;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-in-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-in-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-red-700;
+}
+
+.card {
+  @apply rounded-lg overflow-hidden bg-black/50 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/20;
+}
+
+/* Neon glow effects */
+.neon-text {
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.7), 0 0 10px rgba(255, 0, 0, 0.5), 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+.neon-border {
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.7), 0 0 10px rgba(255, 0, 0, 0.5), 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+/* Circuit board pattern */
+.circuit-pattern {
+  background-image: linear-gradient(rgba(255, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Glowing button effect */
+.glow-button {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.glow-button::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff0000, #ff3333, #ff0000);
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.glow-button:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced button styles */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  background: rgba(30, 41, 59, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.btn-secondary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.5s;
+}
+
+.btn-secondary:hover::before {
+  left: 100%;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s infinite ease-in-out;
+}
+
+/* Optimized circuit background styles */
+.circuit-bg-image {
+  image-rendering: -webkit-optimize-contrast; /* Improve image sharpness in Chrome */
+  image-rendering: crisp-edges; /* Improve image sharpness in Firefox */
+  backface-visibility: hidden; /* Prevent blurry text during animations */
+  transform: translateZ(0); /* Force GPU acceleration */
+  will-change: transform; /* Hint to browser about animation */
+  filter: contrast(1.05) brightness(1.1); /* Enhance image clarity */
+}
+
+/* Add a subtle animation to the circuit background */
+@keyframes pulseOpacity {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.circuit-bg-image {
+  animation: pulseOpacity 8s ease-in-out infinite;
+}
+
+/* Enhance the circuit animation */
+.circuit-animation {
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.2), transparent);
+  background-size: 100% 100%;
+  animation: circuitFlow 8s linear infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes circuitFlow {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Enhance scan line effect */
+.scan-line {
+  background: linear-gradient(to bottom, transparent, rgba(255, 0, 0, 0.1), transparent);
+  background-size: 100% 10px;
+  animation: scanLine 3s linear infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@keyframes scanLine {
+  0% {
+    background-position: 0 -100%;
+  }
+  100% {
+    background-position: 0 200%;
+  }
+}
+
+/* Radial gradient */
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+/* Terminal effect styles */
+.terminal-container {
+  @apply shadow-lg shadow-red-500/10;
+  max-width: 100%;
+}
+
+.terminal-body {
+  height: 300px;
+  white-space: pre-wrap;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  line-height: 1.5;
+}
+
+.terminal-line {
+  min-height: 1.5em;
+}
+
+/* Terminal typing animation */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background-color: #ff0000;
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+/* Matrix animation styles - ensure these are properly defined */
+canvas.matrix-rain {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: auto;
+  opacity: 0.7;
+  mix-blend-mode: screen;
+}
+
+/* Gradient animation */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradientFlow 15s ease infinite;
+}
+
+/* Enhanced radial gradient */
+.radial-gradient {
+  background: radial-gradient(circle at center, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+}
+
+/* Horizontal scroll animation for tech stack */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
+/* Enhanced carousel backdrop effects */
+.carousel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.4) 0%, 
+    rgba(0, 0, 0, 0.3) 50%, 
+    rgba(0, 0, 0, 0.4) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.carousel-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    transparent 0%, 
+    rgba(239, 68, 68, 0.1) 25%, 
+    transparent 50%, 
+    rgba(239, 68, 68, 0.05) 75%, 
+    transparent 100%);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.carousel-backdrop:hover .carousel-glow {
+  opacity: 1;
+}
+
+/* Enhanced scan line effect for carousel */
+.carousel-scan-line {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 100% 4px;
+  animation: carouselScan 4s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+@keyframes carouselScan {
+  0% {
+    background-position: 0 -100%;
+  }
+  100% {
+    background-position: 0 200%;
+  }
+}
+
+/* Geometric pattern overlay */
+.geometric-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.02) 50%, transparent 60%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Enhanced tech card hover effects */
+.tech-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tech-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.tech-card:hover::before {
+  left: 100%;
+}
+
+.tech-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 25px rgba(239, 68, 68, 0.2);
+}
+
+/* Floating particles effect */
+.floating-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(239, 68, 68, 0.6);
+  border-radius: 50%;
+  animation: float-particle 6s linear infinite;
+}
+
+.floating-particle:nth-child(1) {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-particle:nth-child(2) {
+  top: 60%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+.floating-particle:nth-child(3) {
+  top: 80%;
+  left: 30%;
+  animation-delay: 4s;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50px);
+    opacity: 0;
+  }
+}
+
+/* Text shadow glow effect for mobile navbar */
+.text-shadow-glow {
+  text-shadow: 
+    0 0 5px rgba(239, 68, 68, 0.7),
+    0 0 10px rgba(239, 68, 68, 0.5),
+    0 0 15px rgba(239, 68, 68, 0.3),
+    0 0 20px rgba(239, 68, 68, 0.2);
+}
