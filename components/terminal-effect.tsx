@@ -1218,13 +1218,8 @@ export default function TerminalEffect({
           
           {/* Enhanced system status indicators */}
           <div className="ml-auto flex flex-wrap items-center gap-1 sm:gap-2 md:gap-4 text-xs font-mono relative z-10" style={{ color: '#64748b' }}>
-            {/* Mobile: show a small dot for online/offline */}
-            <span className="flex sm:hidden items-center" title={networkStatus}>
-              <span className={`inline-block w-2 h-2 rounded-full mr-1 ${networkStatus === 'online' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-            </span>
-            {/* Desktop: show full status */}
             <motion.div
-              className="hidden sm:flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
+              className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
               style={{ 
                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
               }}
