@@ -398,19 +398,11 @@ canvas.matrix-rain {
 }
 
 .animate-scroll {
-  animation: scroll 20s linear infinite;
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  animation: scroll 12s linear infinite;
 }
 
 .animate-scroll-mobile {
   animation: scroll 8s linear infinite;
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
 }
 
 /* Enhanced carousel backdrop effects */
@@ -495,11 +487,6 @@ canvas.matrix-rain {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
 }
 
 .tech-card::before {
@@ -523,28 +510,10 @@ canvas.matrix-rain {
 }
 
 .tech-card:hover {
-  transform: translateY(-4px) scale(1.02) translateZ(0);
+  transform: translateY(-4px) scale(1.02);
   box-shadow: 
     0 20px 40px rgba(0, 0, 0, 0.3),
     0 0 25px rgba(239, 68, 68, 0.2);
-}
-
-/* Mobile optimizations for tech cards */
-@media (max-width: 768px) {
-  .tech-card {
-    transition: all 0.2s ease;
-  }
-  
-  .tech-card:hover {
-    transform: translateY(-2px) scale(1.01) translateZ(0);
-    box-shadow: 
-      0 10px 20px rgba(0, 0, 0, 0.2),
-      0 0 15px rgba(239, 68, 68, 0.15);
-  }
-  
-  .tech-card::before {
-    transition: left 0.3s ease;
-  }
 }
 
 /* Floating particles effect */
