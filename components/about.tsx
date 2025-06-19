@@ -48,7 +48,7 @@ export default function About() {
     { label: "Availability", value: "available", type: 'availability' }
   ], [])
 
-  const imageUrl = "https://media.discordapp.net/attachments/749911202779365448/1384714073245224960/IMG_0290.jpg?ex=68536ef9&is=68521d79&hm=9d80c38f5be5520f40e54282988dfa2ce6adce3b121f921eea2948b7e04f38f4&=&format=webp&&height=600&width=600"
+  const imageUrl = "/images/about.jpg"
 
   return (
     <section id="about" className="section-padding py-24">
