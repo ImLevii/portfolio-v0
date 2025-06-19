@@ -248,15 +248,14 @@ export default function Hero({ geo }: HeroProps) {
             transition={{ duration: 0.8 }}
             className="text-center lg:text-left py-4 sm:py-0"
           >
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-4 relative">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-4 relative leading-tight">
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="block text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-slate-400 to-slate-500 relative"
+                className="block text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-slate-400 to-slate-500 relative sm:transform-none sm:perspective-[1000px] sm:rotate-x-[2deg]"
                 style={{
                   textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
-                  transform: "perspective(1000px) rotateX(2deg)",
                 }}
               >
                Full-Stack Developer
@@ -265,17 +264,13 @@ export default function Hero({ geo }: HeroProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="block mt-1 relative"
-                style={{
-                  transform: "perspective(1000px) rotateX(-2deg)",
-                }}
+                className="block mt-1 relative sm:transform-none sm:perspective-[1000px] sm:rotate-x-[-2deg]"
               >
                 & Digital{" "}
                 <span 
-                  className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 animate-gradient-x relative inline-block"
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 animate-gradient-x relative inline-block sm:translate-z-[20px]"
                   style={{
                     textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
-                    transform: "translateZ(20px)",
                   }}
                 >
                 Architect
