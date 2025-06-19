@@ -398,7 +398,7 @@ canvas.matrix-rain {
 }
 
 .animate-scroll {
-  animation: scroll 30s linear infinite;
+  animation: scroll 12s linear infinite;
 }
 
 /* Enhanced carousel backdrop effects */

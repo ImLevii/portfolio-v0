@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { motion, useInView } from "framer-motion"
 import Image from "next/image"
 
@@ -69,7 +69,72 @@ const techStack = [
 
 export default function Skills() {
   const ref = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
+
+  // Handle mouse/touch events for drag functionality
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true)
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    setStartX(clientX - (scrollRef.current?.offsetLeft || 0))
+    setScrollLeft(scrollRef.current?.scrollLeft || 0)
+    
+    // Pause the animation when dragging starts
+    if (scrollRef.current) {
+      scrollRef.current.style.animationPlayState = 'paused'
+    }
+  }
+
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return
+    e.preventDefault()
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    const x = clientX - (scrollRef.current?.offsetLeft || 0)
+    const walk = (x - startX) * 2
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollLeft - walk
+    }
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+    // Resume the animation when dragging ends
+    if (scrollRef.current) {
+      scrollRef.current.style.animationPlayState = 'running'
+    }
+  }
+
+  // Add event listeners for drag functionality
+  useEffect(() => {
+    const scrollElement = scrollRef.current
+    if (!scrollElement) return
+
+    const handleMouseLeave = () => {
+      setIsDragging(false)
+      if (scrollElement) {
+        scrollElement.style.animationPlayState = 'running'
+      }
+    }
+    const handleMouseUpGlobal = () => {
+      setIsDragging(false)
+      if (scrollElement) {
+        scrollElement.style.animationPlayState = 'running'
+      }
+    }
+
+    scrollElement.addEventListener('mouseleave', handleMouseLeave)
+    document.addEventListener('mouseup', handleMouseUpGlobal)
+    document.addEventListener('touchend', handleMouseUpGlobal)
+
+    return () => {
+      scrollElement.removeEventListener('mouseleave', handleMouseLeave)
+      document.removeEventListener('mouseup', handleMouseUpGlobal)
+      document.removeEventListener('touchend', handleMouseUpGlobal)
+    }
+  }, [])
 
   return (
     <section id="skills" className="section-padding py-24 relative overflow-hidden">
@@ -129,7 +194,22 @@ export default function Skills() {
             
             {/* Carousel content */}
             <div className="relative overflow-hidden p-8 rounded-xl">
-              <div className="flex animate-scroll">
+              <div 
+                ref={scrollRef}
+                className="flex animate-scroll cursor-grab active:cursor-grabbing select-none"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onTouchStart={handleMouseDown}
+                onTouchMove={handleMouseMove}
+                onTouchEnd={handleMouseUp}
+                style={{ 
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
+                }}
+              >
                 {/* First set of items */}
                 {techStack.map((tech, index) => (
                   <div
