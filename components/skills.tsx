@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
 import Image from "next/image"
 
@@ -69,72 +69,7 @@ const techStack = [
 
 export default function Skills() {
   const ref = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
-  const [isDragging, setIsDragging] = useState(false)
-  const [startX, setStartX] = useState(0)
-  const [scrollLeft, setScrollLeft] = useState(0)
-
-  // Handle mouse/touch events for drag functionality
-  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true)
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    setStartX(clientX - (scrollRef.current?.offsetLeft || 0))
-    setScrollLeft(scrollRef.current?.scrollLeft || 0)
-    
-    // Pause the animation when dragging starts
-    if (scrollRef.current) {
-      scrollRef.current.style.animationPlayState = 'paused'
-    }
-  }
-
-  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return
-    e.preventDefault()
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    const x = clientX - (scrollRef.current?.offsetLeft || 0)
-    const walk = (x - startX) * 2
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = scrollLeft - walk
-    }
-  }
-
-  const handleMouseUp = () => {
-    setIsDragging(false)
-    // Resume the animation when dragging ends
-    if (scrollRef.current) {
-      scrollRef.current.style.animationPlayState = 'running'
-    }
-  }
-
-  // Add event listeners for drag functionality
-  useEffect(() => {
-    const scrollElement = scrollRef.current
-    if (!scrollElement) return
-
-    const handleMouseLeave = () => {
-      setIsDragging(false)
-      if (scrollElement) {
-        scrollElement.style.animationPlayState = 'running'
-      }
-    }
-    const handleMouseUpGlobal = () => {
-      setIsDragging(false)
-      if (scrollElement) {
-        scrollElement.style.animationPlayState = 'running'
-      }
-    }
-
-    scrollElement.addEventListener('mouseleave', handleMouseLeave)
-    document.addEventListener('mouseup', handleMouseUpGlobal)
-    document.addEventListener('touchend', handleMouseUpGlobal)
-
-    return () => {
-      scrollElement.removeEventListener('mouseleave', handleMouseLeave)
-      document.removeEventListener('mouseup', handleMouseUpGlobal)
-      document.removeEventListener('touchend', handleMouseUpGlobal)
-    }
-  }, [])
 
   return (
     <section id="skills" className="section-padding py-24 relative overflow-hidden">
@@ -166,7 +101,7 @@ export default function Skills() {
           className="mt-16"
         >
           {/* Enhanced carousel container with sophisticated backdrop */}
-          <div className="relative mx-4 md:mx-8">
+          <div className="relative mx-2 sm:mx-4 md:mx-8">
             {/* Carousel backdrop with multiple layers */}
             <div className="absolute inset-0 rounded-2xl carousel-backdrop">
               {/* Animated SVG background */}
@@ -193,33 +128,18 @@ export default function Skills() {
             </div>
             
             {/* Carousel content */}
-            <div className="relative overflow-hidden p-8 rounded-xl">
-              <div 
-                ref={scrollRef}
-                className="flex animate-scroll cursor-grab active:cursor-grabbing select-none"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onTouchStart={handleMouseDown}
-                onTouchMove={handleMouseMove}
-                onTouchEnd={handleMouseUp}
-                style={{ 
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  MozUserSelect: 'none',
-                  msUserSelect: 'none'
-                }}
-              >
+            <div className="relative overflow-hidden p-4 sm:p-6 md:p-8 rounded-xl">
+              <div className="flex animate-scroll-mobile md:animate-scroll">
                 {/* First set of items */}
                 {techStack.map((tech, index) => (
                   <div
                     key={`first-${index}`}
-                    className="tech-card flex-shrink-0 mx-4 px-6 py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
+                    className="tech-card flex-shrink-0 mx-2 sm:mx-3 md:mx-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] md:min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    <div className="relative z-10 w-12 h-12 mb-2 flex items-center justify-center">
+                    <div className="relative z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mb-2 flex items-center justify-center">
                       <Image
                         src={tech.logo}
                         alt={tech.name}
@@ -228,19 +148,19 @@ export default function Skills() {
                         className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
                       />
                     </div>
-                    <span className="relative z-10 text-white font-medium text-sm text-center group-hover:text-red-300 transition-colors duration-300">{tech.name}</span>
+                    <span className="relative z-10 text-white font-medium text-xs sm:text-sm text-center group-hover:text-red-300 transition-colors duration-300">{tech.name}</span>
                   </div>
                 ))}
                 {/* Duplicate set for seamless loop */}
                 {techStack.map((tech, index) => (
                   <div
                     key={`second-${index}`}
-                    className="tech-card flex-shrink-0 mx-4 px-6 py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
+                    className="tech-card flex-shrink-0 mx-2 sm:mx-3 md:mx-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] md:min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    <div className="relative z-10 w-12 h-12 mb-2 flex items-center justify-center">
+                    <div className="relative z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mb-2 flex items-center justify-center">
                       <Image
                         src={tech.logo}
                         alt={tech.name}
@@ -249,7 +169,7 @@ export default function Skills() {
                         className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
                       />
                     </div>
-                    <span className="relative z-10 text-white font-medium text-sm text-center group-hover:text-red-300 transition-colors duration-300">{tech.name}</span>
+                    <span className="relative z-10 text-white font-medium text-xs sm:text-sm text-center group-hover:text-red-300 transition-colors duration-300">{tech.name}</span>
                   </div>
                 ))}
               </div>
