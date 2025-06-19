@@ -151,7 +151,7 @@ export default function Hero({ geo }: HeroProps) {
   return (
     <section
       id="home"
-      className="min-h-screen sm:min-h-[90vh] flex items-center justify-center relative overflow-hidden"
+      className="min-h-[100dvh] sm:min-h-[90vh] flex items-center justify-center relative overflow-hidden py-8 sm:py-0"
       ref={containerRef}
     >
       {/* Matrix Background - only render on client side */}
@@ -239,14 +239,14 @@ export default function Hero({ geo }: HeroProps) {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 relative z-50">
-        <div className="grid lg:grid-cols-2 gap-6 items-center">
+      <div className="container mx-auto px-4 relative z-50 h-full flex flex-col justify-center">
+        <div className="grid lg:grid-cols-2 gap-6 items-center min-h-0">
           {/* Left side - Text content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center lg:text-left"
+            className="text-center lg:text-left py-4 sm:py-0"
           >
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-4 relative">
               <motion.span
@@ -365,7 +365,7 @@ export default function Hero({ geo }: HeroProps) {
         </div>
 
         {/* Terminal effect for mobile - below the main content */}
-        <div className="mt-8 lg:hidden">
+        <div className="mt-4 sm:mt-8 lg:hidden flex-shrink-0">
           <TerminalEffect />
         </div>
       </div>
