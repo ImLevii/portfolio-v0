@@ -59,11 +59,11 @@ const techStack = [
   },
   {
     name: "Framer Motion",
-    logo: "https://cdn.worldvectorlogo.com/logos/framer-1.svg"
+    logo: "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/design/framer-juy68xjgctdz8ny5xhq3lb.png/framer-327cd591thw0mfx6rzkm4q.png?_a=DATAdtXyZAA0"
   },
   {
     name: "WebGL",
-    logo: "https://www.khronos.org/assets/images/logo/khronos-group-logo.svg"
+    logo: "https://images.icon-icons.com/3915/PNG/512/webgl_logo_icon_249211.png"
   }
 ]
 
@@ -129,7 +129,7 @@ export default function Skills() {
             
             {/* Carousel content */}
             <div className="relative overflow-hidden p-3 sm:p-4 md:p-6 lg:p-8 rounded-xl">
-              <div className="flex animate-scroll-mobile md:animate-scroll">
+              <div className="carousel-track flex min-w-max animate-scroll-mobile md:animate-scroll">
                 {/* First set of items */}
                 {techStack.map((tech, index) => (
                   <div
