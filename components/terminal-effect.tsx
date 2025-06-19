@@ -1213,7 +1213,7 @@ export default function TerminalEffect({
             <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer" title="Maximize"></div>
           </div>
           <div className="ml-1 sm:ml-2 md:ml-4 text-[10px] sm:text-xs md:text-sm font-mono font-semibold tracking-wider relative z-10" style={{ color: '#cbd5e1' }}>
-            levi@portfolio:~ <span style={{ color: '#ef4444' }}>/dev/portfolio</span>
+            levi@portfolio:~ <span style={{ color: '#ef4444' }}>levik.dev</span>
           </div>
           
           {/* Enhanced system status indicators */}
