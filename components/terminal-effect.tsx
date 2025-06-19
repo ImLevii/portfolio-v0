@@ -1203,28 +1203,25 @@ export default function TerminalEffect({
         }}
       >
         {/* Enhanced terminal header with depth */}
-        <div className="terminal-header flex flex-wrap items-center gap-1 sm:gap-2 md:gap-4 px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-3 lg:px-6 lg:py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-2xl relative overflow-hidden backdrop-blur-sm">
+        <div className="terminal-header flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 px-1.5 py-1 sm:px-3 sm:py-2 md:px-4 md:py-3 lg:px-6 lg:py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-2xl relative overflow-hidden backdrop-blur-sm min-h-[36px]">
           {/* Header background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
-          
-          <div className="flex gap-1 sm:gap-2 relative z-10">
+          <div className="flex gap-0.5 sm:gap-2 relative z-10">
             <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer" title="Close"></div>
             <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer" title="Minimize"></div>
             <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer" title="Maximize"></div>
           </div>
-          <div className="ml-1 sm:ml-2 md:ml-4 text-[10px] sm:text-xs md:text-sm font-mono font-semibold tracking-wider relative z-10" style={{ color: '#cbd5e1' }}>
+          <div className="ml-1 sm:ml-2 md:ml-4 text-[9px] sm:text-xs md:text-sm font-mono font-semibold tracking-wider relative z-10 truncate max-w-[40vw] sm:max-w-none">
             levi@portfolio:~ <span style={{ color: '#ef4444' }}>levik.dev</span>
           </div>
-          
-          {/* Enhanced system status indicators */}
-          <div className="ml-auto flex flex-wrap items-center gap-1 sm:gap-2 md:gap-4 text-xs font-mono relative z-10" style={{ color: '#64748b' }}>
+          <div className="ml-auto flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 text-[10px] sm:text-xs font-mono relative z-10 min-w-0">
             <motion.div
-              className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
+              className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm min-w-0"
               style={{ 
                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
               }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <motion.svg
                   width="12"
                   height="12"
