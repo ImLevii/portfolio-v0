@@ -1445,7 +1445,7 @@ export default function TerminalEffect({
                 transition={{ duration: 0.5 }}
                 className="mt-4 flex justify-center"
               >
-                <div className="p-2 sm:p-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 rounded-lg backdrop-blur-sm shadow-lg max-w-full w-full sm:w-auto">
+                <div className="xrp-chart-container p-2 sm:p-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 rounded-lg backdrop-blur-sm shadow-lg max-w-full w-full sm:w-auto">
                   <XrpChart data={xrpData.history} price={xrpData.price} change24h={xrpData.change24h} width={Math.min(450, typeof window !== 'undefined' ? window.innerWidth - 48 : 300)} height={120} />
                 </div>
               </motion.div>
