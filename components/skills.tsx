@@ -129,12 +129,12 @@ export default function Skills() {
             
             {/* Carousel content */}
             <div className="relative overflow-hidden p-4 sm:p-6 md:p-8 rounded-xl">
-              <div className="flex animate-scroll-mobile md:animate-scroll">
+              <div className="flex animate-scroll-mobile md:animate-scroll transform-gpu">
                 {/* First set of items */}
                 {techStack.map((tech, index) => (
                   <div
                     key={`first-${index}`}
-                    className="tech-card flex-shrink-0 mx-2 sm:mx-3 md:mx-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] md:min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
+                    className="tech-card flex-shrink-0 mx-2 sm:mx-3 md:mx-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] md:min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group transform-gpu"
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -155,7 +155,7 @@ export default function Skills() {
                 {techStack.map((tech, index) => (
                   <div
                     key={`second-${index}`}
-                    className="tech-card flex-shrink-0 mx-2 sm:mx-3 md:mx-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] md:min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group"
+                    className="tech-card flex-shrink-0 mx-2 sm:mx-3 md:mx-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-red-500/50 transition-all duration-300 hover:bg-white/15 flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] md:min-w-[120px] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-red-500/20 group transform-gpu"
                   >
                     {/* Glow effect on hover */}
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
