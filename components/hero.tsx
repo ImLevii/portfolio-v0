@@ -342,7 +342,7 @@ export default function Hero({ geo }: HeroProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="hidden sm:flex flex-col sm:flex-row gap-4 justify-center lg:justify-start relative"
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start relative"
             >
               <a
                 href="#projects"

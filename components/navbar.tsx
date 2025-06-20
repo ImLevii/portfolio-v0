@@ -76,7 +76,9 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-30 transition-all duration-500 font-bold text-black",
+        typeof window !== 'undefined' && window.innerWidth < 640
+          ? "fixed top-0 left-0 right-0 z-10 transition-all duration-500 font-bold text-black"
+          : "fixed top-0 left-0 right-0 z-30 transition-all duration-500 font-bold text-black",
         "bg-black/40 backdrop-blur-xl",
         "border-b border-red-500/10",
         "shadow-[0_2px_15px_-3px_rgba(239,68,68,0.07)]",
