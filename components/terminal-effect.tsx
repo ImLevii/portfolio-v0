@@ -1154,16 +1154,16 @@ export default function TerminalEffect({
   // Infinite scroll: load more lines when scrolled to top
   useEffect(() => {
     const container = containerRef.current
-    if (!container) return
+    if (!container || (typeof window !== 'undefined' && window.innerWidth < 768)) return // Disable on mobile
     const handleScroll = () => {
-      if (container.scrollTop === 0 && visibleLines < totalLines && !isInteractive) {
+      if (container.scrollTop === 0 && visibleLines < totalLines) {
         prevScrollHeight.current = container.scrollHeight
         setVisibleLines((v) => Math.min(v + 30, totalLines))
       }
     }
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
-  }, [visibleLines, totalLines, isInteractive])
+  }, [visibleLines, totalLines])
 
   // Keep scroll position stable when loading more
   useEffect(() => {

@@ -172,13 +172,13 @@ export default function Contact() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="col-span-3 lg:col-span-2 relative"
+            className="lg:col-span-2 relative"
           >
             <AnimatedFormBg />
-            <form onSubmit={handleSubmit} className="card p-8 relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 focus-within:border-[#ff3b3b] hover:border-[#ff3b3b]">
+            <form onSubmit={handleSubmit} className="card p-8 relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden group transition-all duration-300 focus-within:border-[#ff3b3b] hover:border-[#ff3b3b]">
               {/* Animated border glow */}
-              <div className="absolute inset-0 rounded-2xl pointer-events-none border-2 border-[#ff3b3b]/30 opacity-0 focus-within:opacity-100 transition-all duration-500 blur-sm animate-pulse-slow" />
-              <div className="grid gap-6 mb-6">
+              <div className="absolute inset-0 rounded-2xl pointer-events-none border-2 border-[#ff3b3b]/30 opacity-0 group-focus-within:opacity-100 group-hover:opacity-80 transition-all duration-500 blur-sm animate-pulse-slow" />
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                   <input
