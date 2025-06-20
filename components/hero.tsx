@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ArrowDown } from "lucide-react"
+import { ArrowDown, Briefcase, User, Mail } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import TerminalEffect from "./terminal-effect"
 import dynamic from "next/dynamic"
+import { useThrottle } from "@/hooks/use-throttle"
 
 // Dynamically import the MatrixRain component with no SSR
 const MatrixRain = dynamic(() => import("./matrix-rain"), { ssr: false })
@@ -99,6 +100,9 @@ export default function Hero({ geo }: HeroProps) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [isClient, setIsClient] = useState(false)
 
+  const throttledCursorPosition = useThrottle(cursorPosition, 30)
+  const throttledDimensions = useThrottle(dimensions, 100)
+
   // Set isClient to true when component mounts
   useEffect(() => {
     setIsClient(true)
@@ -148,15 +152,24 @@ export default function Hero({ geo }: HeroProps) {
     return () => document.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
+  // Smooth scroll handler for hero buttons
+  const handleHeroButtonClick = (e: React.MouseEvent<HTMLAnchorElement>, target: string) => {
+    e.preventDefault();
+    const el = document.querySelector(target);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section
       id="home"
-      className="min-h-[100dvh] sm:min-h-[90vh] flex items-center justify-center relative overflow-hidden py-8 sm:py-0"
+      className="min-h-[70vh] sm:min-h-[60vh] flex items-center justify-center relative overflow-hidden py-8 sm:py-0"
       ref={containerRef}
     >
       {/* Matrix Background - only render on client side */}
       {isClient && (
-        <MatrixRain color="#ff0000" glowIntensity={0.3} density={0.3} speed={0.8} opacity={0.4} interactive={true} />
+        <MatrixRain color="#ff0000" glowIntensity={0.3} density={0.3} speed={0.8} opacity={0.4} interactive={false} />
       )}
 
       {/* Background layers */}
@@ -173,7 +186,7 @@ export default function Hero({ geo }: HeroProps) {
             <Image
               src="/images/circuit-bg.png"
               alt="Circuit background"
-              quality={90}
+              quality={70}
               priority
               fill
               sizes="100vw"
@@ -333,19 +346,56 @@ export default function Hero({ geo }: HeroProps) {
             >
               <a
                 href="#projects"
-                className="btn-primary group relative px-6 py-3 text-white rounded-md transition-all duration-300 font-medium text-base overflow-hidden"
+                onClick={e => handleHeroButtonClick(e, '#projects')}
+                className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg"
+                style={{
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                }}
               >
-                <span className="relative z-10">View My Work</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-600/20 to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  className="flex items-center"
+                >
+                  <Briefcase size={20} className="text-red-400 drop-shadow" />
+                </motion.span>
+                <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                  style={{
+                    color: '#ef4444',
+                    textShadow: '0 0 8px rgba(239,68,68,0.8)',
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                  }}
+                >
+                  SHOWCASE
+                </span>
               </a>
+
               <a
-                href="#about"
-                className="btn-secondary group relative px-6 py-3 text-white rounded-md transition-all duration-300 font-medium text-base overflow-hidden"
+                href="#contact"
+                onClick={e => handleHeroButtonClick(e, '#contact')}
+                className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg"
+                style={{
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                }}
               >
-                <span className="relative z-10">About Me</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/20 to-slate-800/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, delay: 0.3 }}
+                  className="flex items-center"
+                >
+                  <Mail size={20} className="text-green-400 drop-shadow" />
+                </motion.span>
+                <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                  style={{
+                    color: '#22c55e',
+                    textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                  }}
+                >
+                  Contact
+                </span>
               </a>
             </motion.div>
           </motion.div>

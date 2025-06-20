@@ -7,7 +7,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -42,6 +41,18 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'www.framer.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.streamlinehq.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.icon-icons.com',
         port: '',
         pathname: '/**',
       },

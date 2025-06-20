@@ -3,6 +3,8 @@
 import { useRef, useMemo } from "react"
 import { motion, useInView } from "framer-motion"
 import Image from "next/image"
+import { Mail } from "lucide-react"
+import React from "react"
 
 // Custom availability status component with memoization
 const AvailabilityStatus = ({ status = "available" }: { status?: "available" | "busy" | "unavailable" }) => {
@@ -124,10 +126,36 @@ export default function About() {
 
             <a
               href="#contact"
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-300 inline-block font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              onClick={e => {
+                e.preventDefault();
+                const el = document.querySelector('#contact');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg w-max"
+              style={{
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+              }}
               aria-label="Navigate to contact section"
             >
-              Contact Me
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, delay: 0.3 }}
+                className="flex items-center"
+              >
+                <Mail size={20} className="text-green-400 drop-shadow" />
+              </motion.span>
+              <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                style={{
+                  color: '#22c55e',
+                  textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                }}
+              >
+                Contact
+              </span>
             </a>
           </motion.div>
         </div>
