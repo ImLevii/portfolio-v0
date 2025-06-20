@@ -8,6 +8,129 @@ import TerminalEffect from "./terminal-effect"
 import dynamic from "next/dynamic"
 import { useThrottle } from "@/hooks/use-throttle"
 
+const AnimatedShowcaseIcon = ({ size = 20, color = "#f87171" }) => (
+  <motion.svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* The eye shape */}
+    <motion.path
+      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 1 }}
+    />
+    
+    {/* The iris/pupil that animates */}
+    <motion.circle
+      cx="12"
+      cy="12"
+      initial={{ r: 0 }}
+      animate={{ r: [0, 4, 2.5, 4, 2.5, 4, 0] }}
+      transition={{
+        duration: 4,
+        ease: "easeInOut",
+        repeat: Infinity,
+        repeatDelay: 1,
+      }}
+    />
+    
+    {/* A subtle glow effect on the iris */}
+    <motion.circle
+        cx="12"
+        cy="12"
+        r="4"
+        stroke="none"
+        fill={color}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.3, 0.1, 0.3, 0.1, 0.3, 0] }}
+        transition={{
+            duration: 4,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatDelay: 1,
+        }}
+    />
+  </motion.svg>
+);
+
+const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: number, color?: string }) => (
+  <motion.svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Envelope body */}
+    <path
+      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 6L12 13L2 6"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    
+    {/* Animated data stream */}
+    <motion.path
+      d="M1 12 H 11"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
+      animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut",
+        delay: 0
+      }}
+    />
+    <motion.path
+      d="M1 9 H 9"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
+      animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut",
+        delay: 0.2
+      }}
+    />
+    <motion.path
+      d="M1 15 H 7"
+      stroke={color}
+      strokeWidth="1"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
+      animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut",
+        delay: 0.4
+      }}
+    />
+  </motion.svg>
+)
+
 // Dynamically import the MatrixRain component with no SSR
 const MatrixRain = dynamic(() => import("./matrix-rain"), { ssr: false })
 
@@ -346,48 +469,42 @@ export default function Hero({ geo }: HeroProps) {
             >
               <a
                 href="#projects"
-                onClick={e => handleHeroButtonClick(e, '#projects')}
+                onClick={(e) => handleHeroButtonClick(e, '#projects')}
                 className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg"
                 style={{
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
                 }}
               >
+                <AnimatedShowcaseIcon />
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.7, delay: 0.1 }}
-                  className="flex items-center"
-                >
-                  <Briefcase size={20} className="text-red-400 drop-shadow" />
-                </motion.span>
-                <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                  className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
                   style={{
                     color: '#ef4444',
                     textShadow: '0 0 8px rgba(239,68,68,0.8)',
                     filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
                   }}
                 >
-                  SHOWCASE
-                </span>
+                  Showcase
+                </motion.span>
               </a>
 
               <a
                 href="#contact"
-                onClick={e => handleHeroButtonClick(e, '#contact')}
+                onClick={(e) => handleHeroButtonClick(e, '#contact')}
                 className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg"
                 style={{
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
                 }}
               >
+                <AnimatedDataStreamMailIcon size={20} color="#22c55e" />
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.7, delay: 0.3 }}
-                  className="flex items-center"
-                >
-                  <Mail size={20} className="text-green-400 drop-shadow" />
-                </motion.span>
-                <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                  className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
                   style={{
                     color: '#22c55e',
                     textShadow: '0 0 8px rgba(34,197,94,0.8)',
@@ -395,7 +512,7 @@ export default function Hero({ geo }: HeroProps) {
                   }}
                 >
                   Contact
-                </span>
+                </motion.span>
               </a>
             </motion.div>
           </motion.div>

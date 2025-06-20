@@ -1184,29 +1184,22 @@ export default function TerminalEffect({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className={`terminal-container relative w-full max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto ${className}`}
+      className={`terminal-container relative w-full max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm rounded-md shadow-lg ${className}`}
+      style={{
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+      }}
       onMouseEnter={() => setHoverEffect(true)}
       onMouseLeave={() => setHoverEffect(false)}
     >
-      {/* Multi-layered background effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-black/40 to-red-800/20 rounded-2xl blur-3xl animate-pulse"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-red-500/5 rounded-2xl"></div>
-      
       {/* Circuit pattern background */}
       <canvas
         ref={circuitCanvasRef}
-        className="absolute inset-0 w-full h-full rounded-2xl pointer-events-none z-0"
-        style={{ 
-          width: '100%', 
-          height: '100%',
-          opacity: 0.3
-        }}
+        className="absolute inset-0 w-full h-full rounded-md pointer-events-none z-0"
       />
-      
+
       {/* Enhanced CRT scanlines */}
       <div 
-        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/8 to-transparent rounded-2xl pointer-events-none z-10"
+        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/8 to-transparent rounded-md pointer-events-none z-10"
         style={{
           backgroundSize: '100% 3px',
           animation: 'scanlines 0.08s linear infinite'
@@ -1215,7 +1208,7 @@ export default function TerminalEffect({
       
       {/* Moving scanline with glow */}
       <div 
-        className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/30 to-transparent rounded-2xl pointer-events-none z-20"
+        className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/30 to-transparent rounded-md pointer-events-none z-20"
         style={{
           height: '3px',
           top: `${scanlinePosition}%`,
@@ -1227,18 +1220,10 @@ export default function TerminalEffect({
 
       {/* Terminal frame with enhanced styling and depth */}
       <motion.div 
-        className={`relative z-30 rounded-2xl border border-white/20 bg-gradient-to-b from-black/80 via-gray-900/70 to-black/80 shadow-2xl overflow-hidden backdrop-blur-xl`}
-        style={{
-          boxShadow: `
-            0 0 20px rgba(255, 255, 255, 0.05),
-            0 0 40px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.5)
-          `
-        }}
+        className={`relative z-30 rounded-md overflow-hidden`}
       >
         {/* Enhanced terminal header with depth */}
-        <div className="terminal-header flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 px-1.5 py-1 sm:px-3 sm:py-2 md:px-4 md:py-3 lg:px-6 lg:py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-2xl relative overflow-hidden backdrop-blur-sm min-h-[36px]">
+        <div className="terminal-header flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 px-1.5 py-1 sm:px-3 sm:py-2 md:px-4 md:py-3 lg:px-6 lg:py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-md relative overflow-hidden backdrop-blur-sm min-h-[36px]">
           {/* Header background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
           <div className="flex gap-0.5 sm:gap-2 relative z-10">

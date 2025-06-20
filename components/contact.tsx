@@ -4,8 +4,35 @@ import type React from "react"
 
 import { useRef, useState } from "react"
 import { motion, useInView } from "framer-motion"
-import { Mail, Phone, MapPin, Send, Github, CheckCircle, X } from "lucide-react"
+import { Phone, MapPin, Github, CheckCircle, X } from "lucide-react"
 import { DemoIcon } from "./ui/terminal-icons"
+
+const UniqueUserIcon = ({ className }: { className?: string }) => (
+  <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+  </svg>
+)
+
+const UniqueAtIcon = ({ className }: { className?: string }) => (
+  <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
+  </svg>
+)
+
+const UniquePencilIcon = ({ className }: { className?: string }) => (
+  <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="2" x2="22" y2="6"></line>
+    <path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z"></path>
+  </svg>
+)
+
+const UniqueMessageIcon = ({ className }: { className?: string }) => (
+  <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+)
 
 // AnimatedSendIcon: a green paper airplane with glow and entrance animation (for button only)
 const AnimatedSendIcon = ({ size = 22, color = "#22c55e" }: { size?: number, color?: string }) => (
@@ -48,6 +75,76 @@ const AnimatedSendIcon = ({ size = 22, color = "#22c55e" }: { size?: number, col
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
+    />
+  </motion.svg>
+)
+
+const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: number, color?: string }) => (
+  <motion.svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Envelope body */}
+    <path
+      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 6L12 13L2 6"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    
+    {/* Animated data stream */}
+    <motion.path
+      d="M1 12 H 11"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
+      animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut",
+        delay: 0
+      }}
+    />
+    <motion.path
+      d="M1 9 H 9"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
+      animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut",
+        delay: 0.2
+      }}
+    />
+    <motion.path
+      d="M1 15 H 7"
+      stroke={color}
+      strokeWidth="1"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
+      animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
+      transition={{ 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut",
+        delay: 0.4
+      }}
     />
   </motion.svg>
 )
@@ -127,52 +224,12 @@ export default function Contact() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-12">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-1"
-          >
-            <div className="space-y-8">
-              <div className="card p-6 flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-5 w-5 text-red-500" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-1">Email</h3>
-                  <p className="text-gray-300">contact@levik.dev</p>
-                </div>
-              </div>
-
-              {/* <div className="card p-6 flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                  <Phone className="h-5 w-5 text-red-500" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-1">Discord</h3>
-                  <p className="text-gray-300">nulled_xrp</p>
-                </div>
-              </div> */}
-
-              <div className="card p-6 flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="h-5 w-5 text-red-500" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-1">Location</h3>
-                  <p className="text-gray-300">Wisconsin</p>
-                  <p className="text-gray-300">United States</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
+        <div className="flex justify-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="lg:col-span-2 relative"
+            className="w-full max-w-4xl relative"
           >
             <AnimatedFormBg />
             <form onSubmit={handleSubmit} className="card p-8 relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden group transition-all duration-300 focus-within:border-[#ff3b3b] hover:border-[#ff3b3b]">
@@ -180,7 +237,7 @@ export default function Contact() {
               <div className="absolute inset-0 rounded-2xl pointer-events-none border-2 border-[#ff3b3b]/30 opacity-0 group-focus-within:opacity-100 group-hover:opacity-80 transition-all duration-500 blur-sm animate-pulse-slow" />
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
+                  <UniqueUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                   <input
                     type="text"
                     id="name"
@@ -196,7 +253,7 @@ export default function Contact() {
                   </label>
                 </div>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
+                  <UniqueAtIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                   <input
                     type="email"
                     id="email"
@@ -213,7 +270,7 @@ export default function Contact() {
                 </div>
               </div>
               <div className="mb-6 relative">
-                <Send className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
+                <UniquePencilIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                 <input
                   type="text"
                   id="subject"
@@ -229,7 +286,7 @@ export default function Contact() {
                 </label>
               </div>
               <div className="mb-6 relative">
-                <Mail className="absolute left-3 top-4 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
+                <UniqueMessageIcon className="absolute left-3 top-4 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                 <textarea
                   id="message"
                   name="message"
@@ -244,32 +301,31 @@ export default function Contact() {
                   Message
                 </label>
               </div>
-              <button
-                type="submit"
-                className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
-                }}
-                disabled={loading}
-              >
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.7, delay: 0.1 }}
-                  className="flex items-center"
-                >
-                  <AnimatedSendIcon size={22} color="#22c55e" />
-                </motion.span>
-                <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base relative shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                   style={{
-                    color: '#22c55e',
-                    textShadow: '0 0 8px rgba(34,197,94,0.8)',
-                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
                   }}
+                  disabled={loading}
                 >
-                  {loading ? 'Sending...' : 'Send Message'}
-                </span>
-              </button>
+                  <AnimatedDataStreamMailIcon />
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.7, delay: 0.2 }}
+                    className="font-orbitron uppercase tracking-wider text-xs"
+                    style={{
+                      color: '#22c55e',
+                      textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                    }}
+                  >
+                    Send Message
+                  </motion.span>
+                </button>
+              </div>
               {status && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
