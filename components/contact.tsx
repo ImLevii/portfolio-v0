@@ -3,9 +3,84 @@
 import type React from "react"
 
 import { useRef, useState } from "react"
-import { motion, useInView } from "framer-motion"
+import { motion, useInView, AnimatePresence } from "framer-motion"
 import { Phone, MapPin, Github, CheckCircle, X } from "lucide-react"
 import { DemoIcon } from "./ui/terminal-icons"
+
+const LoadingSpinner = ({ size = 20, color = "#fbbf24" }) => (
+  <motion.svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    xmlns="http://www.w3.org/2000/svg"
+    animate={{ rotate: 360 }}
+    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+  >
+    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+  </motion.svg>
+);
+
+const AnimatedCheckmark = ({ size = 24, color = "#22c55e" }) => (
+  <motion.svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <motion.circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke={color}
+      strokeWidth="2"
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    />
+    <motion.path
+      d="M8 12l3 3 5-5"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.3, ease: "easeInOut" }}
+    />
+  </motion.svg>
+);
+
+const SuccessParticles = () => (
+  <div className="absolute inset-0 pointer-events-none">
+    {[...Array(50)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute w-1 h-1 rounded-full"
+        style={{
+          backgroundColor: `hsl(147, 80%, ${Math.random() * 30 + 50}%)`,
+          left: '50%',
+          top: '50%',
+        }}
+        initial={{ x: 0, y: 0, opacity: 1, scale: Math.random() * 0.5 + 0.5 }}
+        animate={{
+          x: (Math.random() - 0.5) * 400,
+          y: (Math.random() - 0.5) * 400,
+          opacity: 0,
+          scale: 0,
+        }}
+        transition={{
+          duration: Math.random() * 1.5 + 0.5,
+          ease: "easeOut",
+        }}
+      />
+    ))}
+  </div>
+);
 
 const UniqueUserIcon = ({ className }: { className?: string }) => (
   <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -232,9 +307,7 @@ export default function Contact() {
             className="w-full max-w-4xl relative"
           >
             <AnimatedFormBg />
-            <form onSubmit={handleSubmit} className="card p-8 relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden group transition-all duration-300 focus-within:border-[#ff3b3b] hover:border-[#ff3b3b]">
-              {/* Animated border glow */}
-              <div className="absolute inset-0 rounded-2xl pointer-events-none border-2 border-[#ff3b3b]/30 opacity-0 group-focus-within:opacity-100 group-hover:opacity-80 transition-all duration-500 blur-sm animate-pulse-slow" />
+            <form onSubmit={handleSubmit} className="card p-8 relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="relative">
                   <UniqueUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
@@ -308,46 +381,89 @@ export default function Contact() {
                   style={{
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
                   }}
-                  disabled={loading}
+                  disabled={loading || status?.type === 'success'}
                 >
-                  <AnimatedDataStreamMailIcon />
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.7, delay: 0.2 }}
-                    className="font-orbitron uppercase tracking-wider text-xs"
-                    style={{
-                      color: '#22c55e',
-                      textShadow: '0 0 8px rgba(34,197,94,0.8)',
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
-                    }}
-                  >
-                    Send Message
-                  </motion.span>
+                  <AnimatePresence mode="wait">
+                    {loading ? (
+                      <motion.div
+                        key="loading"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="flex items-center gap-3"
+                      >
+                        <LoadingSpinner />
+                        <span
+                          className="font-orbitron uppercase tracking-wider text-xs"
+                          style={{
+                            color: '#fbbf24',
+                            textShadow: '0 0 8px rgba(251, 191, 36, 0.7)',
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                          }}
+                        >
+                          Sending...
+                        </span>
+                      </motion.div>
+                    ) : status?.type === 'success' ? (
+                      <motion.div
+                        key="success"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="flex items-center gap-3"
+                      >
+                        <SuccessParticles />
+                        <AnimatedCheckmark />
+                        <span
+                          className="font-orbitron uppercase tracking-wider text-xs"
+                          style={{
+                            color: '#22c55e',
+                            textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                          }}
+                        >
+                          Message Sent!
+                        </span>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="ready"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="flex items-center gap-3"
+                      >
+                        <AnimatedDataStreamMailIcon />
+                        <span
+                          className="font-orbitron uppercase tracking-wider text-xs"
+                          style={{
+                            color: '#22c55e',
+                            textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                          }}
+                        >
+                          Send Message
+                        </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </button>
               </div>
-              {status && (
+
+              {status?.type === 'error' && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className={`mt-4 text-sm relative ${status.type === 'success' ? 'bg-green-900/80 border border-green-500 text-green-200' : 'bg-red-900/80 border border-red-500 text-red-200'} rounded-md px-4 py-3 flex items-center gap-2 shadow-lg`}
-                  role="alert"
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="mt-4 p-3 rounded-md text-center text-sm bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm shadow-lg relative"
+                  style={{
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                  }}
                 >
-                  {status.type === 'success' ? (
-                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                  ) : (
-                    <X className="h-5 w-5 text-red-400 flex-shrink-0" />
-                  )}
-                  <span>{status.message}</span>
-                  <button
-                    type="button"
-                    onClick={() => setStatus(null)}
-                    className="absolute top-2 right-2 text-white/60 hover:text-white/90 rounded-full p-1 focus:outline-none"
-                    aria-label="Dismiss message"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center justify-center gap-2">
+                    <X className="h-5 w-5 text-red-400" />
+                    <span className="font-bold text-red-400">{status.message}</span>
+                  </div>
                 </motion.div>
               )}
             </form>
