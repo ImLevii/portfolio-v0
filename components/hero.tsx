@@ -257,23 +257,20 @@ export default function Hero({ geo }: HeroProps) {
                 style={{
                   textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
                 }}
-              >
-               Full-Stack Developer
+              > Full-Stack
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="block mt-1 relative sm:transform-none sm:perspective-[1000px] sm:rotate-x-[-2deg]"
-              >
-                & Digital{" "}
+              > System{" "}
                 <span 
                   className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 animate-gradient-x relative inline-block sm:translate-z-[20px]"
                   style={{
                     textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
                   }}
-                >
-                Architect
+                > Administrator
                 </span>
               </motion.span>
               {/* 3D Decorative Elements */}
