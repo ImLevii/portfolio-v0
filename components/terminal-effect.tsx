@@ -1156,14 +1156,14 @@ export default function TerminalEffect({
     const container = containerRef.current
     if (!container) return
     const handleScroll = () => {
-      if (container.scrollTop === 0 && visibleLines < totalLines) {
+      if (container.scrollTop === 0 && visibleLines < totalLines && !isInteractive) {
         prevScrollHeight.current = container.scrollHeight
         setVisibleLines((v) => Math.min(v + 30, totalLines))
       }
     }
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
-  }, [visibleLines, totalLines])
+  }, [visibleLines, totalLines, isInteractive])
 
   // Keep scroll position stable when loading more
   useEffect(() => {
