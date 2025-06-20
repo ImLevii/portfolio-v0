@@ -606,3 +606,11 @@ canvas.matrix-rain {
 .carousel-track.paused.animate-scroll-mobile {
   animation-play-state: paused !important;
 }
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

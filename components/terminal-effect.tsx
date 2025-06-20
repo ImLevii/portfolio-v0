@@ -424,6 +424,8 @@ export default function TerminalEffect({
   const [xrpDisplayed, setXrpDisplayed] = useState(false)
   const [pendingTypeQueue, setPendingTypeQueue] = useState<string | null>(null)
   const [pendingTypeCallback, setPendingTypeCallback] = useState<(() => void) | null>(null)
+  const [visibleLines, setVisibleLines] = useState(30)
+  const prevScrollHeight = useRef<number | null>(null)
   
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -1144,6 +1146,39 @@ export default function TerminalEffect({
     }
   }, [pendingTypeQueue, isTyping, typingSpeed, pendingTypeCallback])
 
+  // Helper to split output into lines
+  const outputLines = displayedText.split("\n")
+  const totalLines = outputLines.length
+  const linesToShow = outputLines.slice(Math.max(0, totalLines - visibleLines))
+
+  // Infinite scroll: load more lines when scrolled to top
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const handleScroll = () => {
+      if (container.scrollTop === 0 && visibleLines < totalLines) {
+        prevScrollHeight.current = container.scrollHeight
+        setVisibleLines((v) => Math.min(v + 30, totalLines))
+      }
+    }
+    container.addEventListener('scroll', handleScroll)
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [visibleLines, totalLines])
+
+  // Keep scroll position stable when loading more
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    if (prevScrollHeight.current !== null) {
+      const diff = container.scrollHeight - prevScrollHeight.current
+      container.scrollTop = diff
+      prevScrollHeight.current = null
+    } else {
+      // On new output, scroll to bottom
+      container.scrollTop = container.scrollHeight
+    }
+  }, [visibleLines, displayedText])
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -1391,13 +1426,14 @@ export default function TerminalEffect({
         {/* Enhanced terminal body with multiple layers */}
         <motion.div
           ref={containerRef}
-          className="terminal-body backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 font-mono text-xs sm:text-sm md:text-base rounded-b-2xl border-t overflow-y-auto overflow-x-auto relative shadow-inner scrollbar-hide"
+          className="terminal-body hide-scrollbar backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 font-mono text-xs sm:text-sm md:text-base border-t overflow-y-auto relative shadow-inner"
           style={{ 
             maxHeight: "70vh",
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             color: '#f8fafc',
             borderColor: 'rgba(255, 255, 255, 0.1)',
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(239, 68, 68, 0.03) 0%, transparent 50%)'
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(239, 68, 68, 0.03) 0%, transparent 50%)',
+            boxShadow: 'inset 0 -8px 24px 0 rgba(0,0,0,0.25)'
           }}
           onClick={() => {
             if (isInteractive && inputRef.current) {
@@ -1408,7 +1444,7 @@ export default function TerminalEffect({
           {/* Particle canvas - only in terminal body */}
           <canvas
             ref={particleCanvasRef}
-            className="absolute inset-0 w-full h-full rounded-2xl pointer-events-none z-0"
+            className="absolute inset-0 w-full h-full pointer-events-none z-0"
             style={{ 
               width: '100%', 
               height: '100%',
@@ -1419,7 +1455,7 @@ export default function TerminalEffect({
           {/* Matrix canvas - only in terminal body */}
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 w-full h-full rounded-2xl z-0"
+            className="absolute inset-0 w-full h-full z-0"
             style={{ 
               width: '100%', 
               height: '100%',
@@ -1434,7 +1470,9 @@ export default function TerminalEffect({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {formatText(displayedText)}
+              {linesToShow.map((line, idx) => (
+                <div key={idx}>{formatText(line)}</div>
+              ))}
             </motion.div>
             
             {/* XRP Chart Display */}
@@ -1527,7 +1565,7 @@ export default function TerminalEffect({
         </motion.div>
 
         {/* Enhanced terminal footer with depth */}
-        <div className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-t border-white/20 rounded-b-2xl text-xs font-mono relative overflow-hidden backdrop-blur-sm">
+        <div className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-t border-white/20 text-xs font-mono relative overflow-hidden backdrop-blur-sm">
           {/* Footer background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
           

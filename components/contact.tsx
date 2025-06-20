@@ -5,6 +5,60 @@ import type React from "react"
 import { useRef, useState } from "react"
 import { motion, useInView } from "framer-motion"
 import { Mail, Phone, MapPin, Send, Github, CheckCircle, X } from "lucide-react"
+import { DemoIcon } from "./ui/terminal-icons"
+
+// AnimatedSendIcon: a green paper airplane with glow and entrance animation (for button only)
+const AnimatedSendIcon = ({ size = 22, color = "#22c55e" }: { size?: number, color?: string }) => (
+  <motion.svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    initial={{ opacity: 0, x: -10 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.7, delay: 0.1 }}
+    style={{ display: 'block' }}
+  >
+    {/* Glow */}
+    <circle
+      cx="12" cy="12" r="11"
+      fill="url(#send-glow)"
+      opacity={0.4}
+      style={{ filter: 'blur(2.5px)' }}
+    />
+    <defs>
+      <radialGradient id="send-glow" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+        <stop offset="0%" stopColor={color} stopOpacity="0.7" />
+        <stop offset="100%" stopColor={color} stopOpacity="0" />
+      </radialGradient>
+    </defs>
+    {/* Paper airplane path (Lucide Send) */}
+    <path
+      d="M22 2L11 13"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 2L15 22L11 13L2 9L22 2Z"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </motion.svg>
+)
+
+// Animated background behind the form
+const AnimatedFormBg = () => (
+  <div className="absolute inset-0 z-0 pointer-events-none">
+    <div className="w-full h-full bg-gradient-to-br from-red-900/10 via-black/40 to-red-700/10 animate-gradient-x rounded-2xl blur-sm" />
+    <div className="absolute inset-0 bg-circuit-pattern opacity-10" />
+  </div>
+)
 
 export default function Contact() {
   const ref = useRef<HTMLDivElement>(null)
@@ -118,14 +172,15 @@ export default function Contact() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 relative"
           >
-            <form onSubmit={handleSubmit} className="card p-8">
+            <AnimatedFormBg />
+            <form onSubmit={handleSubmit} className="card p-8 relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden group transition-all duration-300 focus-within:border-[#ff3b3b] hover:border-[#ff3b3b]">
+              {/* Animated border glow */}
+              <div className="absolute inset-0 rounded-2xl pointer-events-none border-2 border-[#ff3b3b]/30 opacity-0 group-focus-within:opacity-100 group-hover:opacity-80 transition-all duration-500 blur-sm animate-pulse-slow" />
               <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-2">
-                    Your Name
-                  </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                   <input
                     type="text"
                     id="name"
@@ -133,13 +188,15 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff3b3b] focus:border-transparent transition-colors peer placeholder-transparent"
+                    placeholder="Your Name"
                   />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2">
-                    Your Email
+                  <label htmlFor="name" className="absolute left-10 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400 pointer-events-none transition-all duration-200 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-[#ff3b3b] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 bg-black/60 px-1 rounded">
+                    Your Name
                   </label>
+                </div>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                   <input
                     type="email"
                     id="email"
@@ -147,15 +204,16 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff3b3b] focus:border-transparent transition-colors peer placeholder-transparent"
+                    placeholder="Your Email"
                   />
+                  <label htmlFor="email" className="absolute left-10 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400 pointer-events-none transition-all duration-200 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-[#ff3b3b] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 bg-black/60 px-1 rounded">
+                    Your Email
+                  </label>
                 </div>
               </div>
-
-              <div className="mb-6">
-                <label htmlFor="subject" className="block text-sm font-medium mb-2">
-                  Subject
-                </label>
+              <div className="mb-6 relative">
+                <Send className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                 <input
                   type="text"
                   id="subject"
@@ -163,14 +221,15 @@ export default function Contact() {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                  className="w-full pl-10 pr-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff3b3b] focus:border-transparent transition-colors peer placeholder-transparent"
+                  placeholder="Subject"
                 />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="message" className="block text-sm font-medium mb-2">
-                  Message
+                <label htmlFor="subject" className="absolute left-10 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400 pointer-events-none transition-all duration-200 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-[#ff3b3b] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 bg-black/60 px-1 rounded">
+                  Subject
                 </label>
+              </div>
+              <div className="mb-6 relative">
+                <Mail className="absolute left-3 top-4 text-[#ff3b3b]/80 h-5 w-5 pointer-events-none" />
                 <textarea
                   id="message"
                   name="message"
@@ -178,17 +237,38 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors resize-none"
+                  className="w-full pl-10 pr-4 py-3 bg-black/30 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff3b3b] focus:border-transparent transition-colors resize-none peer placeholder-transparent"
+                  placeholder="Message"
                 ></textarea>
+                <label htmlFor="message" className="absolute left-10 top-4 text-sm font-medium text-gray-400 pointer-events-none transition-all duration-200 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-[#ff3b3b] peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 bg-black/60 px-1 rounded">
+                  Message
+                </label>
               </div>
-
               <button
                 type="submit"
-                className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-300 font-medium flex items-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                }}
                 disabled={loading}
               >
-                {loading ? 'Sending...' : 'Send Message'}
-                <Send className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  className="flex items-center"
+                >
+                  <AnimatedSendIcon size={22} color="#22c55e" />
+                </motion.span>
+                <span className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                  style={{
+                    color: '#22c55e',
+                    textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                  }}
+                >
+                  {loading ? 'Sending...' : 'Send Message'}
+                </span>
               </button>
               {status && (
                 <motion.div
