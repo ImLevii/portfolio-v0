@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useRef, useState } from "react"
 import { motion, useInView } from "framer-motion"
-import { Mail, Phone, MapPin, Send, Github } from "lucide-react"
+import { Mail, Phone, MapPin, Send, Github, CheckCircle, X } from "lucide-react"
 
 export default function Contact() {
   const ref = useRef<HTMLDivElement>(null)
@@ -17,24 +17,41 @@ export default function Contact() {
     message: "",
   })
 
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<null | { type: 'success' | 'error', message: string }>(null)
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission logic here
-    console.log(formData)
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    })
-    // Show success message
-    alert("Message sent successfully!")
+    setLoading(true)
+    setStatus(null)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setStatus({ type: 'success', message: 'Message sent successfully!' })
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        })
+      } else {
+        setStatus({ type: 'error', message: data.error || 'Failed to send message.' })
+      }
+    } catch (error) {
+      setStatus({ type: 'error', message: 'An error occurred. Please try again.' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -70,11 +87,11 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold mb-1">Email</h3>
-                  <p className="text-gray-300">contact@levi.dev</p>
+                  <p className="text-gray-300">contact@levik.dev</p>
                 </div>
               </div>
 
-              <div className="card p-6 flex items-start gap-4">
+              {/* <div className="card p-6 flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
                   <Phone className="h-5 w-5 text-red-500" />
                 </div>
@@ -82,7 +99,7 @@ export default function Contact() {
                   <h3 className="font-bold mb-1">Discord</h3>
                   <p className="text-gray-300">nulled_xrp</p>
                 </div>
-              </div>
+              </div> */}
 
               <div className="card p-6 flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
@@ -167,11 +184,36 @@ export default function Contact() {
 
               <button
                 type="submit"
-                className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-300 font-medium flex items-center gap-2 group"
+                className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-300 font-medium flex items-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={loading}
               >
-                Send Message
+                {loading ? 'Sending...' : 'Send Message'}
                 <Send className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
+              {status && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className={`mt-4 text-sm relative ${status.type === 'success' ? 'bg-green-900/80 border border-green-500 text-green-200' : 'bg-red-900/80 border border-red-500 text-red-200'} rounded-md px-4 py-3 flex items-center gap-2 shadow-lg`}
+                  role="alert"
+                >
+                  {status.type === 'success' ? (
+                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+                  ) : (
+                    <X className="h-5 w-5 text-red-400 flex-shrink-0" />
+                  )}
+                  <span>{status.message}</span>
+                  <button
+                    type="button"
+                    onClick={() => setStatus(null)}
+                    className="absolute top-2 right-2 text-white/60 hover:text-white/90 rounded-full p-1 focus:outline-none"
+                    aria-label="Dismiss message"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </motion.div>
+              )}
             </form>
           </motion.div>
         </div>
@@ -181,7 +223,7 @@ export default function Contact() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <p className="text-gray-400">© {new Date().getFullYear()} LEVI.DEV All rights reserved.</p>
+              <p className="text-gray-400">© {new Date().getFullYear()} LEVIK.DEV All rights reserved.</p>
             </div>
             <div className="flex gap-4">
               <a

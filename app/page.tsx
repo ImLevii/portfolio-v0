@@ -25,6 +25,8 @@ export default async function Home() {
         ip: data.ip,
         city: data.city,
         region: data.region,
+
+        
         country: data.country,
         privacy: data.privacy
       }

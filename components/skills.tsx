@@ -129,7 +129,25 @@ export default function Skills() {
             
             {/* Carousel content */}
             <div className="relative overflow-hidden p-3 sm:p-4 md:p-6 lg:p-8 rounded-xl">
-              <div className="carousel-track flex min-w-max animate-scroll-mobile md:animate-scroll">
+              <div
+                className="carousel-track flex min-w-max animate-scroll-mobile md:animate-scroll"
+                tabIndex={0}
+                onMouseDown={e => {
+                  e.currentTarget.classList.add('paused')
+                }}
+                onMouseUp={e => {
+                  e.currentTarget.classList.remove('paused')
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.classList.remove('paused')
+                }}
+                onTouchStart={e => {
+                  e.currentTarget.classList.add('paused')
+                }}
+                onTouchEnd={e => {
+                  e.currentTarget.classList.remove('paused')
+                }}
+              >
                 {/* First set of items */}
                 {techStack.map((tech, index) => (
                   <div

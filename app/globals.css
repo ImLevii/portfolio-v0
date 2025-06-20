@@ -398,11 +398,11 @@ canvas.matrix-rain {
 }
 
 .animate-scroll {
-  animation: scroll 12s linear infinite;
+  animation: scroll 20s linear infinite;
 }
 
 .animate-scroll-mobile {
-  animation: scroll 8s linear infinite;
+  animation: scroll 20s linear infinite;
 }
 
 /* Enhanced carousel backdrop effects */
@@ -600,4 +600,9 @@ canvas.matrix-rain {
     min-width: 0 !important;
     padding: 0 !important;
   }
+}
+
+.carousel-track.paused.animate-scroll,
+.carousel-track.paused.animate-scroll-mobile {
+  animation-play-state: paused !important;
 }
