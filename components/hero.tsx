@@ -164,7 +164,7 @@ export default function Hero({ geo }: HeroProps) {
   return (
     <section
       id="home"
-      className="min-h-[70vh] sm:min-h-[60vh] flex items-center justify-center relative overflow-hidden py-8 sm:py-0"
+      className="min-h-[70vh] sm:min-h-[60vh] flex items-center justify-center relative overflow-hidden pt-20 pb-8 sm:pt-24 sm:pb-0"
       ref={containerRef}
     >
       {/* Matrix Background - only render on client side */}
