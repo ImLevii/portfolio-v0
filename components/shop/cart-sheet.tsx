@@ -28,7 +28,7 @@ export function CartSheet() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
-    const [selectedMethod, setSelectedMethod] = useState<string>("stripe")
+    const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
     const [paypalError, setPaypalError] = useState<string | null>(null)
 
     const totalAmount = cart.items.reduce((acc, item) => acc + item.price, 0)
@@ -37,7 +37,20 @@ export function CartSheet() {
     const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? ""
 
     useEffect(() => {
-        getEnabledPaymentMethods().then(setPaymentMethods)
+        getEnabledPaymentMethods().then((methods) => {
+            setPaymentMethods(methods)
+            if (methods.length === 0) {
+                setSelectedMethod(null)
+                return
+            }
+
+            setSelectedMethod((prev) => {
+                if (prev && methods.some((method) => method.name === prev)) {
+                    return prev
+                }
+                return methods[0].name
+            })
+        })
     }, [])
 
     useEffect(() => {
@@ -47,6 +60,11 @@ export function CartSheet() {
     }, [isPayPalSelected])
 
     const onCheckout = async () => {
+        if (!selectedMethod) {
+            toast.error("No payment methods are available right now.")
+            return
+        }
+
         if (isPayPalSelected) {
             return
         }
@@ -204,7 +222,7 @@ export function CartSheet() {
                         {paymentMethods.length > 0 && (
                             <div className="space-y-3">
                                 <Label className="text-gray-400">Payment Method</Label>
-                                <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod} className="grid gap-2">
+                                <RadioGroup value={selectedMethod ?? ""} onValueChange={setSelectedMethod} className="grid gap-2">
                                     {paymentMethods.map((method) => (
                                         <div key={method.id} className="flex items-center space-x-2 rounded-lg border border-gray-800 bg-gray-900/50 p-3 hover:border-green-500/30 transition-colors">
                                             <RadioGroupItem value={method.name} id={method.name} className="border-gray-600 text-green-500" />

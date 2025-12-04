@@ -76,6 +76,30 @@ export async function POST(req: Request) {
             )
         }
 
+        const capture =
+            captureData?.purchase_units?.[0]?.payments?.captures?.[0]
+        const captureAmount = capture?.amount?.value
+        const captureCurrency = capture?.amount?.currency_code
+
+        if (!captureAmount || !captureCurrency) {
+            return NextResponse.json(
+                { error: "Unable to verify captured amount" },
+                { status: 400 }
+            )
+        }
+
+        const normalizedClientAmount = Number.parseFloat(data.amount).toFixed(2)
+
+        if (
+            normalizedClientAmount !== Number.parseFloat(captureAmount).toFixed(2) ||
+            captureCurrency !== "USD"
+        ) {
+            return NextResponse.json(
+                { error: "Captured amount does not match order total" },
+                { status: 400 }
+            )
+        }
+
         return NextResponse.json(
             {
                 success: true,
