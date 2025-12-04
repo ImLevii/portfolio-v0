@@ -13,7 +13,7 @@ export function AdminSidebar() {
     const links = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/products", label: "Products", icon: ShoppingBag },
-        { href: "/settings", label: "Settings", icon: Settings },
+        { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
     ]
 
     return (
@@ -35,7 +35,7 @@ export function AdminSidebar() {
             )}
 
             <aside className={cn(
-                "w-64 border-r border-white/10 bg-black/90 backdrop-blur-xl fixed h-full z-40 transition-transform duration-300 ease-in-out md:translate-x-0",
+                "w-64 border-r border-white/5 bg-black/80 backdrop-blur-xl fixed h-full z-40 transition-transform duration-300 ease-in-out md:translate-x-0",
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <div className="p-6 border-b border-white/10">
@@ -47,26 +47,25 @@ export function AdminSidebar() {
                     {links.map((link) => {
                         const Icon = link.icon
                         const isActive = pathname === link.href
-
                         return (
                             <Link
                                 key={link.href}
                                 href={link.href}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group relative overflow-hidden",
+                                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden",
                                     isActive
-                                        ? "bg-green-500/10 text-green-400"
+                                        ? "bg-emerald-500/10 text-emerald-400 neon-text-glow"
                                         : "hover:bg-white/5 text-gray-400 hover:text-white"
                                 )}
                             >
                                 {isActive && (
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500 rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-emerald-500 rounded-r-full neon-glow" />
                                 )}
-                                <Icon className={cn("h-5 w-5 transition-transform group-hover:scale-110", isActive && "text-green-500")} />
+                                <Icon className={cn("h-5 w-5 transition-transform group-hover:scale-110", isActive && "text-emerald-500")} />
                                 <span className="font-medium">{link.label}</span>
 
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-green-500/5 blur-xl -z-10" />
+                                    <div className="absolute inset-0 bg-emerald-500/5 blur-xl -z-10" />
                                 )}
                             </Link>
                         )
@@ -83,7 +82,7 @@ export function AdminSidebar() {
 
                 {/* Decorative background element */}
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-green-900/10 to-transparent pointer-events-none" />
-            </aside>
+            </aside >
         </>
     )
 }

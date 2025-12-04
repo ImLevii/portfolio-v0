@@ -75,6 +75,7 @@ model Order {
   amount          Int
   currency        String
   status          String      // "pending", "completed"
+  paymentMethod   String?     // "stripe", "bank_transfer"
   createdAt       DateTime    @default(now())
   items           OrderItem[]
 
@@ -89,4 +90,14 @@ model OrderItem {
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
+}
+
+model PaymentMethod {
+  id          String   @id @default(cuid())
+  name        String   @unique // "stripe", "bank_transfer"
+  displayName String
+  isEnabled   Boolean  @default(false)
+  config      String?  // JSON string for public config (e.g. instructions for bank transfer)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Area, AreaChart, Defs, LinearGradient, Stop } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Area, AreaChart } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
@@ -19,10 +19,10 @@ export function RevenueChart({ data }: RevenueChartProps) {
     const [activeTab, setActiveTab] = useState("daily")
 
     const chartConfig = {
-        daily: { data: data.daily, color: "#22c55e", gradientId: "colorGreen" },
-        weekly: { data: data.weekly, color: "#3b82f6", gradientId: "colorBlue" },
-        monthly: { data: data.monthly, color: "#a855f7", gradientId: "colorPurple" },
-        yearly: { data: data.yearly, color: "#f97316", gradientId: "colorOrange" },
+        daily: { data: data.daily, color: "#10b981", gradientId: "colorGreen" }, // Emerald 500
+        weekly: { data: data.weekly, color: "#06b6d4", gradientId: "colorCyan" }, // Cyan 500
+        monthly: { data: data.monthly, color: "#8b5cf6", gradientId: "colorViolet" }, // Violet 500
+        yearly: { data: data.yearly, color: "#f59e0b", gradientId: "colorAmber" }, // Amber 500
     }
 
     const currentConfig = chartConfig[activeTab as keyof typeof chartConfig]
@@ -33,8 +33,8 @@ export function RevenueChart({ data }: RevenueChartProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
         >
-            <Card className="bg-black/40 border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <Card className="glass-panel border-0 relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                 <CardHeader className="relative z-10">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -48,12 +48,12 @@ export function RevenueChart({ data }: RevenueChartProps) {
                             <p className="text-sm text-gray-400 mt-1">Track your earnings over time</p>
                         </div>
                         <Tabs defaultValue="daily" value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
-                            <TabsList className="bg-black/50 border border-white/10 p-1">
+                            <TabsList className="bg-black/50 border border-white/10 p-1 rounded-full">
                                 {Object.keys(chartConfig).map((tab) => (
                                     <TabsTrigger
                                         key={tab}
                                         value={tab}
-                                        className="capitalize data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:shadow-none transition-all duration-300"
+                                        className="capitalize rounded-full data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/20 transition-all duration-300 px-4"
                                     >
                                         {tab}
                                     </TabsTrigger>
@@ -68,20 +68,20 @@ export function RevenueChart({ data }: RevenueChartProps) {
                             <AreaChart data={currentConfig.data}>
                                 <defs>
                                     <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                     </linearGradient>
-                                    <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    <linearGradient id="colorCyan" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
                                     </linearGradient>
-                                    <linearGradient id="colorPurple" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                                    <linearGradient id="colorViolet" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                                     </linearGradient>
-                                    <linearGradient id="colorOrange" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                                    <linearGradient id="colorAmber" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />

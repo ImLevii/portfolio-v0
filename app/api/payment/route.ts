@@ -105,7 +105,7 @@ export async function POST(req: Request) {
                 success: true,
                 data: {
                     orderID: data.orderID,
-                    captureID: captureData.id,
+                    captureID: capture?.id ?? captureData.id,
                     captureStatus: captureData.status,
                     name: data.name,
                     email: data.email,

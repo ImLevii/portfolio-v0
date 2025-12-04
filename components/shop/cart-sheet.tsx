@@ -21,7 +21,7 @@ import { getEnabledPaymentMethods } from "@/app/shop/actions"
 import { PaymentMethod } from "@prisma/client"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
+import { PayPalButtons } from "@paypal/react-paypal-js"
 
 export function CartSheet() {
     const cart = useCart()
@@ -247,22 +247,13 @@ export function CartSheet() {
                                             {paypalError}
                                         </div>
                                     )}
-                                    <PayPalScriptProvider
-                                        options={{
-                                            clientId: paypalClientId,
-                                            currency: "USD",
-                                            intent: "capture",
-                                            components: "buttons",
-                                        }}
-                                    >
-                                        <PayPalButtons
-                                            createOrder={createPayPalOrder}
-                                            onApprove={onPayPalApprove}
-                                            onError={onPayPalError}
-                                            style={{ layout: "vertical" }}
-                                            disabled={loading}
-                                        />
-                                    </PayPalScriptProvider>
+                                    <PayPalButtons
+                                        createOrder={createPayPalOrder}
+                                        onApprove={onPayPalApprove}
+                                        onError={onPayPalError}
+                                        style={{ layout: "vertical" }}
+                                        disabled={loading}
+                                    />
                                 </div>
                             ) : (
                                 <div className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">

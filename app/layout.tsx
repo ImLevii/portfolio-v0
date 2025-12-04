@@ -5,6 +5,7 @@ import "./globals.css"
 import Navbar from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
+import { PaypalProvider } from "@/components/paypal-provider"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,11 +35,13 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <ScrollToTop />
-          <Navbar user={session?.user} />
-          {children}
-        </ThemeProvider>
+        <PaypalProvider>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+            <ScrollToTop />
+            <Navbar user={session?.user} />
+            {children}
+          </ThemeProvider>
+        </PaypalProvider>
       </body>
     </html>
   )
