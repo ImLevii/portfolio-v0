@@ -22,17 +22,21 @@ export const metadata: Metadata = {
   description: "Professional portfolio showcasing my work and skills"
 }
 
-export default function RootLayout({
+import { auth } from "@/auth"
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const session = await auth()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
           <ScrollToTop />
-          <Navbar />
+          <Navbar user={session?.user} />
           {children}
         </ThemeProvider>
       </body>
