@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils"
 import { SignIn } from "@/components/auth/sign-in"
 import { UserMenu } from "@/components/auth/user-menu"
 
+import { CartSheet } from "@/components/shop/cart-sheet"
+
 export default function Navbar({ user }: { user?: any }) {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -97,11 +99,13 @@ export default function Navbar({ user }: { user?: any }) {
             </Link>
           ))}
           {user ? <UserMenu user={user} /> : <SignIn />}
+          <CartSheet />
         </nav>
 
         {/* Mobile Menu Actions */}
         <div className="flex items-center gap-4 md:hidden">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <CartSheet />
             {user ? <UserMenu user={user} /> : <SignIn compact={true} />}
           </div>
           <div className="w-px h-8 bg-white/10 mx-1"></div>

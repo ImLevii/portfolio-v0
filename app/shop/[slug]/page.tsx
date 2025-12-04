@@ -3,7 +3,6 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, Check } from "lucide-react"
 
 import { db } from "@/lib/db"
-import { CartSheet } from "@/components/shop/cart-sheet"
 import { AddToCartButton } from "@/components/shop/add-to-cart-button"
 
 interface ProductPageProps {
@@ -40,7 +39,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Shop
                     </Link>
-                    <CartSheet />
                 </div>
 
                 <div className="grid gap-8 lg:gap-12 lg:grid-cols-2 items-start">

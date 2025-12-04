@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { ProductCard } from "@/components/shop/product-card"
-import { CartSheet } from "@/components/shop/cart-sheet"
 import { ShopCarousel } from "@/components/shop/shop-carousel"
 import { ShopNav } from "@/components/shop/shop-nav"
 
@@ -51,9 +50,6 @@ export function ShopContent({ products }: ShopContentProps) {
                         <p className="mt-2 md:mt-4 text-base md:text-lg text-gray-400 max-w-xl">
                             Premium tools, assets, and configurations to accelerate your development workflow.
                         </p>
-                    </div>
-                    <div className="self-end md:self-auto">
-                        <CartSheet />
                     </div>
                 </div>
 

@@ -21,7 +21,7 @@ import { getEnabledPaymentMethods } from "@/app/shop/actions"
 import { PaymentMethod } from "@prisma/client"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { PayPalButtons } from "@paypal/react-paypal-js"
+// import { PayPalButtons } from "@paypal/react-paypal-js"
 
 export function CartSheet() {
     const cart = useCart()
@@ -65,9 +65,9 @@ export function CartSheet() {
             return
         }
 
-        if (isPayPalSelected) {
-            return
-        }
+        // if (isPayPalSelected) {
+        //     return
+        // }
 
         try {
             setLoading(true)
@@ -157,14 +157,28 @@ export function CartSheet() {
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="relative border-gray-700 bg-gray-900/50 text-white hover:bg-green-500/20 hover:border-green-500/50 hover:text-green-400 transition-all duration-300">
-                    <ShoppingCart className="h-5 w-5" />
+                <button className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg"
+                    style={{
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                    }}
+                >
+                    <ShoppingCart className="h-5 w-5 text-green-500" />
+                    <span
+                        className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                        style={{
+                            color: '#22c55e',
+                            textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                        }}
+                    >
+                        Cart
+                    </span>
                     {cart.items.length > 0 && (
                         <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white shadow-lg shadow-green-900/50 animate-pulse">
                             {cart.items.length}
                         </span>
                     )}
-                </Button>
+                </button>
             </SheetTrigger>
             <SheetContent className="flex w-full flex-col border-l border-gray-800 bg-black/95 backdrop-blur-xl pr-0 sm:max-w-lg">
                 <SheetHeader className="px-1 border-b border-gray-800 pb-4">
@@ -241,19 +255,24 @@ export function CartSheet() {
                         </div>
                         {isPayPalSelected ? (
                             paypalClientId ? (
-                                <div className="space-y-3">
+                                <div className="space-y-3 relative group">
+                                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 blur-xl rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                     {paypalError && (
                                         <div className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
                                             {paypalError}
                                         </div>
                                     )}
-                                    <PayPalButtons
-                                        createOrder={createPayPalOrder}
-                                        onApprove={onPayPalApprove}
-                                        onError={onPayPalError}
-                                        style={{ layout: "vertical" }}
+                                    <button
+                                        onClick={onCheckout}
                                         disabled={loading}
-                                    />
+                                        className="relative w-full h-auto min-h-[55px] overflow-hidden rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
+                                    >
+                                        <img
+                                            src="/paypal-button.png"
+                                            alt="Pay with PayPal"
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">

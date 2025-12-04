@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 
-import { products } from "@/lib/products"
+import { db } from "@/lib/db"
+import { createPayPalOrder } from "@/lib/paypal"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     // apiVersion: "2025-02-24.acacia", // Use latest or what's available
@@ -21,33 +22,53 @@ export async function OPTIONS() {
 export async function POST(req: Request) {
     const { productIds, paymentMethodId } = await req.json()
 
+    console.log("Checkout request:", { productIds, paymentMethodId })
+
     if (!productIds || productIds.length === 0) {
+        console.log("Checkout error: Product IDs are required")
         return new NextResponse("Product IDs are required", { status: 400 })
     }
 
-    const items = products.filter((item) => productIds.includes(item.id))
+    const items = await db.product.findMany({
+        where: {
+            id: {
+                in: productIds
+            }
+        }
+    })
+
     const totalAmount = items.reduce((acc, item) => acc + item.price, 0)
 
     if (items.length === 0) {
+        console.log("Checkout error: No valid products found", { productIds })
         return new NextResponse("No valid products found for checkout", {
             status: 400,
         })
     }
 
-    // Fetch payment method to verify type
-    // In a real app, you'd fetch this from DB. For now, we assume ID or name is passed.
-    // Actually, let's fetch it to be sure.
-    // We need to import db.
-    // But wait, I can't import db here easily without adding it to imports.
-    // Let's assume paymentMethodId is the 'name' (stripe, bank_transfer) for simplicity if passed,
-    // OR we can fetch it. Let's fetch it.
+    if (paymentMethodId === "paypal") {
+        try {
+            const formattedTotal = (totalAmount / 100).toFixed(2)
+            const order = await createPayPalOrder(formattedTotal)
 
-    // I need to add import { db } from "@/lib/db" at the top.
-    // Since I am replacing the whole function, I should also add the import if it's missing.
-    // But I can't easily add import with replace_file_content if it's not in the range.
-    // I will use multi_replace to add import and replace function.
+            const approveLink = order.links.find((link: any) => link.rel === "approve")
 
-    // Wait, I will just use 'stripe' as default if not provided, and handle 'bank_transfer'.
+            if (!approveLink) {
+                throw new Error("No approval link found in PayPal response")
+            }
+
+            return NextResponse.json(
+                { url: approveLink.href },
+                { headers: corsHeaders }
+            )
+        } catch (error: any) {
+            console.error("PayPal checkout error:", error)
+            return NextResponse.json(
+                { error: error.message || "PayPal checkout failed" },
+                { status: 500, headers: corsHeaders }
+            )
+        }
+    }
 
     // Default to Stripe
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
