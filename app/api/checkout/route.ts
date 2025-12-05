@@ -22,7 +22,8 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
     const session = await auth()
-    const { productIds, paymentMethodId } = await req.json()
+    const reqBody = await req.json()
+    const { productIds, paymentMethodId } = reqBody
 
     console.log("Checkout request:", { productIds, paymentMethodId })
 
@@ -39,11 +40,38 @@ export async function POST(req: Request) {
         }
     })
 
-    const totalAmount = items.reduce((acc, item) => acc + item.price, 0)
+    // Validate Coupon if provided
+    let discountPercent = 0
+    let couponId = undefined
+
+    if (reqBody.couponCode) {
+        const coupon = await db.coupon.findUnique({
+            where: { code: reqBody.couponCode }
+        })
+
+        if (coupon && coupon.isActive) {
+            if ((!coupon.expiresAt || coupon.expiresAt > new Date()) &&
+                (!coupon.maxUses || coupon.uses < coupon.maxUses)) {
+                discountPercent = coupon.percent || 0
+                couponId = coupon.id
+            }
+        }
+    }
+
+    const totalAmount = items.reduce((acc, item) => {
+        let price = item.price
+        if (discountPercent > 0) {
+            price = Math.round(item.price * (1 - discountPercent / 100))
+        }
+        return acc + price
+    }, 0)
+
     console.log("Checkout Check:", {
         foundItems: items.length,
         totalAmount,
-        productIds
+        productIds,
+        couponCode: reqBody.couponCode,
+        discountPercent
     })
 
     if (items.length === 0) {
@@ -69,6 +97,7 @@ export async function POST(req: Request) {
                     currency: "usd",
                     status: "completed",
                     paymentMethod: "free",
+                    couponCode: couponId ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
                     items: {
                         create: items.map((item) => ({
                             productId: item.id,
@@ -78,7 +107,7 @@ export async function POST(req: Request) {
                 }
             })
 
-            // Generate License Keys
+            // Generate License Keys & Decrement Stock
             for (const item of items) {
                 await db.licenseKey.create({
                     data: {
@@ -89,6 +118,26 @@ export async function POST(req: Request) {
                         status: "ACTIVE"
                     }
                 })
+
+                // Decrement Stock
+                await db.product.update({
+                    where: { id: item.id },
+                    data: {
+                        stock: {
+                            decrement: 1
+                        }
+                    }
+                }).catch(err => console.error(`Failed to decrement stock for product ${item.id}:`, err))
+            }
+
+            // Increment Coupon Usage
+            if (couponId) {
+                await db.coupon.update({
+                    where: { id: couponId },
+                    data: {
+                        uses: { increment: 1 }
+                    }
+                }).catch(err => console.error("Failed to increment coupon usage:", err))
             }
 
             return NextResponse.json(
@@ -107,8 +156,9 @@ export async function POST(req: Request) {
 
     // Prevent small charges that Stripe rejects
     if (totalAmount > 0 && totalAmount < 50) {
+        const formattedTotal = (totalAmount / 100).toFixed(2)
         return NextResponse.json(
-            { error: "Minimum order amount is $0.50" },
+            { error: `Order total of $${formattedTotal} is below the minimum of $0.50 required for online payment.` },
             { status: 400, headers: corsHeaders }
         )
     }
@@ -141,6 +191,16 @@ export async function POST(req: Request) {
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
     items.forEach((item) => {
+        // Check stock
+        if (item.stock <= 0) {
+            throw new Error(`Product ${item.name} is out of stock`)
+        }
+
+        let unitAmount = item.price
+        if (discountPercent > 0) {
+            unitAmount = Math.round(item.price * (1 - discountPercent / 100))
+        }
+
         line_items.push({
             quantity: 1,
             price_data: {
@@ -148,7 +208,7 @@ export async function POST(req: Request) {
                 product_data: {
                     name: item.name,
                 },
-                unit_amount: item.price,
+                unit_amount: unitAmount,
             },
         })
     })
@@ -165,6 +225,7 @@ export async function POST(req: Request) {
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop?canceled=1`,
             metadata: {
                 productIds: JSON.stringify(productIds),
+                couponId: couponId
             },
             customer_email: session?.user?.email || undefined, // Prefill email if logged in
         })

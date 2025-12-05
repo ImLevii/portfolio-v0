@@ -14,3 +14,39 @@ export async function getEnabledPaymentMethods() {
         return []
     }
 }
+
+export async function validateCoupon(code: string) {
+    try {
+        const coupon = await db.coupon.findUnique({
+            where: { code },
+        })
+
+        if (!coupon) {
+            return { error: "Invalid coupon code" }
+        }
+
+        if (!coupon.isActive) {
+            return { error: "This coupon is no longer active" }
+        }
+
+        if (coupon.expiresAt && coupon.expiresAt < new Date()) {
+            return { error: "This coupon has expired" }
+        }
+
+        if (coupon.maxUses && coupon.uses >= coupon.maxUses) {
+            return { error: "This coupon has reached its usage limit" }
+        }
+
+        return {
+            success: true,
+            coupon: {
+                code: coupon.code,
+                percent: coupon.percent,
+                amount: coupon.amount
+            }
+        }
+    } catch (error) {
+        console.error("Coupon validation error:", error)
+        return { error: "Failed to validate coupon" }
+    }
+}

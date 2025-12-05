@@ -73,20 +73,37 @@ export function ProductCard({ product }: ProductCardProps) {
                 </CardContent>
 
                 <CardFooter className="relative z-10 flex items-center justify-between border-t border-gray-800 bg-gray-900/50 p-3 backdrop-blur-sm mt-auto">
-                    <div className="text-base font-bold font-orbitron text-white">
-                        ${(product.price / 100).toFixed(2)}
+                    <div className="flex flex-col">
+                        <div className="text-base font-bold font-orbitron text-white">
+                            ${(product.price / 100).toFixed(2)}
+                        </div>
+                        <div className={cn(
+                            "text-[10px] font-bold uppercase tracking-wider",
+                            product.stock > 0 ? "text-green-500" : "text-red-500"
+                        )}>
+                            {product.stock > 0 ? `${product.stock} in stock` : "Out of Stock"}
+                        </div>
                     </div>
                     <Button
                         onClick={onAddToCart}
+                        disabled={product.stock === 0}
                         size="sm"
-                        className="h-8 gap-2 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 hover:bg-gray-800/80 text-white shadow-lg transition-all group/btn"
-                        style={{
+                        className={cn(
+                            "h-8 gap-2 border shadow-lg transition-all group/btn",
+                            product.stock > 0
+                                ? "bg-gradient-to-r from-gray-800/60 to-gray-900/60 border-gray-700/40 hover:bg-gray-800/80 text-white"
+                                : "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
+                        )}
+                        style={product.stock > 0 ? {
                             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
-                        }}
+                        } : {}}
                     >
-                        <ShoppingCart className="h-3.5 w-3.5 text-green-500 group-hover/btn:text-green-400 transition-colors" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 font-orbitron tracking-wider text-[10px] font-bold group-hover/btn:from-green-300 group-hover/btn:to-emerald-500">
-                            ADD
+                        <ShoppingCart className={cn("h-3.5 w-3.5 transition-colors", product.stock > 0 ? "text-green-500 group-hover/btn:text-green-400" : "text-gray-500")} />
+                        <span className={cn(
+                            "font-orbitron tracking-wider text-[10px] font-bold",
+                            product.stock > 0 ? "bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 group-hover/btn:from-green-300 group-hover/btn:to-emerald-500" : "text-gray-500"
+                        )}>
+                            {product.stock > 0 ? "ADD" : "SOLD OUT"}
                         </span>
                     </Button>
                 </CardFooter>

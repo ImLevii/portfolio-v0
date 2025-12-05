@@ -13,6 +13,7 @@ interface ProductFormProps {
         price: number
         image: string
         category: string
+        features: string // JSON string
 
         stock?: number
         filePath?: string | null
@@ -91,14 +92,16 @@ export function ProductForm({ initialData, action }: ProductFormProps) {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron flex items-center gap-1">
-                                    <DollarSign className="h-3 w-3" /> Price (cents)
+                                    <DollarSign className="h-3 w-3" /> Price (USD)
                                 </label>
                                 <input
                                     name="price"
                                     type="number"
-                                    defaultValue={initialData?.price}
+                                    step="0.01"
+                                    defaultValue={initialData?.price ? (initialData.price / 100).toFixed(2) : ""}
                                     required
-                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all"
+                                    placeholder="0.00"
+                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all font-mono"
                                 />
                             </div>
                             <div className="space-y-2">

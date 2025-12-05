@@ -6,6 +6,7 @@ export interface Product {
     image: string
     features: string[]
     category: string
+    stock: number
 }
 
 export const products: Product[] = [
@@ -21,7 +22,8 @@ export const products: Product[] = [
             "Git Hooks",
             "Readme Templates"
         ],
-        category: "Templates"
+        category: "Templates",
+        stock: 100
     },
     {
         id: "prod_pro_icons",
@@ -35,7 +37,8 @@ export const products: Product[] = [
             "React components",
             "Commercial license"
         ],
-        category: "Icons"
+        category: "Icons",
+        stock: 50
     },
     {
         id: "prod_ui_bundle",
@@ -49,6 +52,7 @@ export const products: Product[] = [
             "Dark Mode Support",
             "TypeScript Ready"
         ],
-        category: "UI Kits"
+        category: "UI Kits",
+        stock: 10
     }
 ]

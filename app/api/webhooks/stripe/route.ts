@@ -41,7 +41,17 @@ export async function POST(req: Request) {
                     user = await db.user.create({ data: { email, name: session.customer_details?.name } })
                 }
 
-                // Create Order
+                // Increment Coupon Usage
+                const couponId = session.metadata?.couponId
+                if (couponId) {
+                    await db.coupon.update({
+                        where: { id: couponId },
+                        data: {
+                            uses: { increment: 1 }
+                        }
+                    }).catch(err => console.error("Failed to increment coupon usage:", err))
+                }
+
                 // Create Order
                 const order = await db.order.create({
                     data: {
@@ -50,16 +60,17 @@ export async function POST(req: Request) {
                         amount: amount,
                         currency: session.currency || "usd",
                         status: "completed",
+                        couponCode: couponId ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
                         items: {
                             create: productIds.map((id: string) => ({
                                 productId: id,
-                                price: 0 // Ideally fetch price from DB or Stripe
+                                price: 0 // Ideally fetch price from DB or Stripe - using 0 as placeholder per existing code
                             }))
                         }
                     }
                 })
 
-                // Generate License Keys
+                // Generate License Keys & Decrement Stock
                 const { generateLicenseKey } = await import("@/lib/license")
 
                 for (const productId of productIds) {
@@ -72,6 +83,16 @@ export async function POST(req: Request) {
                             status: "ACTIVE"
                         }
                     })
+
+                    // Decrement Stock
+                    await db.product.update({
+                        where: { id: productId },
+                        data: {
+                            stock: {
+                                decrement: 1
+                            }
+                        }
+                    }).catch(err => console.error(`Failed to decrement stock for product ${productId}:`, err))
                 }
             }
         }

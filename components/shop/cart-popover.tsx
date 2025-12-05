@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 
-import { getEnabledPaymentMethods } from "@/app/shop/actions"
+import { getEnabledPaymentMethods, validateCoupon } from "@/app/shop/actions"
 import { PaymentMethod } from "@prisma/client"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -27,10 +27,27 @@ export function CartPopover({ user }: { user?: any }) {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
     const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
     const [paypalError, setPaypalError] = useState<string | null>(null)
+
     const [isOpen, setIsOpen] = useState(false)
 
+    // Coupon State
+    const [couponCode, setCouponCode] = useState("")
+    const [couponError, setCouponError] = useState<string | null>(null)
+    const [validatingCoupon, setValidatingCoupon] = useState(false)
+    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, percent: number | null, amount: number | null } | null>(null)
+
     const totalAmount = cart.items.reduce((acc, item) => acc + item.price, 0)
-    const formattedTotal = (totalAmount / 100).toFixed(2)
+
+
+    // Calculate Discount
+    let discountAmount = 0
+    if (appliedCoupon && appliedCoupon.percent) {
+        discountAmount = (totalAmount * appliedCoupon.percent) / 100
+    }
+    // TODO: Handle fixed amount coupons if implemented
+
+    const finalTotal = Math.max(0, totalAmount - discountAmount)
+    const formattedTotal = (finalTotal / 100).toFixed(2)
     const isPayPalSelected = selectedMethod === "paypal"
     const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? ""
 
@@ -57,6 +74,27 @@ export function CartPopover({ user }: { user?: any }) {
         }
     }, [isPayPalSelected])
 
+    const onApplyCoupon = async () => {
+        if (!couponCode) return
+        setValidatingCoupon(true)
+        setCouponError(null)
+
+        try {
+            const result = await validateCoupon(couponCode)
+            if (result.error) {
+                setCouponError(result.error)
+                setAppliedCoupon(null)
+            } else if (result.coupon) {
+                setAppliedCoupon(result.coupon)
+                toast.success("Coupon applied!")
+            }
+        } catch (error) {
+            setCouponError("Failed to apply coupon")
+        } finally {
+            setValidatingCoupon(false)
+        }
+    }
+
     const onCheckout = async () => {
         if (!user) {
             toast.error("Please sign in to checkout.")
@@ -80,6 +118,7 @@ export function CartPopover({ user }: { user?: any }) {
                 body: JSON.stringify({
                     productIds: cart.items.map((item) => item.id),
                     paymentMethodId: selectedMethod,
+                    couponCode: appliedCoupon?.code
                 }),
             })
 
@@ -88,7 +127,7 @@ export function CartPopover({ user }: { user?: any }) {
             if (data.url) {
                 window.location.href = data.url
             } else {
-                toast.error("Something went wrong.")
+                toast.error(data.error || "Something went wrong.")
             }
         } catch (error) {
             toast.error("Something went wrong.")
@@ -189,6 +228,36 @@ export function CartPopover({ user }: { user?: any }) {
                                 </RadioGroup>
                             </div>
                         )}
+
+                        <div className="mb-4 space-y-2">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Coupon Code"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                    className="flex-1 bg-gray-900 border border-gray-700 rounded-md px-3 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500/50"
+                                />
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={onApplyCoupon}
+                                    disabled={validatingCoupon || !couponCode || appliedCoupon !== null}
+                                    className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+                                >
+                                    {validatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}
+                                </Button>
+                            </div>
+                            {couponError && (
+                                <p className="text-xs text-red-400">{couponError}</p>
+                            )}
+                            {appliedCoupon && (
+                                <div className="flex justify-between text-xs text-green-400">
+                                    <span>Discount ({appliedCoupon.percent}% off)</span>
+                                    <span>-${(discountAmount / 100).toFixed(2)}</span>
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-sm font-medium text-gray-400">Total</span>

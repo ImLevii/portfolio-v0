@@ -39,7 +39,11 @@ export async function createProduct(formData: FormData) {
 
     const name = formData.get("name") as string
     const description = formData.get("description") as string
-    const price = parseInt(formData.get("price") as string)
+
+    // Convert price from string float (dollars) to integer (cents)
+    const rawPrice = parseFloat(formData.get("price") as string)
+    const price = Math.round(rawPrice * 100)
+
     const image = formData.get("image") as string
     const category = formData.get("category") as string
     const features = formData.get("features") as string
@@ -73,7 +77,11 @@ export async function updateProduct(id: string, formData: FormData) {
 
     const name = formData.get("name") as string
     const description = formData.get("description") as string
-    const price = parseInt(formData.get("price") as string)
+
+    // Convert price from string float (dollars) to integer (cents)
+    const rawPrice = parseFloat(formData.get("price") as string)
+    const price = Math.round(rawPrice * 100)
+
     const image = formData.get("image") as string
     const category = formData.get("category") as string
     const features = formData.get("features") as string
