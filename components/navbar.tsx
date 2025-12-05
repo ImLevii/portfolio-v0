@@ -110,7 +110,7 @@ export default function Navbar({ user }: { user?: any }) {
         </nav>
 
         {/* Mobile Menu Actions */}
-        <div className="flex items-center gap-4 md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
           <div className="flex items-center gap-2">
             <CartSheet user={user} />
             {user ? <UserMenu user={user} /> : <SignIn compact={true} isShop={isShop} />}

@@ -163,14 +163,14 @@ export function CartSheet({ user }: { user?: any }) {
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <button className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg"
+                <button className="flex items-center justify-center gap-0 sm:gap-3 px-2 sm:px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg min-w-[32px] sm:min-w-0"
                     style={{
                         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
                     }}
                 >
                     <ShoppingCart className="h-5 w-5 text-green-500" />
                     <span
-                        className="relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                        className="hidden sm:inline relative z-10 uppercase font-bold tracking-wider text-xs font-orbitron"
                         style={{
                             color: '#22c55e',
                             textShadow: '0 0 8px rgba(34,197,94,0.8)',
