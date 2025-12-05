@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
-import { Plus, Edit, Trash2 } from "lucide-react"
-import { deleteProduct } from "@/app/admin/actions"
+import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react"
+import { deleteProduct, toggleProductListing } from "@/app/admin/actions"
 
 export default async function AdminProductsPage() {
     const products = await db.product.findMany({
@@ -39,6 +39,16 @@ export default async function AdminProductsPage() {
                                 <td className="px-6 py-4 text-gray-400">{product.category}</td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end gap-2">
+                                        {/* Toggle Listing Button */}
+                                        <form action={toggleProductListing.bind(null, product.id, !product.isListed)}>
+                                            <button
+                                                className={`p-2 hover:bg-white/10 rounded-lg transition-colors ${product.isListed ? 'text-green-400' : 'text-gray-500'}`}
+                                                title={product.isListed ? "Delist Product" : "Relist Product"}
+                                            >
+                                                {product.isListed ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                                            </button>
+                                        </form>
+
                                         <Link
                                             href={`/admin/products/${product.id}`}
                                             className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors"

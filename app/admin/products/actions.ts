@@ -13,6 +13,27 @@ async function checkAdmin() {
     }
 }
 
+import { writeFile, mkdir } from "fs/promises"
+import { join } from "path"
+
+async function saveFile(file: File): Promise<string> {
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+
+    // Create a unique filename
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`
+    const filename = `${uniqueSuffix}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+
+    // Ensure upload directory exists
+    const uploadDir = join(process.cwd(), "storage", "products")
+    await mkdir(uploadDir, { recursive: true })
+
+    const filePath = join(uploadDir, filename)
+    await writeFile(filePath, buffer)
+
+    return filename // Store only the filename/relative path identifier
+}
+
 export async function createProduct(formData: FormData) {
     await checkAdmin()
 
@@ -23,6 +44,12 @@ export async function createProduct(formData: FormData) {
     const category = formData.get("category") as string
     const features = formData.get("features") as string
     const stock = parseInt(formData.get("stock") as string) || 0
+    const file = formData.get("file") as File
+
+    let filePath: string | null = null
+    if (file && file.size > 0) {
+        filePath = await saveFile(file)
+    }
 
     await db.product.create({
         data: {
@@ -33,6 +60,7 @@ export async function createProduct(formData: FormData) {
             category,
             features,
             stock,
+            filePath
         },
     })
 
@@ -50,18 +78,25 @@ export async function updateProduct(id: string, formData: FormData) {
     const category = formData.get("category") as string
     const features = formData.get("features") as string
     const stock = parseInt(formData.get("stock") as string) || 0
+    const file = formData.get("file") as File
+
+    const data: any = {
+        name,
+        description,
+        price,
+        image,
+        category,
+        features,
+        stock,
+    }
+
+    if (file && file.size > 0) {
+        data.filePath = await saveFile(file)
+    }
 
     await db.product.update({
         where: { id },
-        data: {
-            name,
-            description,
-            price,
-            image,
-            category,
-            features,
-            stock,
-        },
+        data,
     })
 
     revalidatePath("/admin/products")

@@ -50,14 +50,23 @@ export default async function LicensesPage() {
                                             <div>
                                                 <h3 className="font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{license.product.name}</h3>
                                                 <p className="text-sm text-gray-400">Purchased on {new Date(license.createdAt).toLocaleDateString()}</p>
+                                                {license.product.filePath && (
+                                                    <a
+                                                        href={`/api/download/${license.id}`}
+                                                        className="inline-flex items-center gap-2 mt-2 text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg transition-colors border border-emerald-500/20"
+                                                    >
+                                                        <Key className="h-3 w-3" />
+                                                        Download Assets
+                                                    </a>
+                                                )}
                                             </div>
                                             <div className="flex flex-col items-end gap-2">
                                                 <code className="bg-black/80 px-3 py-1.5 rounded border border-gray-700 text-emerald-400 font-mono tracking-wider shadow-[0_0_10px_-3px_rgba(16,185,129,0.3)]">
                                                     {license.key}
                                                 </code>
                                                 <span className={`text-xs uppercase tracking-widest font-bold ${license.status === 'ACTIVE' ? 'text-emerald-500/80' :
-                                                        license.status === 'REVOKED' ? 'text-red-500/80' :
-                                                            'text-gray-500/80'
+                                                    license.status === 'REVOKED' ? 'text-red-500/80' :
+                                                        'text-gray-500/80'
                                                     }`}>
                                                     {license.status}
                                                 </span>

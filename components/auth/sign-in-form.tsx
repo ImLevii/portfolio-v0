@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function SignInForm() {
@@ -104,23 +103,7 @@ export function SignInForm() {
                 </Button>
             </form>
 
-            <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-800" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-orbitron">
-                    <span className="bg-black px-4 text-gray-500">Or continue with</span>
-                </div>
-            </div>
 
-            <Button
-                variant="outline"
-                className="w-full border-gray-800 bg-black/40 hover:bg-gray-900 hover:text-white hover:border-gray-700 transition-all h-12 group"
-                onClick={() => signIn("github", { callbackUrl: "/" })}
-            >
-                <Github className="mr-3 h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-                <span className="font-orbitron tracking-wide text-gray-300 group-hover:text-white">GitHub</span>
-            </Button>
         </div>
     )
 }

@@ -11,7 +11,8 @@ import { toast } from "sonner"
 function SuccessContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
-    const cart = useCart()
+    const removeAll = useCart((state) => state.removeAll)
+    const items = useCart((state) => state.items)
     const [status, setStatus] = useState<"loading" | "success" | "error">("success")
     const [message, setMessage] = useState("Thank you for your purchase. You will receive an email with your digital assets shortly.")
 
@@ -38,7 +39,7 @@ function SuccessContent() {
                     }
 
                     setStatus("success")
-                    cart.removeAll()
+                    removeAll()
                     toast.success("Payment successful!")
                 } catch (error) {
                     console.error("Capture error:", error)
@@ -48,12 +49,13 @@ function SuccessContent() {
             }
 
             captureOrder()
-        } else if (searchParams.get("session_id")) {
-            // Stripe success, already handled by webhook usually, but we can clear cart here too if needed
-            // For now, assume Stripe flow clears cart or we do it here
-            cart.removeAll()
+        } else if (searchParams.get("session_id") || searchParams.get("free")) {
+            // Stripe success or Free order
+            if (items.length > 0) {
+                removeAll()
+            }
         }
-    }, [method, token, cart, searchParams])
+    }, [method, token, searchParams, removeAll, items.length])
 
     if (status === "loading") {
         return (

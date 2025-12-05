@@ -13,8 +13,9 @@ interface ProductFormProps {
         price: number
         image: string
         category: string
-        features: string
+
         stock?: number
+        filePath?: string | null
     }
     action: (formData: FormData) => Promise<void>
 }
@@ -144,6 +145,32 @@ export function ProductForm({ initialData, action }: ProductFormProps) {
                             />
                         </div>
                     </div>
+
+                    <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-6 shadow-xl">
+                        <h3 className="text-xl font-bold font-orbitron text-white mb-6 flex items-center gap-2">
+                            <Box className="h-5 w-5 text-yellow-500" />
+                            Digital Download
+                        </h3>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Product File</label>
+                                <input
+                                    type="file"
+                                    name="file"
+                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-green-600 file:text-white hover:file:bg-green-500"
+                                />
+                                {initialData?.filePath && (
+                                    <p className="text-xs text-green-400 mt-2 flex items-center gap-2">
+                                        <Box className="h-3 w-3" />
+                                        Current file: {initialData.filePath.split('/').pop()}
+                                    </p>
+                                )}
+                                <p className="text-xs text-gray-500 font-mono">Upload the product file for customers to download.</p>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                     <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-6 shadow-xl">
                         <h3 className="text-xl font-bold font-orbitron text-white mb-6">Features</h3>

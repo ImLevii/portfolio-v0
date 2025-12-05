@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
-
+import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { createPayPalOrder } from "@/lib/paypal"
+import { generateLicenseKey } from "@/lib/license"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     // apiVersion: "2025-02-24.acacia", // Use latest or what's available
@@ -20,6 +21,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
+    const session = await auth()
     const { productIds, paymentMethodId } = await req.json()
 
     console.log("Checkout request:", { productIds, paymentMethodId })
@@ -38,12 +40,77 @@ export async function POST(req: Request) {
     })
 
     const totalAmount = items.reduce((acc, item) => acc + item.price, 0)
+    console.log("Checkout Check:", {
+        foundItems: items.length,
+        totalAmount,
+        productIds
+    })
 
     if (items.length === 0) {
         console.log("Checkout error: No valid products found", { productIds })
         return new NextResponse("No valid products found for checkout", {
             status: 400,
         })
+    }
+
+    // Handle Free Orders
+    if (totalAmount === 0) {
+        if (!session?.user?.email) {
+            return new NextResponse("Authentication required for free orders", { status: 401 })
+        }
+
+        try {
+            // Create Order
+            const order = await db.order.create({
+                data: {
+                    userId: session.user.id as string,
+                    stripeSessionId: `free_${Date.now()}_${Math.random().toString(36).substring(7)}`, // Mock ID for constraints
+                    amount: 0,
+                    currency: "usd",
+                    status: "completed",
+                    paymentMethod: "free",
+                    items: {
+                        create: items.map((item) => ({
+                            productId: item.id,
+                            price: 0
+                        }))
+                    }
+                }
+            })
+
+            // Generate License Keys
+            for (const item of items) {
+                await db.licenseKey.create({
+                    data: {
+                        key: generateLicenseKey(),
+                        productId: item.id,
+                        userId: session.user.id as string,
+                        orderId: order.id,
+                        status: "ACTIVE"
+                    }
+                })
+            }
+
+            return NextResponse.json(
+                { url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success?free=true` },
+                { headers: corsHeaders }
+            )
+
+        } catch (error) {
+            console.error("Free order creation error:", error)
+            return NextResponse.json(
+                { error: "Failed to process free order" },
+                { status: 500, headers: corsHeaders }
+            )
+        }
+    }
+
+    // Prevent small charges that Stripe rejects
+    if (totalAmount > 0 && totalAmount < 50) {
+        return NextResponse.json(
+            { error: "Minimum order amount is $0.50" },
+            { status: 400, headers: corsHeaders }
+        )
     }
 
     if (paymentMethodId === "paypal") {
@@ -87,7 +154,7 @@ export async function POST(req: Request) {
     })
 
     try {
-        const session = await stripe.checkout.sessions.create({
+        const stripeSession = await stripe.checkout.sessions.create({
             line_items,
             mode: "payment",
             billing_address_collection: "required",
@@ -99,10 +166,11 @@ export async function POST(req: Request) {
             metadata: {
                 productIds: JSON.stringify(productIds),
             },
+            customer_email: session?.user?.email || undefined, // Prefill email if logged in
         })
 
         return NextResponse.json(
-            { url: session.url },
+            { url: stripeSession.url },
             {
                 headers: corsHeaders,
             }

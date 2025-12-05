@@ -19,7 +19,16 @@ export default async function OrdersPage() {
             userId: session.user.id,
         },
         include: {
-            items: true,
+            items: {
+                include: {
+                    product: true,
+                },
+            },
+            licenseKeys: {
+                include: {
+                    product: true,
+                }
+            }
         },
         orderBy: {
             createdAt: "desc",
@@ -47,26 +56,57 @@ export default async function OrdersPage() {
                                         <CardTitle className="text-lg font-orbitron text-white">
                                             Order #{order.id.slice(-6)}
                                         </CardTitle>
-                                        <span className="text-sm text-gray-400">
-                                            {new Date(order.createdAt).toLocaleDateString()}
-                                        </span>
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-sm text-gray-400">
+                                                {new Date(order.createdAt).toLocaleDateString()}
+                                            </span>
+                                            <span className={`text-xs ${order.status === 'completed' ? 'text-green-500' : 'text-yellow-500'}`}>
+                                                {order.status.toUpperCase()}
+                                            </span>
+                                        </div>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="pt-4 space-y-4">
-                                    {order.items.map((item) => (
-                                        <div key={item.id} className="flex justify-between items-center">
-                                            <div>
-                                                <p className="font-medium text-white">Product ID: {item.productId}</p>
-                                                <p className="text-sm text-gray-400">${(item.price / 100).toFixed(2)}</p>
+                                    {order.items.map((item) => {
+                                        // Find corresponding license key for this product in this order
+                                        const license = order.licenseKeys.find(lk => lk.productId === item.product.id)
+                                        const hasFile = item.product.filePath
+
+                                        return (
+                                            <div key={item.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-lg bg-black/20 border border-gray-800/50 gap-4">
+                                                <div className="flex items-center gap-4">
+                                                    {item.product.image && (
+                                                        <div className="h-12 w-12 rounded-lg overflow-hidden flex-shrink-0">
+                                                            <img src={item.product.image} alt={item.product.name} className="h-full w-full object-cover" />
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <p className="font-bold text-white font-orbitron tracking-wide">{item.product.name}</p>
+                                                        <p className="text-sm text-gray-400">${(item.price / 100).toFixed(2)}</p>
+                                                    </div>
+                                                </div>
+
+                                                {hasFile && license ? (
+                                                    <a
+                                                        href={`/api/download/${license.id}`}
+                                                        className="w-full sm:w-auto"
+                                                    >
+                                                        <Button size="sm" variant="outline" className="w-full sm:w-auto gap-2 border-green-500/30 text-green-400 hover:bg-green-500/20 hover:text-green-300">
+                                                            <Download className="h-4 w-4" />
+                                                            Download Assets
+                                                        </Button>
+                                                    </a>
+                                                ) : hasFile ? (
+                                                    <Button size="sm" variant="outline" disabled className="w-full sm:w-auto gap-2 border-gray-700 text-gray-500 cursor-not-allowed">
+                                                        <Download className="h-4 w-4" />
+                                                        Processing License...
+                                                    </Button>
+                                                ) : null}
                                             </div>
-                                            <Button size="sm" variant="outline" className="gap-2 border-green-500/30 text-green-400 hover:bg-green-500/20">
-                                                <Download className="h-4 w-4" />
-                                                Download
-                                            </Button>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                     <div className="pt-4 border-t border-gray-800 flex justify-end">
-                                        <p className="text-lg font-bold text-green-500">
+                                        <p className="text-lg font-bold text-green-500 font-orbitron">
                                             Total: ${(order.amount / 100).toFixed(2)}
                                         </p>
                                     </div>
