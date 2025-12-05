@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check } from "lucide-react"
@@ -43,17 +44,31 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 <div className="grid gap-8 lg:gap-12 lg:grid-cols-2 items-start">
                     {/* Product Image */}
-                    <div className="aspect-square relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm shadow-2xl shadow-black/50">
+                    <div className="aspect-square relative overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm shadow-2xl shadow-black/50 group">
                         <div className="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900/50" />
-                        <div className="flex h-full w-full items-center justify-center relative z-10">
-                            <span className="text-9xl font-bold font-orbitron text-gray-800">{product.name.charAt(0)}</span>
-                        </div>
+
+                        {product.image ? (
+                            <div className="relative h-full w-full z-10 transition-transform duration-500 group-hover:scale-105">
+                                <Image
+                                    src={product.image}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex h-full w-full items-center justify-center relative z-10">
+                                <span className="text-9xl font-bold font-orbitron text-gray-800">{product.name.charAt(0)}</span>
+                            </div>
+                        )}
+
                         {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 p-4 opacity-20">
+                        <div className="absolute top-0 right-0 p-4 opacity-20 z-20 pointer-events-none">
                             <div className="h-24 w-24 rounded-full bg-green-500 blur-3xl" />
                         </div>
 
-                        <div className="absolute bottom-4 left-4">
+                        <div className="absolute bottom-4 left-4 z-20">
                             <span className="rounded-full bg-green-500/20 border border-green-500/30 px-3 py-1 text-xs font-bold text-green-400 backdrop-blur-md">
                                 {product.category}
                             </span>

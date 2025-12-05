@@ -106,13 +106,13 @@ export default function Navbar({ user }: { user?: any }) {
             </Link>
           ))}
           {user ? <UserMenu user={user} /> : <SignIn isShop={isShop} />}
-          <CartSheet />
+          <CartSheet user={user} />
         </nav>
 
         {/* Mobile Menu Actions */}
         <div className="flex items-center gap-4 md:hidden">
           <div className="flex items-center gap-2">
-            <CartSheet />
+            <CartSheet user={user} />
             {user ? <UserMenu user={user} /> : <SignIn compact={true} isShop={isShop} />}
           </div>
           <div className="w-px h-8 bg-white/10 mx-1"></div>

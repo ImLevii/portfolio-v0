@@ -23,7 +23,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 // import { PayPalButtons } from "@paypal/react-paypal-js"
 
-export function CartSheet() {
+export function CartSheet({ user }: { user?: any }) {
     const cart = useCart()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
@@ -60,6 +60,12 @@ export function CartSheet() {
     }, [isPayPalSelected])
 
     const onCheckout = async () => {
+        if (!user) {
+            toast.error("Please sign in to checkout.")
+            router.push("/auth/signin")
+            return
+        }
+
         if (!selectedMethod) {
             toast.error("No payment methods are available right now.")
             return

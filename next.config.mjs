@@ -56,6 +56,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'i.gyazo.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 }
