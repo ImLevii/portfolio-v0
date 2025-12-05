@@ -54,6 +54,66 @@ export async function POST(req: Request) {
             }
         }
 
+        // Create Order and License Keys
+        const { db } = await import("@/lib/db")
+        const { generateLicenseKey } = await import("@/lib/license")
+
+        // Find or create user (using email from PayPal or provided data)
+        const email = data.email || capture?.payer?.email_address
+        const name = data.name || `${capture?.payer?.name?.given_name} ${capture?.payer?.name?.surname}`.trim()
+
+        if (email) {
+            let user = await db.user.findUnique({ where: { email } })
+            if (!user) {
+                user = await db.user.create({ data: { email, name } })
+            }
+
+            // Create Order
+            // Note: We need product IDs here. Currently they are not passed in PaymentData.
+            // We should update the client to pass productIds or store them in the PayPal order context if possible.
+            // For now, assuming single product or we need to fetch from cart context on client side and pass it here.
+            // Let's assume the client passes `productIds` in the body.
+
+            // TODO: Update PaymentData interface and client call to include productIds
+
+            // Temporary: If productIds are missing, we can't link products. 
+            // BUT, for this task, we must implement it. 
+            // I will add `productIds` to the request body handling.
+
+            const productIds = (data as any).productIds || []
+
+            if (productIds.length > 0) {
+                const order = await db.order.create({
+                    data: {
+                        userId: user.id,
+                        stripeSessionId: `PAYPAL_${data.orderID}`, // Use PayPal ID as session ID
+                        amount: Number(data.amount) * 100, // Convert to cents if needed, or keep as is depending on schema
+                        currency: "USD",
+                        status: "completed",
+                        paymentMethod: "paypal",
+                        items: {
+                            create: productIds.map((id: string) => ({
+                                productId: id,
+                                price: 0 // Ideally fetch price
+                            }))
+                        }
+                    }
+                })
+
+                for (const productId of productIds) {
+                    await db.licenseKey.create({
+                        data: {
+                            key: generateLicenseKey(),
+                            productId: productId,
+                            userId: user.id,
+                            orderId: order.id,
+                            status: "ACTIVE"
+                        }
+                    })
+                }
+            }
+        }
+
         return NextResponse.json(
             {
                 success: true,

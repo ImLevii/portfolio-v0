@@ -42,7 +42,8 @@ export async function POST(req: Request) {
                 }
 
                 // Create Order
-                await db.order.create({
+                // Create Order
+                const order = await db.order.create({
                     data: {
                         userId: user.id,
                         stripeSessionId: session.id,
@@ -52,11 +53,26 @@ export async function POST(req: Request) {
                         items: {
                             create: productIds.map((id: string) => ({
                                 productId: id,
-                                price: 0 // Ideally fetch price from DB or Stripe, but for now 0 or split amount
+                                price: 0 // Ideally fetch price from DB or Stripe
                             }))
                         }
                     }
                 })
+
+                // Generate License Keys
+                const { generateLicenseKey } = await import("@/lib/license")
+
+                for (const productId of productIds) {
+                    await db.licenseKey.create({
+                        data: {
+                            key: generateLicenseKey(),
+                            productId: productId,
+                            userId: user.id,
+                            orderId: order.id,
+                            status: "ACTIVE"
+                        }
+                    })
+                }
             }
         }
     }

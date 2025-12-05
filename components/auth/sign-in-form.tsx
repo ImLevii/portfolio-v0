@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Github } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export function SignInForm() {
     const [error, setError] = useState<string | null>(null)
@@ -43,43 +44,82 @@ export function SignInForm() {
     }
 
     return (
-        <div className="w-full max-w-sm mx-auto p-6 bg-gray-900/50 backdrop-blur-md rounded-xl border border-gray-800">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center font-orbitron">Sign In</h2>
+        <div
+            className="w-full max-w-sm mx-auto p-8 bg-gradient-to-b from-gray-900/80 to-black/90 backdrop-blur-xl rounded-2xl border border-gray-800/50 shadow-2xl"
+            style={{
+                boxShadow: '0 0 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
+            }}
+        >
+            <h2
+                className="text-3xl font-bold text-center mb-8 font-orbitron tracking-wider"
+                style={{
+                    color: '#ffffff',
+                    textShadow: '0 0 20px rgba(255,255,255,0.1)'
+                }}
+            >
+                SIGN IN
+            </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-black/50 border-gray-700" />
+                    <Label htmlFor="email" className="text-gray-400 text-xs uppercase tracking-widest font-orbitron">Email</Label>
+                    <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="john@example.com"
+                        required
+                        className="bg-black/40 border-gray-800 focus:border-green-500/50 focus:ring-green-500/20 transition-all h-11"
+                    />
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" name="password" type="password" required className="bg-black/50 border-gray-700" />
+                    <Label htmlFor="password" className="text-gray-400 text-xs uppercase tracking-widest font-orbitron">Password</Label>
+                    <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        className="bg-black/40 border-gray-800 focus:border-green-500/50 focus:ring-green-500/20 transition-all h-11"
+                    />
                 </div>
 
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+                {error && (
+                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
-                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
-                    {loading ? "Signing In..." : "Sign In"}
+                <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 shadow-lg group h-12 mt-2"
+                    style={{
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                    }}
+                >
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 font-orbitron tracking-wider text-sm font-bold group-hover:from-green-300 group-hover:to-emerald-500">
+                        {loading ? "SIGNING IN..." : "SIGN IN"}
+                    </span>
                 </Button>
             </form>
 
-            <div className="relative my-6">
+            <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-700" />
+                    <span className="w-full border-t border-gray-800" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-black px-2 text-gray-400">Or continue with</span>
+                <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-orbitron">
+                    <span className="bg-black px-4 text-gray-500">Or continue with</span>
                 </div>
             </div>
 
             <Button
                 variant="outline"
-                className="w-full border-gray-700 bg-black/50 hover:bg-gray-800 hover:text-white"
+                className="w-full border-gray-800 bg-black/40 hover:bg-gray-900 hover:text-white hover:border-gray-700 transition-all h-12 group"
                 onClick={() => signIn("github", { callbackUrl: "/" })}
             >
-                <Github className="mr-2 h-4 w-4" />
-                GitHub
+                <Github className="mr-3 h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
+                <span className="font-orbitron tracking-wide text-gray-300 group-hover:text-white">GitHub</span>
             </Button>
         </div>
     )

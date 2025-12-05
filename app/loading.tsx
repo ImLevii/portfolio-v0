@@ -2,8 +2,16 @@
 
 import { motion } from "framer-motion"
 import { Code, RefreshCw } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 export default function Loading() {
+  const pathname = usePathname()
+  const isShop = pathname?.startsWith("/shop") || pathname?.startsWith("/settings") || pathname?.startsWith("/licenses") || pathname?.startsWith("/admin")
+
+  const accentColor = isShop ? "text-green-500" : "text-red-500"
+  const gradientColor = isShop ? "from-green-500 via-green-600 to-green-500" : "from-red-500 via-red-600 to-red-500"
+  const glowColor = isShop ? "from-green-500/20" : "from-red-500/20"
+
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
       <div className="relative">
@@ -17,9 +25,9 @@ export default function Loading() {
           }}
           className="flex items-center gap-3 mb-8"
         >
-          <Code className="h-12 w-12 text-red-500" />
+          <Code className={`h-12 w-12 ${accentColor}`} />
           <span className="text-4xl font-bold font-orbitron text-white">
-            LEVI<span className="text-red-500">.DEV</span>
+            LEVI<span className={accentColor}>.DEV</span>
           </span>
         </motion.div>
 
@@ -33,7 +41,7 @@ export default function Loading() {
           }}
           className="absolute -right-12 top-1/2 -translate-y-1/2"
         >
-          <RefreshCw className="h-6 w-6 text-red-500" />
+          <RefreshCw className={`h-6 w-6 ${accentColor}`} />
         </motion.div>
 
         {/* Loading bar */}
@@ -46,8 +54,9 @@ export default function Loading() {
               ease: "easeInOut",
               repeat: Infinity,
               repeatType: "reverse",
+              delay: 0.2,
             }}
-            className="h-full bg-gradient-to-r from-red-500 via-red-600 to-red-500"
+            className={`h-full bg-gradient-to-r ${gradientColor}`}
           />
         </div>
 
@@ -75,9 +84,9 @@ export default function Loading() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 -z-10 bg-gradient-radial from-red-500/20 to-transparent blur-3xl"
+          className={`absolute inset-0 -z-10 bg-gradient-radial ${glowColor} to-transparent blur-3xl`}
         />
       </div>
     </div>
   )
-} 
+}

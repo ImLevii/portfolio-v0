@@ -16,7 +16,7 @@ export default function Navbar({ user }: { user?: any }) {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const isAdmin = pathname?.startsWith("/admin")
-  const isShop = pathname?.startsWith("/shop") || pathname?.startsWith("/settings") || isAdmin
+  const isShop = pathname?.startsWith("/shop") || pathname?.startsWith("/settings") || pathname?.startsWith("/licenses") || isAdmin
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,10 +50,17 @@ export default function Navbar({ user }: { user?: any }) {
   const adminLinks = [
     { name: "DASHBOARD", href: "/admin" },
     { name: "PRODUCTS", href: "/admin/products" },
+    { name: "LICENSES", href: "/licenses" },
     { name: "SETTINGS", href: "/settings" },
   ]
 
-  const navLinks = isAdmin ? adminLinks : mainLinks
+  const shopLinks = [
+    { name: "SHOP", href: "/shop" },
+    { name: "LICENSES", href: "/licenses" },
+    { name: "SETTINGS", href: "/settings" },
+  ]
+
+  const navLinks = isAdmin ? adminLinks : (isShop ? shopLinks : mainLinks)
 
   const toggleMenu = () => setIsOpen(!isOpen)
 
@@ -98,7 +105,7 @@ export default function Navbar({ user }: { user?: any }) {
               <span className={cn("absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full", bgColor)}></span>
             </Link>
           ))}
-          {user ? <UserMenu user={user} /> : <SignIn />}
+          {user ? <UserMenu user={user} /> : <SignIn isShop={isShop} />}
           <CartSheet />
         </nav>
 
@@ -106,7 +113,7 @@ export default function Navbar({ user }: { user?: any }) {
         <div className="flex items-center gap-4 md:hidden">
           <div className="flex items-center gap-2">
             <CartSheet />
-            {user ? <UserMenu user={user} /> : <SignIn compact={true} />}
+            {user ? <UserMenu user={user} /> : <SignIn compact={true} isShop={isShop} />}
           </div>
           <div className="w-px h-8 bg-white/10 mx-1"></div>
           <button

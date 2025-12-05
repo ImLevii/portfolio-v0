@@ -24,6 +24,7 @@ export default async function SettingsPage() {
 
             <div className="container relative z-10 mx-auto px-4 py-6 md:py-8">
                 <h1 className="text-4xl font-bold text-white mb-8 font-orbitron text-center md:text-left">Account Settings</h1>
+
                 <div className="max-w-2xl mx-auto">
                     {/* @ts-ignore - User type mismatch between Prisma and NextAuth is common, passing Prisma user is fine as it has the fields */}
                     <SettingsForm user={user} />

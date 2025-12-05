@@ -22,6 +22,7 @@ export async function createProduct(formData: FormData) {
     const image = formData.get("image") as string
     const category = formData.get("category") as string
     const features = formData.get("features") as string
+    const stock = parseInt(formData.get("stock") as string) || 0
 
     await db.product.create({
         data: {
@@ -31,6 +32,7 @@ export async function createProduct(formData: FormData) {
             image,
             category,
             features,
+            stock,
         },
     })
 
@@ -47,6 +49,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const image = formData.get("image") as string
     const category = formData.get("category") as string
     const features = formData.get("features") as string
+    const stock = parseInt(formData.get("stock") as string) || 0
 
     await db.product.update({
         where: { id },
@@ -57,6 +60,7 @@ export async function updateProduct(id: string, formData: FormData) {
             image,
             category,
             features,
+            stock,
         },
     })
 

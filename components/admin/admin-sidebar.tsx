@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X } from "lucide-react"
+import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function AdminSidebar() {
@@ -13,6 +13,7 @@ export function AdminSidebar() {
     const links = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/products", label: "Products", icon: ShoppingBag },
+        { href: "/admin/customers", label: "Customers", icon: Users }, // Added Customers link
         { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
     ]
 

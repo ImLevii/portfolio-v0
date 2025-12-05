@@ -18,6 +18,7 @@ model User {
   sessions      Session[]
   orders        Order[]
   role          String    @default("CUSTOMER")
+  licenseKeys   LicenseKey[]
 }
 
 model Account {
@@ -63,9 +64,11 @@ model Product {
   image       String
   category    String
   features    String      // JSON string
+  stock       Int         @default(0)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   orderItems  OrderItem[]
+  licenseKeys LicenseKey[]
 }
 
 model Order {
@@ -80,6 +83,7 @@ model Order {
   items           OrderItem[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseKeys LicenseKey[]
 }
 
 model OrderItem {
@@ -100,4 +104,19 @@ model PaymentMethod {
   config      String?  // JSON string for public config (e.g. instructions for bank transfer)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model LicenseKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  productId String
+  userId    String
+  orderId   String
+  status    String   @default("ACTIVE") // ACTIVE, REVOKED, USED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
