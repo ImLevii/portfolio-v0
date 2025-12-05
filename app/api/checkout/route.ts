@@ -25,7 +25,14 @@ export async function POST(req: Request) {
     const reqBody = await req.json()
     const { productIds, paymentMethodId } = reqBody
 
-    console.log("Checkout request:", { productIds, paymentMethodId })
+    // Determine Base URL dynamically
+    const origin = req.headers.get("origin")
+    const host = req.headers.get("host")
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https"
+
+    const baseUrl = origin || `${protocol}://${host}` || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+
+    console.log("Checkout request:", { productIds, paymentMethodId, baseUrl })
 
     if (!productIds || productIds.length === 0) {
         console.log("Checkout error: Product IDs are required")
@@ -141,7 +148,7 @@ export async function POST(req: Request) {
             }
 
             return NextResponse.json(
-                { url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success?free=true` },
+                { url: `${baseUrl}/shop/success?free=true` },
                 { headers: corsHeaders }
             )
 
@@ -166,7 +173,7 @@ export async function POST(req: Request) {
     if (paymentMethodId === "paypal") {
         try {
             const formattedTotal = (totalAmount / 100).toFixed(2)
-            const order = await createPayPalOrder(formattedTotal)
+            const order = await createPayPalOrder(formattedTotal, baseUrl)
 
             const approveLink = order.links.find((link: any) => link.rel === "approve")
 
@@ -221,8 +228,8 @@ export async function POST(req: Request) {
             phone_number_collection: {
                 enabled: true,
             },
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop?canceled=1`,
+            success_url: `${baseUrl}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/shop?canceled=1`,
             metadata: {
                 productIds: JSON.stringify(productIds),
                 couponId: couponId

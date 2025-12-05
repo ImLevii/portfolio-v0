@@ -28,11 +28,11 @@ export async function getPayPalAccessToken() {
     return data.access_token as string
 }
 
-export async function createPayPalOrder(amount: string) {
+export async function createPayPalOrder(amount: string, baseUrl: string) {
     const accessToken = await getPayPalAccessToken()
 
-    const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL}/shop/success?method=paypal`
-    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/shop?canceled=1`
+    const returnUrl = `${baseUrl}/shop/success?method=paypal`
+    const cancelUrl = `${baseUrl}/shop?canceled=1`
 
     console.log("Creating PayPal Order:", { amount, returnUrl, cancelUrl })
 
