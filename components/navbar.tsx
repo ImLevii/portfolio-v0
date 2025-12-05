@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { SignIn } from "@/components/auth/sign-in"
 import { UserMenu } from "@/components/auth/user-menu"
 
-import { CartSheet } from "@/components/shop/cart-sheet"
+import { CartPopover } from "@/components/shop/cart-popover"
 
 export default function Navbar({ user }: { user?: any }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -106,13 +106,13 @@ export default function Navbar({ user }: { user?: any }) {
             </Link>
           ))}
           {user ? <UserMenu user={user} /> : <SignIn isShop={isShop} />}
-          <CartSheet user={user} />
+          <CartPopover user={user} />
         </nav>
 
         {/* Mobile Menu Actions */}
         <div className="flex items-center gap-2 md:hidden">
           <div className="flex items-center gap-2">
-            <CartSheet user={user} />
+            <CartPopover user={user} />
             {user ? <UserMenu user={user} /> : <SignIn compact={true} isShop={isShop} />}
           </div>
           <div className="w-px h-8 bg-white/10 mx-1"></div>

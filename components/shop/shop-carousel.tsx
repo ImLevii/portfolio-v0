@@ -4,10 +4,12 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import { getCarouselItems } from "@/app/admin/carousel/actions"
+import { CarouselItem } from "@prisma/client"
 
-const slides = [
+const defaultSlides = [
     {
-        id: 1,
+        id: "1",
         title: "NEW ARRIVALS",
         subtitle: "CHECK OUT THE LATEST TOOLS",
         description: "Upgrade your workflow with our newest developer assets.",
@@ -17,7 +19,7 @@ const slides = [
         button: "bg-green-600 hover:bg-green-700 text-white shadow-green-900/20 hover:shadow-green-500/40"
     },
     {
-        id: 2,
+        id: "2",
         title: "LIMITED OFFER",
         subtitle: "GET 50% OFF UI BUNDLE",
         description: "Complete collection of React components at half price.",
@@ -27,7 +29,7 @@ const slides = [
         button: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-900/20 hover:shadow-emerald-500/40"
     },
     {
-        id: 3,
+        id: "3",
         title: "PREMIUM ICONS",
         subtitle: "PIXEL PERFECT VECTORS",
         description: "Over 200+ custom icons for your next big project.",
@@ -40,13 +42,34 @@ const slides = [
 
 export function ShopCarousel() {
     const [current, setCurrent] = useState(0)
+    const [slides, setSlides] = useState<any[]>(defaultSlides)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchSlides = async () => {
+            try {
+                const items = await getCarouselItems()
+                const activeItems = items.filter((item: any) => item.isActive)
+                if (activeItems.length > 0) {
+                    setSlides(activeItems)
+                }
+            } catch (error) {
+                console.error("Failed to fetch carousel items", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchSlides()
+    }, [])
 
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrent((prev) => (prev + 1) % slides.length)
         }, 5000)
         return () => clearInterval(timer)
-    }, [])
+    }, [slides.length])
+
+    if (loading) return <div className="h-[400px] md:h-[300px] w-full animate-pulse bg-gray-900/50 rounded-2xl border border-gray-800" />
 
     return (
         <div className="relative mb-12 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm shadow-2xl">

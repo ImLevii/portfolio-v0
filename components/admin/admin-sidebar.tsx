@@ -14,7 +14,8 @@ export function AdminSidebar() {
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/products", label: "Products", icon: ShoppingBag },
         { href: "/admin/orders", label: "Orders", icon: Package },
-        { href: "/admin/customers", label: "Customers", icon: Users }, // Added Customers link
+        { href: "/admin/customers", label: "Customers", icon: Users },
+        { href: "/admin/carousel", label: "Carousel", icon: LayoutDashboard }, // Added Carousel link
         { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
     ]
 

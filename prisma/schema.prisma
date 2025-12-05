@@ -122,3 +122,18 @@ model LicenseKey {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
+
+model CarouselItem {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String
+  description String
+  cta         String
+  color       String
+  accent      String
+  button      String
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
