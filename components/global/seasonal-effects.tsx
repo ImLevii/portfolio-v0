@@ -3,8 +3,13 @@
 import { useEffect, useRef, useState } from "react"
 import { useVisualEffectsStore } from "@/store/visual-effects-store"
 import { usePathname } from "next/navigation"
+import type { SeasonalSettings } from "@/actions/seasonal-settings"
 
-export function SeasonalEffects() {
+interface SeasonalEffectsProps {
+    config?: SeasonalSettings
+}
+
+export function SeasonalEffects({ config }: SeasonalEffectsProps) {
     const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()
@@ -38,11 +43,13 @@ export function SeasonalEffects() {
     }, [])
 
     useEffect(() => {
-        const month = new Date().getMonth() // 0-11
+        if (config?.mode && config.mode !== "auto") {
+            setSeason(config.mode === "none" ? null : config.mode)
+            return
+        }
 
-        // Debug override (Uncomment to test)
-        // const month = 11 // December (Winter)
-        // const month = 10 // November (Autumn)
+        const month = new Date().getMonth() // 0-11
+        // ... (removed debug override comments)
 
         if (month === 11) { // December
             setSeason("winter")
@@ -51,7 +58,7 @@ export function SeasonalEffects() {
         } else {
             setSeason(null)
         }
-    }, [])
+    }, [config?.mode])
 
     // cleanup melody helper
     const stopMelody = () => {
@@ -72,9 +79,10 @@ export function SeasonalEffects() {
 
     // Determine if settings allow playback
     const settingsEnabled =
-        season === "winter" &&
+        season !== null &&
         weatherEffects &&
-        soundEffects
+        soundEffects &&
+        (config?.enableAudio ?? true)
 
     // Effect 1: Manage Play/Stop Lifecycle
     useEffect(() => {
@@ -90,9 +98,10 @@ export function SeasonalEffects() {
             stopMelody()
 
             // 2. Play Impact (One-shot)
-            if (generalVolume > 0) {
+            const vol = config?.soundEffectsVolume ?? generalVolume
+            if (vol > 0) {
                 const impactAudio = new Audio("/sounds/christmas-impact.mp3")
-                impactAudio.volume = Math.max(0, Math.min(1, generalVolume / 100))
+                impactAudio.volume = Math.max(0, Math.min(1, vol / 100))
                 impactAudio.play().catch((err) => {
                     // Impact is short and usually triggered by a click to navigate, 
                     // but if user routed directly, it might be blocked.
@@ -105,10 +114,11 @@ export function SeasonalEffects() {
         // --- Logic for Home Page (Melody) ---
         if (pathname === "/") {
             // Start Melody if not playing (and soundtrack volume allows)
-            if (!melodyRef.current && soundtrackVolume > 0) {
+            const vol = config?.musicVolume ?? soundtrackVolume
+            if (!melodyRef.current && vol > 0) {
                 const audio = new Audio("/sounds/christmas-melody.mp3")
                 audio.loop = true
-                audio.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
+                audio.volume = Math.max(0, Math.min(1, vol / 100))
 
                 const playPromise = audio.play()
 
@@ -157,21 +167,22 @@ export function SeasonalEffects() {
     useEffect(() => {
         if (melodyRef.current && !fadeIntervalRef.current) {
             // Only update volume if not currently fading out
-            melodyRef.current.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
+            const vol = config?.musicVolume ?? soundtrackVolume
+            melodyRef.current.volume = Math.max(0, Math.min(1, vol / 100))
         }
-    }, [soundtrackVolume])
+    }, [soundtrackVolume, config?.musicVolume])
 
     if (!season || !weatherEffects) return null
 
     return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-            {season === "winter" && <SnowEffect />}
-            {season === "autumn" && <LeavesEffect />}
+            {season === "winter" && <SnowEffect density={config?.snowDensity} />}
+            {season === "autumn" && <LeavesEffect density={config?.leavesDensity} />}
         </div>
     )
 }
 
-function SnowEffect() {
+function SnowEffect({ density: densityProp }: { density?: number }) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
@@ -202,7 +213,11 @@ function SnowEffect() {
         }
 
         const initParticles = () => {
-            const particleCount = Math.floor(window.innerWidth / 8) // Moderate density for detailed flakes
+            const density = typeof densityProp === 'number' ? densityProp : 50
+            // Base count: (width / 8). Adjust by density: 50 is baseline.
+            // Formula: base * (density / 50)
+            const baseCount = Math.floor(window.innerWidth / 8)
+            const particleCount = Math.floor(baseCount * (density / 50))
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 const depth = Math.random() // 0 = far, 1 = close
@@ -291,7 +306,7 @@ function SnowEffect() {
     return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
 }
 
-function LeavesEffect() {
+function LeavesEffect({ density: densityProp }: { density?: number }) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
@@ -324,7 +339,9 @@ function LeavesEffect() {
         }
 
         const initParticles = () => {
-            const particleCount = Math.floor(window.innerWidth / 15) // Density
+            const density = typeof densityProp === 'number' ? densityProp : 50
+            const baseCount = Math.floor(window.innerWidth / 15)
+            const particleCount = Math.floor(baseCount * (density / 50))
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 particles.push({

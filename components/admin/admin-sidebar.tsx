@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users } from "lucide-react"
+import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function AdminSidebar() {
@@ -18,6 +18,7 @@ export function AdminSidebar() {
         { href: "/admin/carousel", label: "Carousel", icon: LayoutDashboard }, // Added Carousel link
         { href: "/admin/coupons", label: "Coupons", icon: Package },
         { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
+        { href: "/admin/seasonal", label: "Seasonal Effects", icon: Snowflake },
     ]
 
     return (

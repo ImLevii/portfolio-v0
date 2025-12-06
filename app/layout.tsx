@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import { PaypalProvider } from "@/components/paypal-provider"
 import { SeasonalEffects } from "@/components/global/seasonal-effects"
+import { getSeasonalSettings } from "@/actions/seasonal-settings"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const session = await auth()
+  const seasonalSettings = await getSeasonalSettings()
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -40,7 +42,7 @@ export default async function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
             <ScrollToTop />
             <Navbar user={session?.user} />
-            <SeasonalEffects />
+            <SeasonalEffects config={seasonalSettings} />
             {children}
           </ThemeProvider>
         </PaypalProvider>
