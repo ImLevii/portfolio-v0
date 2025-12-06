@@ -114,6 +114,11 @@ export function SeasonalEffects() {
         const handleInteraction = () => {
             if (hasInteracted) return
 
+            // CRITICAL FIX: Only consume interaction if we are actually allowed to play.
+            // If settings are not enabled yet (or user disabled them), preserve the "interaction token"
+            // for when they eventually enable it.
+            if (!settingsEnabled) return
+
             // 1. Mark as interacted
             setHasInteracted(true)
 
@@ -131,7 +136,7 @@ export function SeasonalEffects() {
         return () => {
             events.forEach(event => window.removeEventListener(event, handleInteraction))
         }
-    }, [hasInteracted, playCurrentContextSound])
+    }, [hasInteracted, playCurrentContextSound, settingsEnabled])
 
     // Effect 1: Lifecycle / Navigation
     // Triggered on Pathname change OR Settings toggle (Enable/Disable)
@@ -206,7 +211,10 @@ function SnowEffect() {
         const initParticles = () => {
             const width = canvas.width
             const height = canvas.height
-            const particleCount = Math.floor(width / 8) // Moderate density
+            // Optimization: Reduce particle count on mobile
+            const isMobile = width < 768
+            const density = isMobile ? 24 : 8 // Much lower density on mobile (higher divisor)
+            const particleCount = Math.floor(width / density)
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 const depth = Math.random() // 0 = far, 1 = close
@@ -330,7 +338,10 @@ function LeavesEffect() {
         const initParticles = () => {
             const width = canvas.width
             const height = canvas.height
-            const particleCount = Math.floor(width / 15)
+            // Optimization: Reduce particle count on mobile
+            const isMobile = width < 768
+            const density = isMobile ? 45 : 15
+            const particleCount = Math.floor(width / density)
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 particles.push({
