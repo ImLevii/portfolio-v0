@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { updateProfile, updatePassword } from "@/app/settings/actions"
 import { User } from "next-auth"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { SettingsButton } from "@/components/settings/settings-button"
+import { Save, Key } from "lucide-react"
 
 interface SettingsFormProps {
     user: User
@@ -93,9 +94,14 @@ export function SettingsForm({ user }: SettingsFormProps) {
                         </div>
                     </div>
 
-                    <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={loading}>
-                        Save Profile
-                    </Button>
+                    <div className="flex justify-end">
+                        <SettingsButton
+                            type="submit"
+                            label="Save Profile"
+                            icon={Save}
+                            loading={loading}
+                        />
+                    </div>
                 </form>
             </div>
 
@@ -129,9 +135,14 @@ export function SettingsForm({ user }: SettingsFormProps) {
                         />
                     </div>
 
-                    <Button type="submit" className="bg-gray-700 hover:bg-gray-600" disabled={loading}>
-                        Update Password
-                    </Button>
+                    <div className="flex justify-end">
+                        <SettingsButton
+                            type="submit"
+                            label="Update Password"
+                            icon={Key}
+                            loading={loading}
+                        />
+                    </div>
                 </form>
             </div>
 

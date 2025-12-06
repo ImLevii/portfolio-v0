@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import { SettingsForm } from "@/components/settings/settings-form"
+import { EffectsList } from "@/components/settings/effects-list"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
 
@@ -28,6 +29,13 @@ export default async function SettingsPage() {
                 <div className="max-w-2xl mx-auto">
                     {/* @ts-ignore - User type mismatch between Prisma and NextAuth is common, passing Prisma user is fine as it has the fields */}
                     <SettingsForm user={user} />
+
+                    <div className="mt-12 pt-8 border-t border-white/10">
+                        <h2 className="text-2xl font-bold font-orbitron text-white mb-6">Visual Effects</h2>
+                        <div className="rounded-xl p-0 md:p-0">
+                            <EffectsList />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

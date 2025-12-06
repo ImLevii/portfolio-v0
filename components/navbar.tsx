@@ -60,7 +60,7 @@ export default function Navbar({ user }: { user?: any }) {
     { name: "SETTINGS", href: "/settings" },
   ]
 
-  const navLinks = isAdmin ? adminLinks : (isShop ? shopLinks : mainLinks)
+  const navLinks = isAdmin ? adminLinks : (isShop || user ? shopLinks : mainLinks)
 
   const toggleMenu = () => setIsOpen(!isOpen)
 

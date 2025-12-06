@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import { PaypalProvider } from "@/components/paypal-provider"
+import { SeasonalEffects } from "@/components/global/seasonal-effects"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default async function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
             <ScrollToTop />
             <Navbar user={session?.user} />
+            <SeasonalEffects />
             {children}
           </ThemeProvider>
         </PaypalProvider>
