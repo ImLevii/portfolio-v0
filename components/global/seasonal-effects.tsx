@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useVisualEffectsStore } from "@/store/visual-effects-store"
 import { usePathname } from "next/navigation"
 
-import { SeasonalSettingsConfig } from "@/actions/seasonal-settings"
-
-export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig }) {
+export function SeasonalEffects() {
     const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()
@@ -16,39 +14,7 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
     const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const stopTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-    // Interaction tracking for autoplay fallback
-    const [hasInteracted, setHasInteracted] = useState(false)
-
     useEffect(() => {
-        const handleInteraction = () => {
-            setHasInteracted(true)
-            // Cleanup listeners once interaction is detected
-            window.removeEventListener('click', handleInteraction)
-            window.removeEventListener('keydown', handleInteraction)
-            window.removeEventListener('scroll', handleInteraction)
-        }
-
-        window.addEventListener('click', handleInteraction)
-        window.addEventListener('keydown', handleInteraction)
-        window.addEventListener('scroll', handleInteraction)
-
-        return () => {
-            window.removeEventListener('click', handleInteraction)
-            window.removeEventListener('keydown', handleInteraction)
-            window.removeEventListener('scroll', handleInteraction)
-        }
-    }, [])
-
-    useEffect(() => {
-        if (config?.mode && config.mode !== "auto") {
-            if (config.mode === "none") {
-                setSeason(null)
-            } else {
-                setSeason(config.mode)
-            }
-            return
-        }
-
         const month = new Date().getMonth() // 0-11
 
         // Debug override (Uncomment to test)
@@ -62,7 +28,7 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
         } else {
             setSeason(null)
         }
-    }, [config?.mode])
+    }, [])
 
     // cleanup melody helper
     const stopMelody = () => {
@@ -85,8 +51,7 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
     const settingsEnabled =
         season === "winter" &&
         weatherEffects &&
-        soundEffects &&
-        (config?.musicEnabled ?? true)
+        soundEffects
 
     // Effect 1: Manage Play/Stop Lifecycle
     useEffect(() => {
@@ -105,11 +70,7 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
             if (generalVolume > 0) {
                 const impactAudio = new Audio("/sounds/christmas-impact.mp3")
                 impactAudio.volume = Math.max(0, Math.min(1, generalVolume / 100))
-                impactAudio.play().catch((err) => {
-                    // Impact is short and usually triggered by a click to navigate, 
-                    // but if user routed directly, it might be blocked.
-                    console.error("Impact autoplay failed:", err)
-                })
+                impactAudio.play().catch((err) => console.error("Impact autoplay failed:", err))
             }
             return
         }
@@ -117,21 +78,14 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
         // --- Logic for Home Page (Melody) ---
         if (pathname === "/") {
             // Start Melody if not playing (and soundtrack volume allows)
-            const volumeLimit = (config?.audioVolume ?? 100) / 100
-            const effectiveVolume = Math.min(volumeLimit, soundtrackVolume / 100)
-
-            if (!melodyRef.current && effectiveVolume > 0) {
+            if (!melodyRef.current && soundtrackVolume > 0) {
                 const audio = new Audio("/sounds/christmas-melody.mp3")
                 audio.loop = true
-                audio.volume = Math.max(0, Math.min(1, effectiveVolume))
+                audio.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
 
-                const playPromise = audio.play()
-
-                if (playPromise !== undefined) {
-                    playPromise.catch((err) => {
-                        console.error("Melody autoplay failed (blocked):", err)
-                    })
-                }
+                audio.play().catch((err) => {
+                    console.error("Melody autoplay failed:", err)
+                })
 
                 melodyRef.current = audio
 
@@ -152,16 +106,13 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
                     }, fadeInterval)
 
                 }, 60000) // 60 seconds
-            } else if (melodyRef.current && hasInteracted && melodyRef.current.paused) {
-                // Retry playing if paused (likely due to autoplay block) and we now have interaction
-                melodyRef.current.play().catch(e => console.error("Retry play failed", e))
             }
         }
 
         // --- Logic for Other Pages ---
         // Do nothing. Melody persists if playing. Impact played and finished.
 
-    }, [settingsEnabled, pathname, soundtrackVolume, generalVolume, hasInteracted, config?.audioVolume])
+    }, [settingsEnabled, pathname, soundtrackVolume, generalVolume])
 
     // Cleanup on unmount only
     useEffect(() => {
@@ -172,22 +123,21 @@ export function SeasonalEffects({ config }: { config?: SeasonalSettingsConfig })
     useEffect(() => {
         if (melodyRef.current && !fadeIntervalRef.current) {
             // Only update volume if not currently fading out
-            const volumeLimit = (config?.audioVolume ?? 100) / 100
-            melodyRef.current.volume = Math.max(0, Math.min(1, Math.min(volumeLimit, soundtrackVolume / 100)))
+            melodyRef.current.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
         }
-    }, [soundtrackVolume, config?.audioVolume])
+    }, [soundtrackVolume])
 
-    if (!season || !weatherEffects || (config && !config.enabled)) return null
+    if (!season || !weatherEffects) return null
 
     return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-            {season === "winter" && <SnowEffect density={config?.snowDensity} />}
-            {season === "autumn" && <LeavesEffect density={config?.leavesDensity} />}
+            {season === "winter" && <SnowEffect />}
+            {season === "autumn" && <LeavesEffect />}
         </div>
     )
 }
 
-function SnowEffect({ density = 50 }: { density?: number }) {
+function SnowEffect() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
@@ -218,12 +168,7 @@ function SnowEffect({ density = 50 }: { density?: number }) {
         }
 
         const initParticles = () => {
-            // Base divisor is 20, so higher density means lower divisor -> more particles
-            // density 1 = divisor 400 (very sparse)
-            // density 50 = divisor ~8 (moderate)
-            // density 100 = divisor ~4 (dense)
-            const divisor = Math.max(2, 400 / (density * 2 || 1))
-            const particleCount = Math.floor(window.innerWidth / divisor)
+            const particleCount = Math.floor(window.innerWidth / 8) // Moderate density for detailed flakes
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 const depth = Math.random() // 0 = far, 1 = close
@@ -312,7 +257,7 @@ function SnowEffect({ density = 50 }: { density?: number }) {
     return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
 }
 
-function LeavesEffect({ density = 30 }: { density?: number }) {
+function LeavesEffect() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
@@ -345,11 +290,7 @@ function LeavesEffect({ density = 30 }: { density?: number }) {
         }
 
         const initParticles = () => {
-            // Base divisor 15 (moderate).
-            // density 1 = divisor 450
-            // density 30 = divisor 15
-            const divisor = Math.max(3, 450 / (density || 1))
-            const particleCount = Math.floor(window.innerWidth / divisor)
+            const particleCount = Math.floor(window.innerWidth / 15) // Density
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 particles.push({

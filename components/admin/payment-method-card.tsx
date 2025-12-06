@@ -59,7 +59,11 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                 <div>
                     <h3 className="text-xl font-bold text-white">{method.displayName}</h3>
                     <p className="text-sm text-gray-400">
-                        {method.name === "stripe" ? "Configure Stripe payments" : "Configure manual bank transfer details"}
+                        {method.name === "stripe"
+                            ? "Configure Stripe payments"
+                            : method.name === "paypal"
+                                ? "Configure PayPal settings"
+                                : "Configure manual bank transfer details"}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -75,14 +79,18 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                 </div>
             </div>
 
-            {method.name === "bank_transfer" && (
+            {(method.name === "bank_transfer" || method.name === "paypal") && (
                 <div className="space-y-2 pt-4 border-t border-white/10">
-                    <label className="text-sm font-medium text-gray-300">Bank Details & Instructions (JSON)</label>
+                    <label className="text-sm font-medium text-gray-300">
+                        {method.name === "paypal" ? "PayPal Credentials (JSON)" : "Bank Details & Instructions (JSON)"}
+                    </label>
                     <Textarea
                         value={config}
                         onChange={(e) => setConfig(e.target.value)}
                         className="font-mono text-sm bg-black/50 border-white/10 min-h-[150px]"
-                        placeholder='{"bankName": "...", "accountNumber": "..."}'
+                        placeholder={method.name === "paypal"
+                            ? '{"clientId": "...", "clientSecret": "...", "mode": "sandbox"}'
+                            : '{"bankName": "...", "accountNumber": "..."}'}
                     />
                     <div className="flex justify-end">
                         <TechButton

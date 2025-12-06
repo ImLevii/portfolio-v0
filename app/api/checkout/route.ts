@@ -172,20 +172,6 @@ export async function POST(req: Request) {
         )
     }
 
-    // Validate Payment Method
-    if (paymentMethodId && paymentMethodId !== "free") {
-        const method = await db.paymentMethod.findUnique({
-            where: { name: paymentMethodId }
-        })
-
-        if (!method || !method.isEnabled) {
-            return NextResponse.json(
-                { error: `Payment method ${paymentMethodId} is not enabled` },
-                { status: 400, headers: corsHeaders }
-            )
-        }
-    }
-
     if (paymentMethodId === "paypal") {
         try {
             const formattedTotal = (totalAmount / 100).toFixed(2)

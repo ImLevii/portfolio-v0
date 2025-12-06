@@ -1,8 +1,31 @@
+import { db } from "@/lib/db"
+
 const PAYPAL_API_URL = "https://api-m.paypal.com"
 
 export async function getPayPalAccessToken() {
-    const clientId = "Aah3diQKlZaEyXnKZRGlcUOqwOqIpOGKfqLWC39j8Gdwhz1KdPp3Jjn06xyK01DYXfMg_XO7Fj5yMgfh"
-    const clientSecret = "EEgnavQEtWZPpKWumZS-DMCJHyEHplJcraTtm26M5hSMtR-sWuyODxNXltv7QZz81Vxpx0U9e4hJWGcU"
+    const method = await db.paymentMethod.findUnique({
+        where: { name: "paypal" }
+    })
+
+    let clientId = process.env.PAYPAL_CLIENT_ID
+    let clientSecret = process.env.PAYPAL_CLIENT_SECRET
+    let apiUrl = PAYPAL_API_URL
+
+    if (method && method.config) {
+        try {
+            const config = JSON.parse(method.config)
+            if (config.clientId) clientId = config.clientId
+            if (config.clientSecret) clientSecret = config.clientSecret
+            if (config.mode === "sandbox") apiUrl = "https://api-m.sandbox.paypal.com"
+        } catch (e) {
+            console.error("Failed to parse PayPal config from DB", e)
+        }
+    }
+
+    // Fallback if DB lookup failed or was empty, to the hardcoded ones (or env vars)
+    // NOTE: Ideally remove hardcoded credentials in production!
+    if (!clientId) clientId = "Aah3diQKlZaEyXnKZRGlcUOqwOqIpOGKfqLWC39j8Gdwhz1KdPp3Jjn06xyK01DYXfMg_XO7Fj5yMgfh"
+    if (!clientSecret) clientSecret = "EEgnavQEtWZPpKWumZS-DMCJHyEHplJcraTtm26M5hSMtR-sWuyODxNXltv7QZz81Vxpx0U9e4hJWGcU"
 
     if (!clientId || !clientSecret) {
         throw new Error("Missing PayPal credentials")
@@ -10,7 +33,7 @@ export async function getPayPalAccessToken() {
 
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64")
 
-    const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
+    const response = await fetch(`${apiUrl}/v1/oauth2/token`, {
         method: "POST",
         headers: {
             Authorization: `Basic ${auth}`,
@@ -25,18 +48,18 @@ export async function getPayPalAccessToken() {
     }
 
     const data = await response.json()
-    return data.access_token as string
+    return { accessToken: data.access_token as string, apiUrl }
 }
 
 export async function createPayPalOrder(amount: string, baseUrl: string) {
-    const accessToken = await getPayPalAccessToken()
+    const { accessToken, apiUrl } = await getPayPalAccessToken()
 
     const returnUrl = `${baseUrl}/shop/success?method=paypal`
     const cancelUrl = `${baseUrl}/shop?canceled=1`
 
     console.log("Creating PayPal Order:", { amount, returnUrl, cancelUrl })
 
-    const response = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders`, {
+    const response = await fetch(`${apiUrl}/v2/checkout/orders`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -71,9 +94,9 @@ export async function createPayPalOrder(amount: string, baseUrl: string) {
 }
 
 export async function capturePayPalOrder(orderID: string) {
-    const accessToken = await getPayPalAccessToken()
+    const { accessToken, apiUrl } = await getPayPalAccessToken()
 
-    const response = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderID}/capture`, {
+    const response = await fetch(`${apiUrl}/v2/checkout/orders/${orderID}/capture`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${accessToken}`,
