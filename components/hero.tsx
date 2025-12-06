@@ -7,6 +7,7 @@ import Image from "next/image"
 import TerminalEffect from "./terminal-effect"
 import dynamic from "next/dynamic"
 import { useThrottle } from "@/hooks/use-throttle"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 
 const AnimatedShowcaseIcon = ({ size = 20, color = "#f87171" }) => (
   <motion.svg
@@ -27,7 +28,7 @@ const AnimatedShowcaseIcon = ({ size = 20, color = "#f87171" }) => (
       animate={{ pathLength: 1, opacity: 1 }}
       transition={{ duration: 1 }}
     />
-    
+
     {/* The iris/pupil that animates */}
     <motion.circle
       cx="12"
@@ -41,22 +42,22 @@ const AnimatedShowcaseIcon = ({ size = 20, color = "#f87171" }) => (
         repeatDelay: 1,
       }}
     />
-    
+
     {/* A subtle glow effect on the iris */}
     <motion.circle
-        cx="12"
-        cy="12"
-        r="4"
-        stroke="none"
-        fill={color}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.3, 0.1, 0.3, 0.1, 0.3, 0] }}
-        transition={{
-            duration: 4,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatDelay: 1,
-        }}
+      cx="12"
+      cy="12"
+      r="4"
+      stroke="none"
+      fill={color}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 0.3, 0.1, 0.3, 0.1, 0.3, 0] }}
+      transition={{
+        duration: 4,
+        ease: "easeInOut",
+        repeat: Infinity,
+        repeatDelay: 1,
+      }}
     />
   </motion.svg>
 );
@@ -84,7 +85,7 @@ const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: n
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    
+
     {/* Animated data stream */}
     <motion.path
       d="M1 12 H 11"
@@ -93,9 +94,9 @@ const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: n
       strokeLinecap="round"
       initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
       animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
-      transition={{ 
-        duration: 1.5, 
-        repeat: Infinity, 
+      transition={{
+        duration: 1.5,
+        repeat: Infinity,
         ease: "easeInOut",
         delay: 0
       }}
@@ -107,9 +108,9 @@ const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: n
       strokeLinecap="round"
       initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
       animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
-      transition={{ 
-        duration: 1.5, 
-        repeat: Infinity, 
+      transition={{
+        duration: 1.5,
+        repeat: Infinity,
         ease: "easeInOut",
         delay: 0.2
       }}
@@ -121,9 +122,9 @@ const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: n
       strokeLinecap="round"
       initial={{ pathLength: 0, pathOffset: 1, opacity: 0 }}
       animate={{ pathLength: 1, pathOffset: 0, opacity: [0, 1, 0] }}
-      transition={{ 
-        duration: 1.5, 
-        repeat: Infinity, 
+      transition={{
+        duration: 1.5,
+        repeat: Infinity,
         ease: "easeInOut",
         delay: 0.4
       }}
@@ -135,7 +136,7 @@ const AnimatedDataStreamMailIcon = ({ size = 22, color = "#22c55e" }: { size?: n
 const MatrixRain = dynamic(() => import("./matrix-rain"), { ssr: false })
 
 // Create a client-side only component for particles
-const AnimatedParticles = () => {
+const AnimatedParticles = ({ isMobile }: { isMobile?: boolean }) => {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -144,11 +145,14 @@ const AnimatedParticles = () => {
 
   if (!mounted) return null
 
+  const particleCount = isMobile ? 8 : 20
+  const floatersCount = isMobile ? 2 : 5
+
   return (
     <>
       {/* Glowing particles */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(particleCount)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-red-500/20 rounded-full"
@@ -176,7 +180,7 @@ const AnimatedParticles = () => {
 
       {/* Floating elements */}
       <div className="absolute bottom-0 left-0 right-0 h-48 z-30 pointer-events-none">
-        {[...Array(5)].map((_, i) => (
+        {[...Array(floatersCount)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-red-500/10 rounded-full"
@@ -222,6 +226,8 @@ export default function Hero({ geo }: HeroProps) {
   const [cursorPosition, setCursorPosition] = useState({ x: 0.5, y: 0.5 })
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [isClient, setIsClient] = useState(false)
+
+  const isMobile = useIsMobile()
 
   const throttledCursorPosition = useThrottle(cursorPosition, 30)
   const throttledDimensions = useThrottle(dimensions, 100)
@@ -291,8 +297,17 @@ export default function Hero({ geo }: HeroProps) {
       ref={containerRef}
     >
       {/* Matrix Background - only render on client side */}
+      {/* Matrix Background - only render on client side and if not mobile */}
       {isClient && (
-        <MatrixRain color="#ff0000" glowIntensity={0.3} density={0.3} speed={0.8} opacity={0.4} interactive={false} />
+        <MatrixRain
+          color="#ff0000"
+          glowIntensity={0.3}
+          density={isMobile ? 0.5 : 0.3}
+          speed={0.8}
+          opacity={0.4}
+          interactive={false}
+          enabled={!isMobile}
+        />
       )}
 
       {/* Background layers */}
@@ -345,10 +360,10 @@ export default function Hero({ geo }: HeroProps) {
         <div className="absolute bottom-0 left-0 right-0 h-36 z-40 overflow-hidden">
           {/* Main gradient overlay with enhanced blend */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
-          
+
           {/* Subtle border glow */}
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent"></div>
-          
+
           {/* Animated gradient lines */}
           <div className="absolute inset-0 opacity-20">
             <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,0,0,0.1)_50%,transparent_100%)] animate-shimmer"></div>
@@ -356,7 +371,7 @@ export default function Hero({ geo }: HeroProps) {
           </div>
 
           {/* Client-side only particles */}
-          {isClient && <AnimatedParticles />}
+          {isClient && <AnimatedParticles isMobile={isMobile} />}
 
           {/* Enhanced circuit pattern overlay */}
           <div className="absolute inset-0 opacity-5">
@@ -401,7 +416,7 @@ export default function Hero({ geo }: HeroProps) {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="block mt-1 relative sm:transform-none sm:perspective-[1000px] sm:rotate-x-[-2deg]"
               > System{" "}
-                <span 
+                <span
                   className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 animate-gradient-x relative inline-block sm:translate-z-[20px]"
                   style={{
                     textShadow: "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
@@ -426,7 +441,7 @@ export default function Hero({ geo }: HeroProps) {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-400">
                 Transforming ideas into{" "}
               </span>
-              <span 
+              <span
                 className="text-transparent bg-clip-text bg-gradient-to-r from-slate-300 to-slate-500 relative inline-block"
                 style={{
                   transform: "translateZ(10px)",
@@ -437,7 +452,7 @@ export default function Hero({ geo }: HeroProps) {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-400">
                 {" "}through{" "}
               </span>
-              <span 
+              <span
                 className="text-transparent bg-clip-text bg-gradient-to-r from-slate-400 to-slate-600 relative inline-block"
                 style={{
                   transform: "translateZ(15px)",
@@ -448,7 +463,7 @@ export default function Hero({ geo }: HeroProps) {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-400">
                 {" "}and{" "}
               </span>
-              <span 
+              <span
                 className="text-transparent bg-clip-text bg-gradient-to-r from-slate-500 to-slate-700 relative inline-block"
                 style={{
                   transform: "translateZ(20px)",

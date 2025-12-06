@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 
 interface TerminalEffectProps {
   commands?: string[]
@@ -56,67 +57,67 @@ const DemoIcon = ({ isActive }: { isActive: boolean }) => {
   return (
     <div className="relative w-4 h-4">
       {/* Main terminal screen */}
-      <div 
+      <div
         className="absolute inset-0 rounded-sm border border-current"
-        style={{ 
+        style={{
           color: isActive ? '#ef4444' : '#64748b',
           backgroundColor: isActive ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-          boxShadow: isActive 
+          boxShadow: isActive
             ? '0 0 8px rgba(239, 68, 68, 0.6), inset 0 0 4px rgba(239, 68, 68, 0.2)'
             : '0 0 4px rgba(100, 116, 139, 0.3), inset 0 0 2px rgba(100, 116, 139, 0.1)'
         }}
       />
-      
+
       {/* Terminal header */}
-      <div 
+      <div
         className="absolute top-0 left-0 right-0 h-1 rounded-t-sm"
-        style={{ 
+        style={{
           backgroundColor: isActive ? 'rgba(239, 68, 68, 0.3)' : 'rgba(100, 116, 139, 0.2)',
           borderBottom: `1px solid ${isActive ? 'rgba(239, 68, 68, 0.5)' : 'rgba(100, 116, 139, 0.3)'}`
         }}
       />
-      
+
       {/* Terminal dots */}
       <div className="absolute top-0.5 left-1 flex gap-0.5">
-        <div 
+        <div
           className="w-0.5 h-0.5 rounded-full"
           style={{ backgroundColor: isActive ? '#ef4444' : '#64748b' }}
         />
-        <div 
+        <div
           className="w-0.5 h-0.5 rounded-full"
           style={{ backgroundColor: isActive ? '#ef4444' : '#64748b' }}
         />
-        <div 
+        <div
           className="w-0.5 h-0.5 rounded-full"
           style={{ backgroundColor: isActive ? '#ef4444' : '#64748b' }}
         />
       </div>
-      
+
       {/* Terminal content lines */}
       <div className="absolute top-2 left-1 right-1 space-y-0.5">
-        <div 
+        <div
           className="h-0.5 rounded-full"
-          style={{ 
+          style={{
             backgroundColor: isActive ? 'rgba(239, 68, 68, 0.6)' : 'rgba(100, 116, 139, 0.4)',
             width: '60%'
           }}
         />
-        <div 
+        <div
           className="h-0.5 rounded-full"
-          style={{ 
+          style={{
             backgroundColor: isActive ? 'rgba(239, 68, 68, 0.6)' : 'rgba(100, 116, 139, 0.4)',
             width: '80%'
           }}
         />
-        <div 
+        <div
           className="h-0.5 rounded-full"
-          style={{ 
+          style={{
             backgroundColor: isActive ? 'rgba(239, 68, 68, 0.6)' : 'rgba(100, 116, 139, 0.4)',
             width: '40%'
           }}
         />
       </div>
-      
+
       {/* Cursor blink effect */}
       {isActive && (
         <motion.div
@@ -133,10 +134,10 @@ const DemoIcon = ({ isActive }: { isActive: boolean }) => {
           }}
         />
       )}
-      
+
       {/* Glow effect for active state */}
       {isActive && (
-        <div 
+        <div
           className="absolute inset-0 rounded-sm opacity-30"
           style={{
             background: 'radial-gradient(circle, rgba(239, 68, 68, 0.4), transparent)',
@@ -153,46 +154,46 @@ const InteractiveIcon = ({ isActive }: { isActive: boolean }) => {
   return (
     <div className="relative w-4 h-4">
       {/* Main terminal screen */}
-      <div 
+      <div
         className="absolute inset-0 rounded-sm border border-current"
-        style={{ 
+        style={{
           color: isActive ? '#22c55e' : '#64748b',
           backgroundColor: isActive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-          boxShadow: isActive 
+          boxShadow: isActive
             ? '0 0 8px rgba(34, 197, 94, 0.6), inset 0 0 4px rgba(34, 197, 94, 0.2)'
             : '0 0 4px rgba(100, 116, 139, 0.3), inset 0 0 2px rgba(100, 116, 139, 0.1)'
         }}
       />
-      
+
       {/* Terminal header */}
-      <div 
+      <div
         className="absolute top-0 left-0 right-0 h-1 rounded-t-sm"
-        style={{ 
+        style={{
           backgroundColor: isActive ? 'rgba(34, 197, 94, 0.3)' : 'rgba(100, 116, 139, 0.2)',
           borderBottom: `1px solid ${isActive ? 'rgba(34, 197, 94, 0.5)' : 'rgba(100, 116, 139, 0.3)'}`
         }}
       />
-      
+
       {/* Terminal dots */}
       <div className="absolute top-0.5 left-1 flex gap-0.5">
-        <div 
+        <div
           className="w-0.5 h-0.5 rounded-full"
           style={{ backgroundColor: isActive ? '#22c55e' : '#64748b' }}
         />
-        <div 
+        <div
           className="w-0.5 h-0.5 rounded-full"
           style={{ backgroundColor: isActive ? '#22c55e' : '#64748b' }}
         />
-        <div 
+        <div
           className="w-0.5 h-0.5 rounded-full"
           style={{ backgroundColor: isActive ? '#22c55e' : '#64748b' }}
         />
       </div>
-      
+
       {/* Interactive prompt */}
       <div className="absolute top-2 left-1 right-1">
         <div className="flex items-center gap-0.5">
-          <span 
+          <span
             className="text-[4px] font-bold"
             style={{ color: isActive ? '#22c55e' : '#64748b' }}
           >
@@ -215,10 +216,10 @@ const InteractiveIcon = ({ isActive }: { isActive: boolean }) => {
           />
         </div>
       </div>
-      
+
       {/* Glow effect for active state */}
       {isActive && (
-        <div 
+        <div
           className="absolute inset-0 rounded-sm opacity-30"
           style={{
             background: 'radial-gradient(circle, rgba(34, 197, 94, 0.4), transparent)',
@@ -231,12 +232,12 @@ const InteractiveIcon = ({ isActive }: { isActive: boolean }) => {
 }
 
 // XRP Price Chart Component
-const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: { 
-  data: number[], 
-  price: number, 
+const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
+  data: number[],
+  price: number,
   change24h: number,
-  width?: number, 
-  height?: number 
+  width?: number,
+  height?: number
 }) => {
   if (!data || data.length === 0) return null
 
@@ -263,20 +264,20 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
             <stop offset="100%" stopColor="#ef4444" stopOpacity="0.1" />
           </linearGradient>
           <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-            <feMerge> 
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
-        
+
         {/* Area fill */}
         <polygon
           points={`0,${height} ${points} ${width},${height}`}
           fill={`url(#${gradientId})`}
         />
-        
+
         {/* Line */}
         <polyline
           points={points}
@@ -287,7 +288,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
           strokeLinejoin="round"
           filter="url(#glow)"
         />
-        
+
         {/* Current price indicator */}
         <circle
           cx={width}
@@ -298,7 +299,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
           strokeWidth="2"
           filter="url(#glow)"
         />
-        
+
         {/* Price label background */}
         <rect
           x={width - 170}
@@ -310,7 +311,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
           stroke="rgba(255, 255, 255, 0.3)"
           strokeWidth="1"
         />
-        
+
         {/* Current price text */}
         <text
           x={width - 165}
@@ -322,7 +323,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
         >
           ${price.toFixed(4)}
         </text>
-        
+
         {/* 24h change */}
         <text
           x={width - 165}
@@ -334,7 +335,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
         >
           {changeSymbol} {change24h.toFixed(2)}%
         </text>
-        
+
         {/* XRP label background */}
         <rect
           x="20"
@@ -346,7 +347,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
           stroke="rgba(255, 255, 255, 0.3)"
           strokeWidth="1"
         />
-        
+
         {/* XRP label */}
         <text
           x="25"
@@ -359,7 +360,7 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
         >
           XRP/USD
         </text>
-        
+
         {/* Time labels */}
         <text
           x="25"
@@ -398,7 +399,7 @@ export default function TerminalEffect({
   const [showCommands, setShowCommands] = useState(false)
   const [scanlinePosition, setScanlinePosition] = useState(0)
   const [isTyping, setIsTyping] = useState(false)
-  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, vx: number, vy: number, life: number, type: string}>>([])
+  const [particles, setParticles] = useState<Array<{ id: number, x: number, y: number, vx: number, vy: number, life: number, type: string }>>([])
   const [currentTime, setCurrentTime] = useState("")
   const [currentDate, setCurrentDate] = useState("")
   const [isClient, setIsClient] = useState(false)
@@ -418,7 +419,7 @@ export default function TerminalEffect({
   const [keyPressEffect, setKeyPressEffect] = useState(false)
   const [ambientGlow, setAmbientGlow] = useState(0)
   const [circuitPattern, setCircuitPattern] = useState(0)
-  const [xrpData, setXrpData] = useState<{price: number, change24h: number, history: number[]} | null>(null)
+  const [xrpData, setXrpData] = useState<{ price: number, change24h: number, history: number[] } | null>(null)
   const [xrpLoading, setXrpLoading] = useState(false)
   const [showXrpChart, setShowXrpChart] = useState(false)
   const [xrpDisplayed, setXrpDisplayed] = useState(false)
@@ -426,32 +427,35 @@ export default function TerminalEffect({
   const [pendingTypeCallback, setPendingTypeCallback] = useState<(() => void) | null>(null)
   const [visibleLines, setVisibleLines] = useState(30)
   const prevScrollHeight = useRef<number | null>(null)
-  
+
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particleCanvasRef = useRef<HTMLCanvasElement>(null)
   const circuitCanvasRef = useRef<HTMLCanvasElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Use custom hook for mobile detection
+  const isMobile = useIsMobile()
   const particlesRef = useRef(particles)
 
   // Client-side only initialization
   useEffect(() => {
     setIsClient(true)
-    setCurrentTime(new Date().toLocaleTimeString('en-US', { 
+    setCurrentTime(new Date().toLocaleTimeString('en-US', {
       hour12: false,
       hour: '2-digit',
       minute: '2-digit'
     }))
-    setCurrentDate(new Date().toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
+    setCurrentDate(new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
     }).toUpperCase())
-    
+
     // Start demo after 2 seconds
     const demoTimeout = setTimeout(() => {
       setShowCommands(true)
     }, 2000)
-    
+
     // Simulate system metrics
     const systemInterval = setInterval(() => {
       setSystemLoad(Math.random() * 100)
@@ -485,14 +489,14 @@ export default function TerminalEffect({
     if (!isClient) return
 
     const interval = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString('en-US', { 
+      setCurrentTime(new Date().toLocaleTimeString('en-US', {
         hour12: false,
         hour: '2-digit',
         minute: '2-digit'
       }))
-      setCurrentDate(new Date().toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric' 
+      setCurrentDate(new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
       }).toUpperCase())
     }, 1000)
 
@@ -501,14 +505,15 @@ export default function TerminalEffect({
 
   // Enhanced Matrix animation setup
   useEffect(() => {
+    // Disable on mobile for performance
+    if (isMobile || !showMatrix) return
+
     const canvas = canvasRef.current
-    if (!canvas || !showMatrix) return
+    if (!canvas) return
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Detect mobile device
-    const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     // Use device pixel ratio for crisp rendering
     const dpr = window.devicePixelRatio || 1
     // Responsive font size and density
@@ -571,7 +576,8 @@ export default function TerminalEffect({
   // Enhanced particle system with multiple types
   useEffect(() => {
     const canvas = particleCanvasRef.current
-    if (!canvas || !showParticles) return
+    // Disable on mobile for performance
+    if (isMobile || !canvas || !showParticles) return
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
@@ -585,7 +591,7 @@ export default function TerminalEffect({
 
     const animateParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
+
       setParticles(prevParticles => {
         const updatedParticles = prevParticles
           .map(particle => ({
@@ -618,13 +624,13 @@ export default function TerminalEffect({
       particlesRef.current.forEach(particle => {
         const alpha = particle.life / 200
         const size = (particle.life / 200) * 4
-        
+
         if (particle.type === 'data') {
           // Data particles - small dots
           const gradient = ctx.createRadialGradient(particle.x, particle.y, 0, particle.x, particle.y, size)
           gradient.addColorStop(0, `rgba(255, 0, 0, ${alpha})`)
           gradient.addColorStop(1, `rgba(255, 0, 0, 0)`)
-          
+
           ctx.fillStyle = gradient
           ctx.beginPath()
           ctx.arc(particle.x, particle.y, size, 0, Math.PI * 2)
@@ -654,7 +660,8 @@ export default function TerminalEffect({
   // Circuit pattern animation
   useEffect(() => {
     const canvas = circuitCanvasRef.current
-    if (!canvas) return
+    // Disable on mobile for performance
+    if (isMobile || !canvas) return
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
@@ -668,27 +675,27 @@ export default function TerminalEffect({
 
     const drawCircuit = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
+
       const gridSize = 30
       const cols = Math.floor(canvas.width / gridSize)
       const rows = Math.floor(canvas.height / gridSize)
-      
+
       ctx.strokeStyle = `rgba(239, 68, 68, ${0.1 + Math.sin(ambientGlow) * 0.05})`
       ctx.lineWidth = 1
-      
+
       // Draw circuit grid
       for (let i = 0; i <= cols; i++) {
         for (let j = 0; j <= rows; j++) {
           const x = i * gridSize
           const y = j * gridSize
-          
+
           if (Math.random() > 0.7) {
             ctx.beginPath()
             ctx.moveTo(x, y)
             ctx.lineTo(x + gridSize, y)
             ctx.stroke()
           }
-          
+
           if (Math.random() > 0.7) {
             ctx.beginPath()
             ctx.moveTo(x, y)
@@ -697,7 +704,7 @@ export default function TerminalEffect({
           }
         }
       }
-      
+
       // Draw animated data flow
       const flowX = (circuitPattern / 100) * canvas.width
       ctx.strokeStyle = `rgba(239, 68, 68, ${0.3 + Math.sin(ambientGlow * 2) * 0.2})`
@@ -736,18 +743,18 @@ export default function TerminalEffect({
       // Using CoinGecko API (free, no API key required)
       const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=usd&include_24hr_change=true')
       const data = await response.json()
-      
+
       if (data.ripple) {
         const price = data.ripple.usd
         const change24h = data.ripple.usd_24h_change
-        
+
         // Generate mock historical data for the last 24 hours (24 data points)
         const history = Array.from({ length: 24 }, (_, i) => {
           const basePrice = price
           const variation = (Math.random() - 0.5) * 0.1 // ±5% variation
           return basePrice * (1 + variation)
         })
-        
+
         setXrpData({ price, change24h, history })
       }
     } catch (error) {
@@ -862,7 +869,7 @@ export default function TerminalEffect({
   const handleCommand = useCallback((command: string) => {
     const cmd = command.toLowerCase().trim()
     const response = INTERACTIVE_COMMANDS[cmd as keyof typeof INTERACTIVE_COMMANDS]
-    
+
     if (response) {
       if (cmd === 'clear') {
         setDisplayedText("")
@@ -977,7 +984,7 @@ export default function TerminalEffect({
 
         // Find all matches with their positions
         const matches: Match[] = []
-        
+
         patterns.forEach((pattern, patternIndex) => {
           let match
           while ((match = pattern.regex.exec(text)) !== null) {
@@ -998,7 +1005,7 @@ export default function TerminalEffect({
         // Remove overlapping matches (keep the first one)
         const filteredMatches: Match[] = []
         let lastEnd = 0
-        
+
         matches.forEach(match => {
           if (match.start >= lastEnd) {
             filteredMatches.push(match)
@@ -1019,14 +1026,14 @@ export default function TerminalEffect({
               weight: '400'
             })
           }
-          
+
           // Add the match
           result.push({
             text: match.text,
             color: match.color,
             weight: match.weight
           })
-          
+
           currentPos = match.end
         })
 
@@ -1054,8 +1061,8 @@ export default function TerminalEffect({
       const highlightedParts = highlightSyntax(line.replace(/^\$ /, ''))
 
       return (
-        <motion.div 
-          key={index} 
+        <motion.div
+          key={index}
           className="terminal-line leading-relaxed"
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -1063,11 +1070,11 @@ export default function TerminalEffect({
         >
           {line.startsWith('$ ') && <span style={{ color: '#ef4444', fontWeight: '700', marginRight: '0.5rem' }}>$ </span>}
           {highlightedParts.map((part, partIndex) => (
-            <span 
-              key={partIndex} 
-              style={{ 
-                color: part.color, 
-                fontWeight: part.weight 
+            <span
+              key={partIndex}
+              style={{
+                color: part.color,
+                fontWeight: part.weight
               }}
             >
               {part.text}
@@ -1198,16 +1205,16 @@ export default function TerminalEffect({
       />
 
       {/* Enhanced CRT scanlines */}
-      <div 
+      <div
         className="absolute inset-0 bg-gradient-to-b from-transparent via-white/8 to-transparent rounded-md pointer-events-none z-10"
         style={{
           backgroundSize: '100% 3px',
           animation: 'scanlines 0.08s linear infinite'
         }}
       />
-      
+
       {/* Moving scanline with glow */}
-      <div 
+      <div
         className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/30 to-transparent rounded-md pointer-events-none z-20"
         style={{
           height: '3px',
@@ -1219,7 +1226,7 @@ export default function TerminalEffect({
       />
 
       {/* Terminal frame with enhanced styling and depth */}
-      <motion.div 
+      <motion.div
         className={`relative z-30 rounded-md overflow-hidden`}
       >
         {/* Enhanced terminal header with depth */}
@@ -1237,7 +1244,7 @@ export default function TerminalEffect({
           <div className="ml-auto flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 text-[10px] sm:text-xs font-mono relative z-10 min-w-0">
             <motion.div
               className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm min-w-0"
-              style={{ 
+              style={{
                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
               }}
             >
@@ -1262,10 +1269,10 @@ export default function TerminalEffect({
                     ease: "easeInOut"
                   }}
                 >
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  <circle cx="12" cy="12" r="3" />
                 </motion.svg>
-                <span style={{ 
+                <span style={{
                   color: networkStatus === 'online' ? '#22c55e' : '#ef4444',
                   fontWeight: '700',
                   fontSize: '11px',
@@ -1278,42 +1285,42 @@ export default function TerminalEffect({
                 </span>
               </div>
             </motion.div>
-            
+
             {/* Compact Enhanced Date & Time display */}
             {isClient && (
               <motion.div
                 className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm relative overflow-hidden"
-                style={{ 
+                style={{
                   boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
                 }}
               >
                 <div className="flex items-center gap-1 sm:gap-2">
                   {/* Main clock icon */}
                   <div className="relative">
-                    <motion.svg 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <motion.svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                       className="relative z-10 w-2.5 h-2.5 sm:w-3 sm:h-3"
                       style={{ color: '#ef4444' }}
-                      animate={{ 
+                      animate={{
                         rotate: [0, 360],
                         scale: [1, 1.05, 1]
                       }}
-                      transition={{ 
+                      transition={{
                         rotate: { duration: 60, repeat: Infinity, ease: "linear" },
                         scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                       }}
                     >
-                      <circle cx="12" cy="12" r="10"/>
-                      <polyline points="12,6 12,12 16,14"/>
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12,6 12,12 16,14" />
                     </motion.svg>
-                    
+
                     {/* Subtle clock glow */}
-                    <div 
+                    <div
                       className="absolute inset-0 w-2.5 h-2.5 sm:w-3 sm:h-3 opacity-20"
                       style={{
                         background: 'radial-gradient(circle, rgba(245, 158, 11, 0.4), transparent)',
@@ -1321,11 +1328,11 @@ export default function TerminalEffect({
                       }}
                     />
                   </div>
-                  
+
                   {/* Date and Time display */}
                   <div className="flex items-center gap-0.5 sm:gap-1">
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         color: '#ffffff',
                         fontWeight: '700',
                         fontSize: '9px',
@@ -1337,9 +1344,9 @@ export default function TerminalEffect({
                       {currentTime}
                     </span>
                     <span className="hidden sm:inline" style={{ color: '#94a3b8', fontSize: '6px' }}>•</span>
-                    <span 
+                    <span
                       className="hidden sm:inline"
-                      style={{ 
+                      style={{
                         color: '#e2e8f0',
                         fontWeight: '600',
                         fontSize: '9px',
@@ -1354,21 +1361,21 @@ export default function TerminalEffect({
                 </div>
               </motion.div>
             )}
-            
+
             {showMatrix && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
-                style={{ 
+                style={{
                   boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
                 }}
               >
-                <div className="w-2 h-2 animate-pulse shadow-sm" style={{ 
+                <div className="w-2 h-2 animate-pulse shadow-sm" style={{
                   backgroundColor: '#dc2626',
                   boxShadow: '0 1px 2px rgba(220, 38, 38, 0.5)'
                 }}></div>
-                <span style={{ 
+                <span style={{
                   color: '#ef4444',
                   fontWeight: '700',
                   fontSize: '11px',
@@ -1385,15 +1392,15 @@ export default function TerminalEffect({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
-                style={{ 
+                style={{
                   boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
                 }}
               >
-                <div className="w-2 h-2 animate-pulse shadow-sm" style={{ 
+                <div className="w-2 h-2 animate-pulse shadow-sm" style={{
                   backgroundColor: '#dc2626',
                   boxShadow: '0 1px 2px rgba(220, 38, 38, 0.5)'
                 }}></div>
-                <span style={{ 
+                <span style={{
                   color: '#ef4444',
                   fontWeight: '700',
                   fontSize: '11px',
@@ -1412,7 +1419,7 @@ export default function TerminalEffect({
         <motion.div
           ref={containerRef}
           className="terminal-body hide-scrollbar backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 font-mono text-xs sm:text-sm md:text-base border-t overflow-y-auto relative shadow-inner"
-          style={{ 
+          style={{
             maxHeight: "70vh",
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             color: '#f8fafc',
@@ -1430,8 +1437,8 @@ export default function TerminalEffect({
           <canvas
             ref={particleCanvasRef}
             className="absolute inset-0 w-full h-full pointer-events-none z-0"
-            style={{ 
-              width: '100%', 
+            style={{
+              width: '100%',
               height: '100%',
               opacity: showParticles ? 0.4 : 0
             }}
@@ -1441,8 +1448,8 @@ export default function TerminalEffect({
           <canvas
             ref={canvasRef}
             className="absolute inset-0 w-full h-full z-0"
-            style={{ 
-              width: '100%', 
+            style={{
+              width: '100%',
               height: '100%',
               opacity: showMatrix ? 0.5 : 0
             }}
@@ -1459,7 +1466,7 @@ export default function TerminalEffect({
                 <div key={idx}>{formatText(line)}</div>
               ))}
             </motion.div>
-            
+
             {/* XRP Chart Display */}
             {showXrpChart && xrpData && (
               <motion.div
@@ -1473,30 +1480,30 @@ export default function TerminalEffect({
                 </div>
               </motion.div>
             )}
-            
+
             {/* Interactive input line with enhanced effects */}
             {isInteractive && (
               <div className="flex items-center">
                 <span style={{ color: '#ef4444', fontWeight: '700', marginRight: '0.5rem' }}>$ </span>
                 <div className="flex-1 flex items-center relative">
                   <span className="font-mono" style={{ color: '#f8fafc' }}>{userInput}</span>
-                  <motion.span 
+                  <motion.span
                     className="inline-block w-3 h-5 ml-1 rounded-sm shadow-lg"
-                    style={{ 
+                    style={{
                       backgroundColor: '#ef4444',
                       boxShadow: '0 10px 15px -3px rgba(239, 68, 68, 0.5)'
                     }}
                     animate={{
                       opacity: cursorVisible ? 1 : 0,
                       scale: isTyping ? [1, 1.2, 1] : 1,
-                      boxShadow: cursorVisible ? 
-                        (isTyping ? 
+                      boxShadow: cursorVisible ?
+                        (isTyping ?
                           ["0 0 8px #ef4444, 0 0 15px #ef4444", "0 0 15px #ef4444, 0 0 25px #ef4444, 0 0 35px #ef4444", "0 0 8px #ef4444, 0 0 15px #ef4444"] :
                           "0 0 8px #ef4444, 0 0 15px #ef4444, 0 0 20px #ef4444"
-                        ) : 
+                        ) :
                         "0 0 0px #ef4444"
                     }}
-                    transition={{ 
+                    transition={{
                       opacity: { duration: 0.1 },
                       scale: { duration: 0.3 },
                       boxShadow: { duration: 0.3 }
@@ -1518,27 +1525,27 @@ export default function TerminalEffect({
                 />
               </div>
             )}
-            
+
             {/* Fixed cursor for demo mode with enhanced effects */}
             {!isInteractive && (
               <div className="flex items-center">
-                <motion.span 
+                <motion.span
                   className="inline-block w-3 h-5 ml-1 rounded-sm shadow-lg"
-                  style={{ 
+                  style={{
                     backgroundColor: '#ef4444',
                     boxShadow: '0 10px 15px -3px rgba(239, 68, 68, 0.5)'
                   }}
                   animate={{
                     opacity: cursorVisible ? 1 : 0,
                     scale: isTyping ? [1, 1.2, 1] : 1,
-                    boxShadow: cursorVisible ? 
-                      (isTyping ? 
+                    boxShadow: cursorVisible ?
+                      (isTyping ?
                         ["0 0 8px #ef4444, 0 0 15px #ef4444", "0 0 15px #ef4444, 0 0 25px #ef4444, 0 0 35px #ef4444", "0 0 8px #ef4444, 0 0 15px #ef4444"] :
                         "0 0 8px #ef4444, 0 0 15px #ef4444, 0 0 20px #ef4444"
-                      ) : 
+                      ) :
                       "0 0 0px #ef4444"
                   }}
-                  transition={{ 
+                  transition={{
                     opacity: { duration: 0.1 },
                     scale: { duration: 0.3 },
                     boxShadow: { duration: 0.3 }
@@ -1553,12 +1560,12 @@ export default function TerminalEffect({
         <div className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-t border-white/20 text-xs font-mono relative overflow-hidden backdrop-blur-sm">
           {/* Footer background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
-          
+
           <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-4 relative z-10" style={{ color: '#64748b' }}>
             {/* Enhanced mode toggle button with Glass UI */}
             <div
               className="flex items-center gap-3 px-3 py-1.5 rounded-md bg-white/10 border border-white/20 backdrop-blur-md hover:bg-white/15 transition-all duration-300 cursor-pointer group shadow-lg"
-              style={{ 
+              style={{
                 boxShadow: `
                   0 4px 12px rgba(0, 0, 0, 0.3),
                   0 2px 4px rgba(0, 0, 0, 0.2),
@@ -1576,9 +1583,9 @@ export default function TerminalEffect({
                 <DemoIcon isActive={true} />
               )}
               <div className="flex flex-col">
-                <span 
+                <span
                   className="font-bold text-xs uppercase tracking-wider"
-                  style={{ 
+                  style={{
                     color: isInteractive ? '#22c55e' : '#ef4444',
                     textShadow: `0 0 8px ${isInteractive ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)'}`,
                     filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
@@ -1586,9 +1593,9 @@ export default function TerminalEffect({
                 >
                   {isInteractive ? 'INTERACTIVE' : 'DEMO'}
                 </span>
-                <span 
+                <span
                   className="text-[10px] opacity-80 group-hover:opacity-100 transition-opacity"
-                  style={{ 
+                  style={{
                     color: '#e2e8f0',
                     textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
                   }}
@@ -1598,35 +1605,35 @@ export default function TerminalEffect({
               </div>
               <motion.div
                 className="ml-1"
-                animate={{ 
+                animate={{
                   x: [0, 2, 0],
                   opacity: [0.8, 1, 0.8]
                 }}
-                transition={{ 
-                  duration: 2, 
+                transition={{
+                  duration: 2,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
               >
-                <svg 
-                  width="12" 
-                  height="12" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
-                  style={{ 
+                  style={{
                     color: '#e2e8f0',
                     filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
                   }}
                 >
-                  <path d="M9 18l6-6-6-6"/>
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
               </motion.div>
             </div>
-            
+
             <div className="flex items-center gap-4 text-xs">
               <span>CPU: {cpuUsage.toFixed(1)}%</span>
               <span>MEM: {memoryUsage.toFixed(1)}%</span>

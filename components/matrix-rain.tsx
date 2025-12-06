@@ -13,6 +13,7 @@ interface MatrixRainProps {
   speed?: number
   opacity?: number
   interactive?: boolean
+  enabled?: boolean
 }
 
 export default function MatrixRain({
@@ -22,6 +23,7 @@ export default function MatrixRain({
   speed = 2.0,
   opacity = 0.8,
   interactive = true,
+  enabled = true,
 }: MatrixRainProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -40,7 +42,7 @@ export default function MatrixRain({
 
   // Handle mouse interactions
   useEffect(() => {
-    if (!interactive || !canvasRef.current) return
+    if (!enabled || !interactive || !canvasRef.current) return
 
     const canvas = canvasRef.current
 
@@ -90,7 +92,7 @@ export default function MatrixRain({
   }, [interactive])
 
   useEffect(() => {
-    if (!canvasRef.current || !containerRef.current) return
+    if (!enabled || !canvasRef.current || !containerRef.current) return
 
     console.log("Initializing Matrix Rain animation")
 
