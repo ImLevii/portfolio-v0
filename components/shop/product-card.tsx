@@ -103,7 +103,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             "font-orbitron tracking-wider text-[10px] font-bold",
                             product.stock > 0 ? "bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 group-hover/btn:from-green-300 group-hover/btn:to-emerald-500" : "text-gray-500"
                         )}>
-                            {product.stock > 0 ? "ADD" : "SOLD OUT"}
+                            {product.stock > 0 ? "PURCHASE" : "SOLD OUT"}
                         </span>
                     </Button>
                 </CardFooter>

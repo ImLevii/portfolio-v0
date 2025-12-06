@@ -74,13 +74,17 @@ export async function POST(req: Request) {
                 const { generateLicenseKey } = await import("@/lib/license")
 
                 for (const productId of productIds) {
+                    const product = await db.product.findUnique({ where: { id: productId } })
+                    const expiresAt = product?.duration ? new Date(Date.now() + product.duration * 24 * 60 * 60 * 1000) : null
+
                     await db.licenseKey.create({
                         data: {
                             key: generateLicenseKey(),
                             productId: productId,
                             userId: user.id,
                             orderId: order.id,
-                            status: "ACTIVE"
+                            status: "ACTIVE",
+                            expiresAt: expiresAt
                         }
                     })
 

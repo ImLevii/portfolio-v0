@@ -66,6 +66,7 @@ model Product {
   features    String      // JSON string
   stock       Int         @default(0)
   isListed    Boolean     @default(true)
+  duration    Int?        // Duration in days (null = lifetime)
   filePath    String?     // Path to the uploaded file (if any)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -128,7 +129,8 @@ model LicenseKey {
   productId String
   userId    String
   orderId   String
-  status    String   @default("ACTIVE") // ACTIVE, REVOKED, USED
+  status    String   @default("ACTIVE") // ACTIVE, REVOKED, USED, EXPIRED
+  expiresAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

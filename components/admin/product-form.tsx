@@ -14,6 +14,7 @@ interface ProductFormProps {
         image: string
         category: string
         features: string // JSON string
+        duration?: number | null // Duration in days
 
         stock?: number
         filePath?: string | null
@@ -115,6 +116,19 @@ export function ProductForm({ initialData, action }: ProductFormProps) {
                                     required
                                     min="0"
                                     className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron flex items-center gap-1">
+                                    <Box className="h-3 w-3" /> License Duration (Days)
+                                </label>
+                                <input
+                                    name="duration"
+                                    type="number"
+                                    defaultValue={initialData?.duration ?? ""}
+                                    placeholder="Leave empty for lifetime"
+                                    min="0"
+                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700"
                                 />
                             </div>
                             <div className="space-y-2">

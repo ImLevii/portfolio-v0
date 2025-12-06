@@ -48,6 +48,8 @@ export async function createProduct(formData: FormData) {
     const category = formData.get("category") as string
     const features = formData.get("features") as string
     const stock = parseInt(formData.get("stock") as string) || 0
+    const durationRaw = formData.get("duration") as string
+    const duration = durationRaw ? parseInt(durationRaw) : null
     const file = formData.get("file") as File
 
     let filePath: string | null = null
@@ -64,6 +66,7 @@ export async function createProduct(formData: FormData) {
             category,
             features,
             stock,
+            duration,
             filePath
         },
     })
@@ -86,6 +89,8 @@ export async function updateProduct(id: string, formData: FormData) {
     const category = formData.get("category") as string
     const features = formData.get("features") as string
     const stock = parseInt(formData.get("stock") as string) || 0
+    const durationRaw = formData.get("duration") as string
+    const duration = durationRaw ? parseInt(durationRaw) : null
     const file = formData.get("file") as File
 
     const data: any = {
@@ -96,6 +101,7 @@ export async function updateProduct(id: string, formData: FormData) {
         category,
         features,
         stock,
+        duration,
     }
 
     if (file && file.size > 0) {

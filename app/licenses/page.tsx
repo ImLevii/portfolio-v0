@@ -2,6 +2,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
 import { Key } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export default async function LicensesPage() {
     const session = await auth()
@@ -59,6 +60,14 @@ export default async function LicensesPage() {
                                                         Download Assets
                                                     </a>
                                                 )}
+                                                {license.expiresAt && (
+                                                    <p className={cn("text-xs mt-1",
+                                                        new Date() > new Date(license.expiresAt) ? "text-red-400" : "text-gray-500"
+                                                    )}>
+                                                        {new Date() > new Date(license.expiresAt) ? "Expired on " : "Expires on "}
+                                                        {new Date(license.expiresAt).toLocaleDateString()}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div className="flex flex-col items-end gap-2">
                                                 <code className="bg-black/80 px-3 py-1.5 rounded border border-gray-700 text-emerald-400 font-mono tracking-wider shadow-[0_0_10px_-3px_rgba(16,185,129,0.3)]">
@@ -66,9 +75,10 @@ export default async function LicensesPage() {
                                                 </code>
                                                 <span className={`text-xs uppercase tracking-widest font-bold ${license.status === 'ACTIVE' ? 'text-emerald-500/80' :
                                                     license.status === 'REVOKED' ? 'text-red-500/80' :
-                                                        'text-gray-500/80'
+                                                        (license.expiresAt && new Date() > new Date(license.expiresAt)) ? 'text-red-500/80' :
+                                                            'text-gray-500/80'
                                                     }`}>
-                                                    {license.status}
+                                                    {(license.expiresAt && new Date() > new Date(license.expiresAt)) ? 'EXPIRED' : license.status}
                                                 </span>
                                             </div>
                                         </div>

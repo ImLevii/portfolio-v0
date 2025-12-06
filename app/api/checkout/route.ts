@@ -116,13 +116,15 @@ export async function POST(req: Request) {
 
             // Generate License Keys & Decrement Stock
             for (const item of items) {
+                const expiresAt = item.duration ? new Date(Date.now() + item.duration * 24 * 60 * 60 * 1000) : null
                 await db.licenseKey.create({
                     data: {
                         key: generateLicenseKey(),
                         productId: item.id,
                         userId: session.user.id as string,
                         orderId: order.id,
-                        status: "ACTIVE"
+                        status: "ACTIVE",
+                        expiresAt: expiresAt
                     }
                 })
 
