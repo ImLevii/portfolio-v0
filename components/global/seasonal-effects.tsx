@@ -3,9 +3,14 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { useVisualEffectsStore } from "@/store/visual-effects-store"
 import { usePathname } from "next/navigation"
+import { SeasonalSettingsConfig } from "@/actions/seasonal-settings"
 
-export function SeasonalEffects() {
-    const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
+interface SeasonalEffectsProps {
+    config: SeasonalSettingsConfig
+}
+
+export function SeasonalEffects({ config }: SeasonalEffectsProps) {
+    const { weatherEffects, soundEffects, soundtrackVolume, generalVolume, setSoundtrackVolume, toggleSoundEffects } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()
     // Track if user has interacted to unlock audio context
@@ -20,16 +25,35 @@ export function SeasonalEffects() {
 
     useEffect(() => {
         isMounted.current = true
-        const month = new Date().getMonth() // 0-11
-        if (month === 11) { // December
-            setSeason("winter")
-        } else if (month === 10) { // November
-            setSeason("autumn")
-        } else {
-            setSeason(null)
+
+        // Determine season based on Config Mode
+        const determineSeason = () => {
+            if (config.mode === "winter") return "winter"
+            if (config.mode === "autumn") return "autumn"
+            if (config.mode === "none") return null
+            // Auto
+            const month = new Date().getMonth()
+            if (month === 11) return "winter"
+            if (month === 10) return "autumn"
+            return null
         }
+
+        setSeason(determineSeason())
+
+        // Sync Mobile Defaults
+        // If music is enabled in settings, force it to 50% on mobile for "Automated" experience
+        if (config.musicEnabled) {
+            const width = window.innerWidth
+            const isMobile = width < 768
+            if (isMobile) {
+                // Ensure sound is enabled and volume is decent (50%)
+                // We use setSoundtrackVolume(50) which in the store also sets soundEffects=true
+                setSoundtrackVolume(50)
+            }
+        }
+
         return () => { isMounted.current = false }
-    }, [])
+    }, [config.mode, config.musicEnabled, setSoundtrackVolume])
 
     // cleanup melody helper
     const stopMelody = useCallback(() => {
