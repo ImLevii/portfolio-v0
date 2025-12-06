@@ -8,6 +8,7 @@ export function SeasonalEffects() {
     const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()
+    const [hasInteracted, setHasInteracted] = useState(false)
 
     // Audio refs
     const melodyRef = useRef<HTMLAudioElement | null>(null)
@@ -27,6 +28,27 @@ export function SeasonalEffects() {
             setSeason("autumn")
         } else {
             setSeason(null)
+        }
+    }, [])
+
+    // Interaction Listener
+    useEffect(() => {
+        const handleInteraction = () => {
+            setHasInteracted(true)
+            // Once interacted, we don't need the listeners anymore
+            window.removeEventListener("click", handleInteraction)
+            window.removeEventListener("keydown", handleInteraction)
+            window.removeEventListener("touchstart", handleInteraction)
+        }
+
+        window.addEventListener("click", handleInteraction)
+        window.addEventListener("keydown", handleInteraction)
+        window.addEventListener("touchstart", handleInteraction)
+
+        return () => {
+            window.removeEventListener("click", handleInteraction)
+            window.removeEventListener("keydown", handleInteraction)
+            window.removeEventListener("touchstart", handleInteraction)
         }
     }, [])
 
@@ -60,6 +82,10 @@ export function SeasonalEffects() {
             stopMelody()
             return
         }
+
+        // Only proceed if user has interacted at least once to allow autoplay
+        // Or if we are already playing (ref exists) we can continue
+        if (!hasInteracted && !melodyRef.current) return
 
         // --- Logic for Shop Page (Impact) ---
         if (pathname === "/shop") {
@@ -112,7 +138,7 @@ export function SeasonalEffects() {
         // --- Logic for Other Pages ---
         // Do nothing. Melody persists if playing. Impact played and finished.
 
-    }, [settingsEnabled, pathname, soundtrackVolume, generalVolume])
+    }, [settingsEnabled, pathname, soundtrackVolume, generalVolume, hasInteracted])
 
     // Cleanup on unmount only
     useEffect(() => {
