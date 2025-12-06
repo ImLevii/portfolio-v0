@@ -1,20 +1,25 @@
 import { getSeasonalSettings } from "@/actions/seasonal-settings"
 import { SeasonalSettingsForm } from "@/components/admin/seasonal-settings-form"
-import { Separator } from "@/components/ui/separator"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "Seasonal Settings | Admin",
+    description: "Manage seasonal effects and audio",
+}
 
 export default async function SeasonalSettingsPage() {
     const settings = await getSeasonalSettings()
 
     return (
-        <div className="space-y-6 pt-10 pb-10 pr-10">
-            <div className="space-y-0.5">
-                <h2 className="text-2xl font-bold tracking-tight font-orbitron">Seasonal Settings</h2>
-                <p className="text-muted-foreground">
-                    Customize global seasonal effects and audio.
+        <div className="space-y-8 p-8">
+            <div className="flex flex-col gap-2">
+                <h1 className="text-3xl font-bold font-orbitron text-white">Seasonal Settings</h1>
+                <p className="text-gray-400">
+                    Customize the visual effects and audio for seasonal events.
                 </p>
             </div>
-            <Separator className="my-6 bg-white/10" />
-            <SeasonalSettingsForm initialSettings={settings} />
+
+            <SeasonalSettingsForm settings={settings} />
         </div>
     )
 }

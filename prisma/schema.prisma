@@ -156,7 +156,7 @@ model CarouselItem {
 
 model SiteSettings {
   id        String   @id @default(cuid())
-  key       String   @unique // e.g., "seasonal-effects"
-  value     String   // JSON string storing configuration
+  key       String   @unique // e.g., "seasonal-effects", "general-settings"
+  value     String   // JSON stringified configuration
   updatedAt DateTime @updatedAt
 }

@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import { PaypalProvider } from "@/components/paypal-provider"
 import { SeasonalEffects } from "@/components/global/seasonal-effects"
-import { getSeasonalSettings } from "@/actions/seasonal-settings"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,6 +25,8 @@ export const metadata: Metadata = {
 }
 
 import { auth } from "@/auth"
+
+import { getSeasonalSettings } from "@/actions/seasonal-settings"
 
 export default async function RootLayout({
   children,

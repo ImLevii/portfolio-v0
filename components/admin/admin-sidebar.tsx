@@ -17,8 +17,8 @@ export function AdminSidebar() {
         { href: "/admin/customers", label: "Customers", icon: Users },
         { href: "/admin/carousel", label: "Carousel", icon: LayoutDashboard }, // Added Carousel link
         { href: "/admin/coupons", label: "Coupons", icon: Package },
-        { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
         { href: "/admin/seasonal", label: "Seasonal Effects", icon: Snowflake },
+        { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
     ]
 
     return (

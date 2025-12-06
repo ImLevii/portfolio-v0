@@ -1,37 +1,36 @@
 "use server"
 
-import { db } from "@/lib/db"
+import { auth } from "@/auth"
+import { db as prisma } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
-const SETTINGS_KEY = "seasonal-effects"
+export type SeasonalMode = "auto" | "winter" | "autumn" | "none"
 
-export interface SeasonalSettings {
-    mode: "auto" | "winter" | "autumn" | "none"
+export interface SeasonalSettingsConfig {
+    mode: SeasonalMode
+    enabled: boolean
     snowDensity: number // 1-100
     leavesDensity: number // 1-100
-    enableAudio: boolean // Master toggle for seasonal audio
-    musicVolume: number // 0-100 (default for soundtrack)
-    soundEffectsVolume: number // 0-100 (impacts, etc)
+    musicEnabled: boolean
+    audioVolume: number // 0-100
 }
 
-const DEFAULT_SETTINGS: SeasonalSettings = {
+const DEFAULT_SETTINGS: SeasonalSettingsConfig = {
     mode: "auto",
+    enabled: true,
     snowDensity: 50,
-    leavesDensity: 50,
-    enableAudio: true,
-    musicVolume: 5,
-    soundEffectsVolume: 10,
+    leavesDensity: 30,
+    musicEnabled: true,
+    audioVolume: 20
 }
 
-export async function getSeasonalSettings(): Promise<SeasonalSettings> {
+export async function getSeasonalSettings(): Promise<SeasonalSettingsConfig> {
     try {
-        const settings = await db.siteSettings.findUnique({
-            where: { key: SETTINGS_KEY },
+        const settings = await prisma.siteSettings.findUnique({
+            where: { key: "seasonal-effects" }
         })
 
-        if (!settings) {
-            return DEFAULT_SETTINGS
-        }
+        if (!settings) return DEFAULT_SETTINGS
 
         return { ...DEFAULT_SETTINGS, ...JSON.parse(settings.value) }
     } catch (error) {
@@ -40,17 +39,29 @@ export async function getSeasonalSettings(): Promise<SeasonalSettings> {
     }
 }
 
-export async function updateSeasonalSettings(data: SeasonalSettings) {
+export async function updateSeasonalSettings(data: Partial<SeasonalSettingsConfig>) {
     try {
-        await db.siteSettings.upsert({
-            where: { key: SETTINGS_KEY },
-            update: { value: JSON.stringify(data) },
-            create: { key: SETTINGS_KEY, value: JSON.stringify(data) },
+        const session = await auth()
+        if ((session?.user as any)?.role !== "ADMIN") {
+            throw new Error("Unauthorized")
+        }
+
+        const current = await getSeasonalSettings()
+        const updated = { ...current, ...data }
+
+        await prisma.siteSettings.upsert({
+            where: { key: "seasonal-effects" },
+            update: { value: JSON.stringify(updated) },
+            create: {
+                key: "seasonal-effects",
+                value: JSON.stringify(updated)
+            }
         })
 
         revalidatePath("/")
         revalidatePath("/admin/seasonal")
-        return { success: true }
+
+        return { success: true, settings: updated }
     } catch (error) {
         console.error("Failed to update seasonal settings:", error)
         return { success: false, error: "Failed to update settings" }
