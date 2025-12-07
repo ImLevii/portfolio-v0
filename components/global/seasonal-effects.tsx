@@ -1,69 +1,60 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useVisualEffectsStore } from "@/store/visual-effects-store"
 import { usePathname } from "next/navigation"
-import { SeasonalSettingsConfig } from "@/actions/seasonal-settings"
 
-interface SeasonalEffectsProps {
-    config: SeasonalSettingsConfig
-}
-
-export function SeasonalEffects({ config }: SeasonalEffectsProps) {
-    // Add "toggleSoundEffects" to destructured props so we can force it if needed, 
-    // though setSoundtrackVolume should handle it.
-    const { weatherEffects, soundEffects, soundtrackVolume, generalVolume, setSoundtrackVolume, toggleSoundEffects } = useVisualEffectsStore()
+export function SeasonalEffects() {
+    const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()
-    // Track if user has interacted to unlock audio context
     const [hasInteracted, setHasInteracted] = useState(false)
-    // Track if we have already mounted/setup to avoid double-firing in Strict Mode
-    const isMounted = useRef(false)
 
-    // Audio refs
+    // Persistent Audio Refs
     const melodyRef = useRef<HTMLAudioElement | null>(null)
+    const impactRef = useRef<HTMLAudioElement | null>(null)
+
+    // Interval Refs
     const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const stopTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
-        isMounted.current = true
+        const month = new Date().getMonth()
+        if (month === 11) setSeason("winter")      // December
+        else if (month === 10) setSeason("autumn") // November
+        else setSeason(null)
 
-        // Determine season based on Config Mode
-        const determineSeason = () => {
-            if (config.mode === "winter") return "winter"
-            if (config.mode === "autumn") return "autumn"
-            if (config.mode === "none") return null
-            // Auto
-            const month = new Date().getMonth()
-            if (month === 11) return "winter"
-            if (month === 10) return "autumn"
-            return null
+        // Pre-initialize audio objects so they are ready for the click handler
+        if (!melodyRef.current) {
+            melodyRef.current = new Audio("/sounds/christmas-melody.mp3")
+            melodyRef.current.loop = true
         }
-
-        setSeason(determineSeason())
-
-        // Sync Defaults (Mobile & Desktop)
-        // If music is enabled in settings, force it to 50% (or config value) to ensure "Automated" experience
-        // works immediately without requiring manual enable.
-        if (config.musicEnabled) {
-            // Log for debugging
-            console.log("[SeasonalEffects] Auto-enabling sound. Config:", config)
-
-            // Timeout to avoid Zustand Persist rehydration overwriting our change immediately on mount.
-            setTimeout(() => {
-                setSoundtrackVolume(50)
-            }, 100)
+        if (!impactRef.current) {
+            impactRef.current = new Audio("/sounds/christmas-impact.mp3")
         }
+    }, [])
 
-        return () => { isMounted.current = false }
-    }, [config.mode, config.musicEnabled, setSoundtrackVolume])
+    const settingsEnabled = season === "winter" && weatherEffects && soundEffects
 
-    // cleanup melody helper
-    const stopMelody = useCallback(() => {
+    // Helper to safely play audio
+    const safePlay = (audio: HTMLAudioElement, volume: number) => {
+        try {
+            audio.volume = Math.max(0, Math.min(1, volume / 100))
+            const playPromise = audio.play()
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error("Playback failed (likely autoplay policy):", error)
+                })
+            }
+        } catch (e) {
+            console.error("Audio play error:", e)
+        }
+    }
+
+    const stopMelody = () => {
         if (melodyRef.current) {
             melodyRef.current.pause()
             melodyRef.current.currentTime = 0
-            melodyRef.current = null
         }
         if (fadeIntervalRef.current) {
             clearInterval(fadeIntervalRef.current)
@@ -73,128 +64,123 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
             clearTimeout(stopTimeoutRef.current)
             stopTimeoutRef.current = null
         }
-    }, [])
+    }
 
-    // Determine if settings allow playback
-    const settingsEnabled =
-        season === "winter" &&
-        weatherEffects &&
-        soundEffects
+    // Interaction Listener
+    useEffect(() => {
+        if (hasInteracted) return
 
-    // Synchronous Audio Logic Helper
-    const playCurrentContextSound = useCallback((currentPath: string) => {
-        // Safe guard: only play if enabled
+        const handleInteraction = () => {
+            setHasInteracted(true)
+
+            // Try to start/resume audio CONTEXT immediately within user gesture
+            // Determine what SHOULD be playing right now
+            if (settingsEnabled) {
+                if (pathname === "/shop") {
+                    // Play impact
+                    if (impactRef.current) {
+                        impactRef.current.currentTime = 0
+                        safePlay(impactRef.current, generalVolume)
+                    }
+                } else if (pathname === "/") {
+                    // Play melody
+                    if (melodyRef.current) {
+                        safePlay(melodyRef.current, soundtrackVolume)
+                        // Setup fade out timer
+                        startFadeOutTimer()
+                    }
+                }
+            }
+
+            // Remove listeners
+            ["click", "touchstart", "keydown"].forEach(event =>
+                window.removeEventListener(event, handleInteraction)
+            )
+        }
+
+        ["click", "touchstart", "keydown"].forEach(event =>
+            window.addEventListener(event, handleInteraction)
+        )
+
+        return () => {
+            ["click", "touchstart", "keydown"].forEach(event =>
+                window.removeEventListener(event, handleInteraction)
+            )
+        }
+    }, [hasInteracted, pathname, settingsEnabled, generalVolume, soundtrackVolume])
+
+    const startFadeOutTimer = () => {
+        if (stopTimeoutRef.current) clearTimeout(stopTimeoutRef.current)
+
+        stopTimeoutRef.current = setTimeout(() => {
+            const fadeAudio = melodyRef.current
+            if (!fadeAudio) return
+
+            const fadeStep = 0.05
+            const fadeInterval = 100
+
+            fadeIntervalRef.current = setInterval(() => {
+                if (fadeAudio.volume > fadeStep) {
+                    fadeAudio.volume -= fadeStep
+                } else {
+                    stopMelody()
+                }
+            }, fadeInterval)
+        }, 60000)
+    }
+
+    // Main Logic Effect (Runs on route changes / settings changes)
+    useEffect(() => {
         if (!settingsEnabled) {
             stopMelody()
             return
         }
 
-        // --- Shop Page (Impact) ---
-        if (currentPath === "/shop") {
+        if (!hasInteracted) return
+
+        // --- Shop Page ---
+        if (pathname === "/shop") {
             stopMelody()
-            // Play Impact (One-shot)
-            if (generalVolume > 0) {
-                const impactAudio = new Audio("/sounds/christmas-impact.mp3")
-                impactAudio.volume = Math.max(0, Math.min(1, generalVolume / 100))
-                impactAudio.play().catch((err) => console.warn("Impact play failed:", err))
+            // Impact is mostly one-shot handled by interaction or route change?
+            // If we navigate TO shop, play impact (if not already handled by interaction)
+            // We need a way to know if we JUST arrived. 
+            // The simple "play on render" works fine IF we interacted previously.
+            if (impactRef.current && impactRef.current.paused) {
+                // We allow re-playing impact on route enter?
+                // Simple logic: Play it.
+                impactRef.current.currentTime = 0
+                safePlay(impactRef.current, generalVolume)
             }
             return
         }
 
-        // --- Home Page (Melody) ---
-        if (currentPath === "/") {
-            // Start Melody if not playing
-            if (!melodyRef.current && soundtrackVolume > 0) {
-                const audio = new Audio("/sounds/christmas-melody.mp3")
-                audio.loop = true
-                audio.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
-
-                audio.play().catch((err) => {
-                    console.warn("Melody play failed:", err)
-                })
-
-                melodyRef.current = audio
-
-                // Set 60s timeout for fade out
-                stopTimeoutRef.current = setTimeout(() => {
-                    const fadeAudio = melodyRef.current
-                    if (!fadeAudio) return
-
-                    const fadeStep = 0.05
-                    const fadeInterval = 100
-
-                    fadeIntervalRef.current = setInterval(() => {
-                        if (fadeAudio.volume > fadeStep) {
-                            fadeAudio.volume -= fadeStep
-                        } else {
-                            stopMelody()
-                        }
-                    }, fadeInterval)
-
-                }, 60000) // 60 seconds
+        // --- Home Page ---
+        if (pathname === "/") {
+            if (melodyRef.current && melodyRef.current.paused) {
+                safePlay(melodyRef.current, soundtrackVolume)
+                startFadeOutTimer()
             }
         }
-    }, [generalVolume, soundtrackVolume, settingsEnabled, stopMelody])
 
-    // Interaction Listener
-    useEffect(() => {
-        const handleInteraction = () => {
-            if (hasInteracted) return
+        // --- Other Pages ---
+        // Melody continues if running.
 
-            // CRITICAL FIX: Only consume interaction if we are actually allowed to play.
-            // If settings are not enabled yet (or user disabled them), preserve the "interaction token"
-            // for when they eventually enable it.
-            if (!settingsEnabled) return
+    }, [pathname, settingsEnabled, hasInteracted, soundtrackVolume, generalVolume])
 
-            // 1. Mark as interacted
-            setHasInteracted(true)
-
-            // 2. Try to play IMMEDIATELY in this event loop
-            playCurrentContextSound(window.location.pathname)
-
-            // Remove listeners
-            const events = ["click", "touchstart", "keydown"]
-            events.forEach(event => window.removeEventListener(event, handleInteraction))
-        }
-
-        const events = ["click", "touchstart", "keydown"]
-        events.forEach(event => window.addEventListener(event, handleInteraction))
-
-        return () => {
-            events.forEach(event => window.removeEventListener(event, handleInteraction))
-        }
-    }, [hasInteracted, playCurrentContextSound, settingsEnabled])
-
-    // Effect 1: Lifecycle / Navigation
-    // Triggered on Pathname change OR Settings toggle (Enable/Disable)
-    // NOT triggered on Volume change (to avoid re-playing Impact)
-    useEffect(() => {
-        // If we haven't interacted yet, don't try to auto-play on nav
-        // The interaction handler will cover the first play.
-        if (!hasInteracted) return
-
-        playCurrentContextSound(pathname)
-
-    }, [pathname, settingsEnabled, hasInteracted, playCurrentContextSound])
-    // ^ Excluded playCurrentContextSound from deps to avoid Volume triggering this effect
-    // We strictly want this for Navigation and Enable/Disable.
-
-    // Effect 2: Volume Sync (Melody Only)
+    // Sync Volumes live
     useEffect(() => {
         if (melodyRef.current && !fadeIntervalRef.current) {
             melodyRef.current.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
         }
-    }, [soundtrackVolume])
-
-    // Cleanup
-    useEffect(() => {
-        return () => stopMelody()
-    }, [stopMelody])
+        if (impactRef.current) {
+            impactRef.current.volume = Math.max(0, Math.min(1, generalVolume / 100))
+        }
+    }, [soundtrackVolume, generalVolume])
 
     if (!season || !weatherEffects) return null
 
     return (
-        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden leading-none">
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
             {season === "winter" && <SnowEffect />}
             {season === "autumn" && <LeavesEffect />}
         </div>
@@ -226,38 +212,29 @@ function SnowEffect() {
         }[] = []
 
         const resize = () => {
-            // Use visualViewport if available for mobile address bar handling
-            const width = window.visualViewport ? window.visualViewport.width : window.innerWidth
-            const height = window.visualViewport ? window.visualViewport.height : window.innerHeight
-
-            canvas.width = width
-            canvas.height = height
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
             initParticles()
         }
 
         const initParticles = () => {
-            const width = canvas.width
-            const height = canvas.height
-            // Optimization: Reduce particle count on mobile
-            const isMobile = width < 768
-            const density = isMobile ? 24 : 8 // Much lower density on mobile (higher divisor)
-            const particleCount = Math.floor(width / density)
+            const particleCount = Math.floor(window.innerWidth / 8) // Moderate density for detailed flakes
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 const depth = Math.random() // 0 = far, 1 = close
-                const sizeBase = Math.random() * 3 + 2
+                const sizeBase = Math.random() * 3 + 2 // Base size 2-5
 
                 particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    radius: sizeBase * (depth * 0.8 + 0.4),
-                    speed: (Math.random() * 1 + 0.8) * (depth * 0.8 + 0.4),
-                    wind: (Math.random() - 0.5) * 0.3,
-                    sway: Math.random() * Math.PI * 2,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: sizeBase * (depth * 0.8 + 0.4), // Size affected by depth
+                    speed: (Math.random() * 1 + 0.8) * (depth * 0.8 + 0.4), // Speed affected by depth
+                    wind: (Math.random() - 0.5) * 0.3, // Random lateral drift
+                    sway: Math.random() * Math.PI * 2, // Random starting oscillator
                     swaySpeed: Math.random() * 0.02 + 0.01,
                     rotation: Math.random() * Math.PI * 2,
                     rotationSpeed: (Math.random() - 0.5) * 0.02,
-                    opacity: (Math.random() * 0.6 + 0.4) * (depth * 0.7 + 0.3),
+                    opacity: (Math.random() * 0.6 + 0.4) * (depth * 0.7 + 0.3), // Opacity based on depth
                 })
             }
         }
@@ -266,19 +243,24 @@ function SnowEffect() {
             ctx.save()
             ctx.translate(x, y)
             ctx.rotate(rotation)
+
             ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`
             ctx.lineWidth = Math.max(0.5, radius * 0.15)
             ctx.lineCap = "round"
-            ctx.shadowBlur = radius
+            ctx.shadowBlur = radius // Glow effect
             ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.5})`
+
             ctx.beginPath()
+            // Draw 6 branches
             for (let i = 0; i < 6; i++) {
                 ctx.moveTo(0, 0)
                 ctx.lineTo(0, radius)
+                // Inner branch
                 ctx.moveTo(0, radius * 0.4)
                 ctx.lineTo(radius * 0.25, radius * 0.6)
                 ctx.moveTo(0, radius * 0.4)
                 ctx.lineTo(-radius * 0.25, radius * 0.6)
+                // Rotate for next branch
                 ctx.rotate(Math.PI / 3)
             }
             ctx.stroke()
@@ -287,11 +269,15 @@ function SnowEffect() {
 
         const draw = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
+
             particles.forEach((p) => {
+                // Update physics
                 p.y += p.speed
                 p.x += p.wind + Math.sin(p.sway) * 0.5
                 p.sway += p.swaySpeed
                 p.rotation += p.rotationSpeed
+
+                // Wrap around screen
                 if (p.y > canvas.height + p.radius) {
                     p.y = -p.radius
                     p.x = Math.random() * canvas.width
@@ -301,25 +287,19 @@ function SnowEffect() {
                 } else if (p.x < -p.radius) {
                     p.x = canvas.width + p.radius
                 }
+
                 drawSnowflake(p.x, p.y, p.radius, p.rotation, p.opacity)
             })
+
             animationFrameId = requestAnimationFrame(draw)
         }
 
-        // Listen to both resize and visualViewport resize for mobile
         window.addEventListener("resize", resize)
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', resize);
-        }
-
         resize()
         draw()
 
         return () => {
             window.removeEventListener("resize", resize)
-            if (window.visualViewport) {
-                window.visualViewport.removeEventListener('resize', resize);
-            }
             cancelAnimationFrame(animationFrameId)
         }
     }, [])
@@ -338,6 +318,7 @@ function LeavesEffect() {
         if (!ctx) return
 
         let animationFrameId: number
+        // Types of leaves colors
         const colors = ["#d97706", "#b45309", "#92400e", "#78350f", "#f59e0b"]
 
         let particles: {
@@ -353,27 +334,18 @@ function LeavesEffect() {
         }[] = []
 
         const resize = () => {
-            // Use visualViewport if available
-            const width = window.visualViewport ? window.visualViewport.width : window.innerWidth
-            const height = window.visualViewport ? window.visualViewport.height : window.innerHeight
-
-            canvas.width = width
-            canvas.height = height
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
             initParticles()
         }
 
         const initParticles = () => {
-            const width = canvas.width
-            const height = canvas.height
-            // Optimization: Reduce particle count on mobile
-            const isMobile = width < 768
-            const density = isMobile ? 45 : 15
-            const particleCount = Math.floor(width / density)
+            const particleCount = Math.floor(window.innerWidth / 15) // Density
             particles = []
             for (let i = 0; i < particleCount; i++) {
                 particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
                     size: Math.random() * 8 + 4,
                     speed: Math.random() * 1.5 + 0.5,
                     rotation: Math.random() * 360,
@@ -387,40 +359,42 @@ function LeavesEffect() {
 
         const draw = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
+
             particles.forEach((p) => {
                 ctx.save()
                 ctx.translate(p.x, p.y)
                 ctx.rotate((p.rotation * Math.PI) / 180)
+
                 ctx.fillStyle = p.color
+                // Draw a simple leaf shape (ellipse-ish)
                 ctx.beginPath()
                 ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2)
                 ctx.fill()
+
                 ctx.restore()
+
+                // Update position
                 p.y += p.speed
                 p.x += Math.sin(p.oscillation) * 0.5
                 p.rotation += p.rotationSpeed
                 p.oscillation += p.oscillationSpeed
+
+                // Reset if out of bounds
                 if (p.y > canvas.height + p.size) {
                     p.y = -p.size
                     p.x = Math.random() * canvas.width
                 }
             })
+
             animationFrameId = requestAnimationFrame(draw)
         }
 
         window.addEventListener("resize", resize)
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', resize);
-        }
-
         resize()
         draw()
 
         return () => {
             window.removeEventListener("resize", resize)
-            if (window.visualViewport) {
-                window.visualViewport.removeEventListener('resize', resize);
-            }
             cancelAnimationFrame(animationFrameId)
         }
     }, [])
