@@ -13,6 +13,7 @@ export default {
         },
         async jwt({ token, user }) {
             if (user) {
+                console.log("Auth Config: User logged in, setting role in token:", (user as any).role)
                 // @ts-ignore - Role is added in the database but not in default types yet
                 token.role = user.role
             }
