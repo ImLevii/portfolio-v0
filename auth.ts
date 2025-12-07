@@ -28,6 +28,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 }
             }
             return session
+        },
+        async jwt({ token, user }) {
+            if (user) {
+                // @ts-ignore - Role is added in the database but not in default types yet
+                token.role = user.role
+            }
+            return token
         }
     },
     providers: [
