@@ -24,7 +24,7 @@ export default auth((req) => {
         const userRole = req.auth?.user?.role || "CUSTOMER"
         console.log(`Middleware: Admin route accessed. User Role: ${userRole}`)
 
-        if (userRole !== "ADMIN") {
+        if (userRole !== "ADMIN" && userRole !== "Admin") {
             console.log("Middleware: User is not ADMIN. Redirecting to /.")
             return Response.redirect(new URL("/", req.nextUrl))
         }
