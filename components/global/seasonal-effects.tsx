@@ -10,6 +10,8 @@ interface SeasonalEffectsProps {
 }
 
 export function SeasonalEffects({ config }: SeasonalEffectsProps) {
+    // Add "toggleSoundEffects" to destructured props so we can force it if needed, 
+    // though setSoundtrackVolume should handle it.
     const { weatherEffects, soundEffects, soundtrackVolume, generalVolume, setSoundtrackVolume, toggleSoundEffects } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()
@@ -40,16 +42,17 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
 
         setSeason(determineSeason())
 
-        // Sync Mobile Defaults
-        // If music is enabled in settings, force it to 50% on mobile for "Automated" experience
+        // Sync Defaults (Mobile & Desktop)
+        // If music is enabled in settings, force it to 50% (or config value) to ensure "Automated" experience
+        // works immediately without requiring manual enable.
         if (config.musicEnabled) {
-            const width = window.innerWidth
-            const isMobile = width < 768
-            if (isMobile) {
-                // Ensure sound is enabled and volume is decent (50%)
-                // We use setSoundtrackVolume(50) which in the store also sets soundEffects=true
+            // Log for debugging
+            console.log("[SeasonalEffects] Auto-enabling sound. Config:", config)
+
+            // Timeout to avoid Zustand Persist rehydration overwriting our change immediately on mount.
+            setTimeout(() => {
                 setSoundtrackVolume(50)
-            }
+            }, 100)
         }
 
         return () => { isMounted.current = false }
