@@ -283,7 +283,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
             {/* Floating Toggle */}
             <motion.button
-                className="group relative flex h-12 w-12 items-center justify-center rounded-xl bg-[#111] border border-zinc-800 shadow-xl transition-all hover:bg-zinc-800 hover:border-zinc-700"
+                className="group relative flex h-16 w-16 items-center justify-center rounded-2xl bg-[#111] border border-zinc-800 shadow-xl transition-all hover:bg-zinc-800 hover:border-zinc-700"
                 onClick={() => {
                     if (isOpen && isMinimized) {
                         setIsMinimized(false)
@@ -294,12 +294,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
             >
-                <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-green-500 border-2 border-[#111]"></span>
+                <span className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-green-500 border-2 border-[#111]"></span>
 
                 {isOpen && !isMinimized ? (
-                    <X className="h-5 w-5 text-zinc-400 group-hover:text-white" />
+                    <X className="h-8 w-8 text-zinc-400 group-hover:text-white" />
                 ) : (
-                    <MessageCircle className="h-5 w-5 text-zinc-400 group-hover:text-white" />
+                    <MessageCircle className="h-8 w-8 text-zinc-400 group-hover:text-white" />
                 )}
             </motion.button>
 

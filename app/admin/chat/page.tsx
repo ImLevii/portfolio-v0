@@ -1,4 +1,5 @@
 import { ChatSettingsForm } from "@/components/admin/chat-settings-form"
+import { AnnouncementForm } from "@/components/admin/announcement-form"
 import { getChatSettings } from "@/actions/chat-settings"
 import { MessageSquare } from "lucide-react"
 
@@ -18,6 +19,7 @@ export default async function ChatSettingsPage() {
             </div>
 
             <ChatSettingsForm initialConfig={settings} />
+            <AnnouncementForm />
         </div>
     )
 }
