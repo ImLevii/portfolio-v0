@@ -32,6 +32,7 @@ export function AnnouncementForm() {
     const [text, setText] = useState("")
     const [imageUrl, setImageUrl] = useState("")
     const [sound, setSound] = useState<'notification' | 'alert' | 'none'>('notification')
+    const [color, setColor] = useState<'green' | 'blue' | 'red' | 'purple' | 'orange'>('green')
 
     const handleBroadcast = () => {
         if (!text) {
@@ -43,7 +44,8 @@ export function AnnouncementForm() {
             const result = await broadcastAnnouncement({
                 text,
                 imageUrl,
-                soundType: sound
+                soundType: sound,
+                color
             })
             if (result.success) {
                 toast.success("Announcement broadcasted successfully!")
@@ -82,30 +84,45 @@ export function AnnouncementForm() {
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Types something exciting..."
-                        className="bg-zinc-900/50 border-zinc-800 min-h-[100px]"
+                        className="bg-zinc-900/50 border-zinc-800 min-h-[100px] text-white"
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label className="text-zinc-200">Image URL (Optional)</Label>
                         <Input
                             value={imageUrl}
                             onChange={(e) => setImageUrl(e.target.value)}
                             placeholder="https://..."
-                            className="bg-zinc-900/50 border-zinc-800"
+                            className="bg-zinc-900/50 border-zinc-800 text-white"
                         />
                     </div>
                     <div className="space-y-2">
                         <Label className="text-zinc-200">Sound Effect</Label>
                         <Select value={sound} onValueChange={(v: any) => setSound(v)}>
-                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800">
+                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
                                 <SelectItem value="notification">Notification (Ding)</SelectItem>
                                 <SelectItem value="alert">Alert (Siren)</SelectItem>
                                 <SelectItem value="none">Silent</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-zinc-200">Theme Color</Label>
+                        <Select value={color} onValueChange={(v: any) => setColor(v)}>
+                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
+                                <SelectItem value="green" className="text-green-500 font-bold">Neon Green</SelectItem>
+                                <SelectItem value="blue" className="text-cyan-500 font-bold">Cyber Blue</SelectItem>
+                                <SelectItem value="purple" className="text-purple-500 font-bold">Royal Purple</SelectItem>
+                                <SelectItem value="red" className="text-red-500 font-bold">Alert Red</SelectItem>
+                                <SelectItem value="orange" className="text-orange-500 font-bold">Warning Orange</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

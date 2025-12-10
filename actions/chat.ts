@@ -4,6 +4,8 @@ import { auth } from "@/auth"
 import { db as prisma } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
+import { filterProfanity } from "@/lib/profanity"
+
 export interface ChatMessageData {
     id: string
     text: string
@@ -27,9 +29,11 @@ export async function sendMessage(text: string) {
             return { success: false, error: "Unauthorized" }
         }
 
+        const cleanText = filterProfanity(text)
+
         await prisma.chatMessage.create({
             data: {
-                text,
+                text: cleanText,
                 senderName: user.name || "Anonymous",
                 senderAvatar: user.image,
                 senderRole: (user as any).role || "USER",
@@ -41,6 +45,26 @@ export async function sendMessage(text: string) {
     } catch (error) {
         console.error("Failed to send message:", error)
         return { success: false, error: "Failed to send message" }
+    }
+}
+
+export async function deleteMessage(messageId: string) {
+    try {
+        const session = await auth()
+        const role = (session?.user as any)?.role
+
+        if (role !== "ADMIN" && role !== "Admin") {
+            return { success: false, error: "Unauthorized" }
+        }
+
+        await prisma.chatMessage.delete({
+            where: { id: messageId }
+        })
+
+        return { success: true }
+    } catch (error) {
+        console.error("Failed to delete message:", error)
+        return { success: false, error: "Failed to delete" }
     }
 }
 

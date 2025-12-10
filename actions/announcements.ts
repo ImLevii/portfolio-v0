@@ -9,6 +9,7 @@ export interface AnnouncementConfig {
     text: string
     imageUrl?: string
     soundType: 'notification' | 'alert' | 'none'
+    color: 'green' | 'blue' | 'red' | 'purple' | 'orange'
     timestamp: number // Used to detect "new" announcements on client
     autoHideAfter?: number // seconds, optional
 }
@@ -26,7 +27,7 @@ export async function getAnnouncement(): Promise<AnnouncementConfig | null> {
     }
 }
 
-export async function broadcastAnnouncement(data: { text: string, imageUrl?: string, soundType: 'notification' | 'alert' | 'none' }) {
+export async function broadcastAnnouncement(data: { text: string, imageUrl?: string, soundType: 'notification' | 'alert' | 'none', color: 'green' | 'blue' | 'red' | 'purple' | 'orange' }) {
     try {
         const session = await auth()
         const role = (session?.user as any)?.role
@@ -39,6 +40,7 @@ export async function broadcastAnnouncement(data: { text: string, imageUrl?: str
             text: data.text,
             imageUrl: data.imageUrl,
             soundType: data.soundType,
+            color: data.color || 'green',
             timestamp: Date.now(),
             autoHideAfter: 10 // default 10s
         }

@@ -65,6 +65,19 @@ export function GlobalAnnouncementOverlay() {
         }
     }
 
+    const getColors = (color: string) => {
+        switch (color) {
+            case 'green': return { border: 'border-green-500/30', glow: 'shadow-green-500/10', gradient: 'from-green-500 to-emerald-600', text: 'text-green-500', button: 'bg-green-600 hover:bg-green-500' }
+            case 'blue': return { border: 'border-cyan-500/30', glow: 'shadow-cyan-500/10', gradient: 'from-cyan-500 to-blue-600', text: 'text-cyan-500', button: 'bg-cyan-600 hover:bg-cyan-500' }
+            case 'purple': return { border: 'border-purple-500/30', glow: 'shadow-purple-500/10', gradient: 'from-purple-500 to-violet-600', text: 'text-purple-500', button: 'bg-purple-600 hover:bg-purple-500' }
+            case 'red': return { border: 'border-red-500/30', glow: 'shadow-red-500/10', gradient: 'from-red-500 to-rose-600', text: 'text-red-500', button: 'bg-red-600 hover:bg-red-500' }
+            case 'orange': return { border: 'border-orange-500/30', glow: 'shadow-orange-500/10', gradient: 'from-orange-500 to-amber-600', text: 'text-orange-500', button: 'bg-orange-600 hover:bg-orange-500' }
+            default: return { border: 'border-green-500/30', glow: 'shadow-green-500/10', gradient: 'from-green-500 to-emerald-600', text: 'text-green-500', button: 'bg-green-600 hover:bg-green-500' }
+        }
+    }
+
+    const colors = announcement ? getColors(announcement.color) : getColors('green')
+
     return (
         <AnimatePresence>
             {isVisible && announcement && (
@@ -85,19 +98,19 @@ export function GlobalAnnouncementOverlay() {
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         className="relative w-full max-w-md pointer-events-auto"
                     >
-                        <div className="relative overflow-hidden rounded-2xl bg-[#0a0a0a] border border-cyan-500/30 shadow-2xl shadow-cyan-500/10">
+                        <div className={`relative overflow-hidden rounded-2xl bg-[#0a0a0a] border ${colors.border} shadow-2xl ${colors.glow}`}>
                             {/* Decorative Top Line */}
-                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600" />
+                            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
 
                             <div className="p-6">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-500">
-                                            <Bell className="h-5 w-5 animate-bounce" />
+                                        <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-opacity-10 ${colors.text.replace('text', 'bg')}`}>
+                                            <Bell className={`h-5 w-5 animate-bounce ${colors.text}`} />
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-bold text-white font-orbitron">Announcement</h3>
-                                            <p className="text-xs text-cyan-400/70">Broadcast Message</p>
+                                            <p className={`text-xs ${colors.text} opacity-70`}>Broadcast Message</p>
                                         </div>
                                     </div>
                                     <button
@@ -126,7 +139,7 @@ export function GlobalAnnouncementOverlay() {
 
                                 <button
                                     onClick={handleDismiss}
-                                    className="mt-6 w-full rounded-xl bg-cyan-600 py-3 text-sm font-bold text-white hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-500/20"
+                                    className={`mt-6 w-full rounded-xl py-3 text-sm font-bold text-white transition-all shadow-lg ${colors.button}`}
                                 >
                                     Got it!
                                 </button>

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useTransition } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Flag } from "lucide-react"
+import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -11,8 +11,9 @@ import { cn } from "@/lib/utils"
 
 import { type ChatSettingsConfig } from "@/actions/chat-settings"
 import { updatePresence, getOnlineCount } from "@/actions/presence"
-import { getRecentMessages, sendMessage, addReaction, type ChatMessageData } from "@/actions/chat"
+import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData } from "@/actions/chat"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
+import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
 
 interface ChatMessage extends ChatMessageData {
     type?: 'system' | 'user' | 'announcement' // 'user' is default for DB messages
@@ -104,6 +105,18 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         })
     }
 
+    const handleDeleteMessage = async (msgId: string) => {
+        if (!confirm("Delete this message?")) return
+
+        // Optimistic UI
+        setMessages(prev => prev.filter(m => m.id !== msgId))
+        await deleteMessage(msgId)
+    }
+
+    const handleEmojiSelect = (emoji: string) => {
+        setInputText(prev => prev + emoji)
+    }
+
     const handleReaction = async (msgId: string, type: 'likes' | 'dislikes' | 'hearts') => {
         // Optimistic update
         setMessages(prev => prev.map(msg => {
@@ -123,6 +136,17 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         await addReaction(msgId, type)
     }
 
+    const getAnnouncementColor = (color: string = 'green') => {
+        switch (color) {
+            case 'green': return { bg: 'from-green-900/40 to-emerald-900/40', border: 'border-green-500/30', text: 'text-green-300', icon: 'bg-green-400' }
+            case 'blue': return { bg: 'from-cyan-900/40 to-blue-900/40', border: 'border-cyan-500/30', text: 'text-cyan-300', icon: 'bg-cyan-400' }
+            case 'red': return { bg: 'from-red-900/40 to-rose-900/40', border: 'border-red-500/30', text: 'text-red-300', icon: 'bg-red-400' }
+            case 'purple': return { bg: 'from-purple-900/40 to-violet-900/40', border: 'border-purple-500/30', text: 'text-purple-300', icon: 'bg-purple-400' }
+            case 'orange': return { bg: 'from-orange-900/40 to-amber-900/40', border: 'border-orange-500/30', text: 'text-orange-300', icon: 'bg-orange-400' }
+            default: return { bg: 'from-green-900/40 to-emerald-900/40', border: 'border-green-500/30', text: 'text-green-300', icon: 'bg-green-400' }
+        }
+    }
+
     // Helper to parse mild markdown for system messages (bolding)
     const parseText = (text: string) => {
         const parts = text.split(/(\*\*.*?\*\*)/g)
@@ -136,6 +160,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
     // Check if config enabled
     if (config && !config.enabled) return null
+
+    const annColors = announcement ? getAnnouncementColor(announcement.color) : getAnnouncementColor('green')
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end print:hidden">
@@ -191,11 +217,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
                         {/* Global Announcement In-Chat Injection */}
                         {announcement && announcement.active && (
-                            <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 p-3 mx-4 mt-4 rounded-lg border border-purple-500/30 flex items-start gap-3">
-                                <div className="mt-1 h-2 w-2 rounded-full bg-purple-400 animate-pulse shrink-0" />
+                            <div className={`bg-gradient-to-r ${annColors.bg} p-3 mx-4 mt-4 rounded-lg border ${annColors.border} flex items-start gap-3`}>
+                                <div className={`mt-1 h-2 w-2 rounded-full ${annColors.icon} animate-pulse shrink-0`} />
                                 <div>
-                                    <p className="text-xs font-bold text-purple-300 mb-1">ANNOUNCEMENT</p>
-                                    <p className="text-sm text-purple-100/90 leading-snug">{announcement.text}</p>
+                                    <p className={`text-xs font-bold ${annColors.text} mb-1`}>ANNOUNCEMENT</p>
+                                    <p className={`text-sm ${annColors.text} opacity-90 leading-snug`}>{announcement.text}</p>
                                 </div>
                             </div>
                         )}
@@ -218,9 +244,22 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
                                 {messages.map((msg) => {
                                     const isAdmin = msg.senderRole === "ADMIN" || msg.senderRole === "Admin"
+                                    const isSelf = msg.senderName === user?.name // weak check but sufficient for UI
+                                    const canDelete = (user as any)?.role === "ADMIN" || (user as any)?.role === "Admin"
+
                                     return (
                                         <div key={msg.id} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                            <div className="group">
+                                            <div className="group relative">
+                                                {canDelete && (
+                                                    <button
+                                                        onClick={() => handleDeleteMessage(msg.id)}
+                                                        className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-500/10 rounded transition-all"
+                                                        title="Delete Message"
+                                                    >
+                                                        <Trash2 className="h-3 w-3" />
+                                                    </button>
+                                                )}
+
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <Avatar className={cn("h-8 w-8 border", isAdmin ? "border-red-500/50" : "border-zinc-700")}>
                                                         <AvatarImage src={msg.senderAvatar || undefined} />
@@ -285,6 +324,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         <div className="border-t border-zinc-800 bg-[#111] p-3">
                             {user ? (
                                 <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
+                                    <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending} />
                                     <Input
                                         value={inputText}
                                         onChange={(e) => setInputText(e.target.value)}
