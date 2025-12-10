@@ -38,8 +38,9 @@ export async function getChatSettings(): Promise<ChatSettingsConfig> {
 export async function updateChatSettings(data: Partial<ChatSettingsConfig>) {
     try {
         const session = await auth()
-        if ((session?.user as any)?.role !== "ADMIN") {
-            throw new Error("Unauthorized")
+        const role = (session?.user as any)?.role
+        if (role !== "ADMIN" && role !== "Admin") {
+            throw new Error("Unauthorized - Admin access required")
         }
 
         const current = await getChatSettings()
