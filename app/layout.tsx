@@ -43,7 +43,7 @@ export default async function RootLayout({
           <ScrollToTop />
           <Navbar user={session?.user} />
           <SeasonalEffects config={seasonalSettings} />
-          <LiveChatWidget />
+          <LiveChatWidget user={session?.user} />
           {children}
         </ThemeProvider>
       </body>
