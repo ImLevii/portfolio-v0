@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import { SeasonalEffects } from "@/components/global/seasonal-effects"
+import { LiveChatWidget } from "@/components/global/live-chat-widget"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default async function RootLayout({
           <ScrollToTop />
           <Navbar user={session?.user} />
           <SeasonalEffects config={seasonalSettings} />
+          <LiveChatWidget />
           {children}
         </ThemeProvider>
       </body>
