@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from "react"
 import { useVisualEffectsStore } from "@/store/visual-effects-store"
 import { usePathname } from "next/navigation"
 
-export function SeasonalEffects() {
+import type { SeasonalSettingsConfig } from "@/actions/seasonal-settings"
+
+interface SeasonalEffectsProps {
+    config?: SeasonalSettingsConfig
+}
+
+export function SeasonalEffects({ config }: SeasonalEffectsProps) {
     const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
     const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
     const pathname = usePathname()

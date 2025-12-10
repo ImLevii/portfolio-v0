@@ -39,7 +39,7 @@ export const useVisualEffectsStore = create<VisualEffectsState>()(
 
             generalVolume: 10,
             gamesVolume: 50,
-            soundtrackVolume: 5,
+            soundtrackVolume: 1,
 
             toggleSoundEffects: () => set((state) => ({ soundEffects: !state.soundEffects })),
             toggleWeatherEffects: () => set((state) => ({ weatherEffects: !state.weatherEffects })),
@@ -63,7 +63,7 @@ export const useVisualEffectsStore = create<VisualEffectsState>()(
             resetSoundToDefault: () => set({
                 generalVolume: 10,
                 gamesVolume: 50,
-                soundtrackVolume: 5,
+                soundtrackVolume: 1,
                 soundEffects: true
             }),
         }),

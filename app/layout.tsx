@@ -5,7 +5,6 @@ import "./globals.css"
 import Navbar from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
-import { PaypalProvider } from "@/components/paypal-provider"
 import { SeasonalEffects } from "@/components/global/seasonal-effects"
 
 const inter = Inter({
@@ -39,14 +38,12 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
-        <PaypalProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-            <ScrollToTop />
-            <Navbar user={session?.user} />
-            <SeasonalEffects config={seasonalSettings} />
-            {children}
-          </ThemeProvider>
-        </PaypalProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <ScrollToTop />
+          <Navbar user={session?.user} />
+          <SeasonalEffects config={seasonalSettings} />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
