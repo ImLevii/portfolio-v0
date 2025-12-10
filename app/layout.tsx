@@ -27,6 +27,7 @@ export const metadata: Metadata = {
 import { auth } from "@/auth"
 
 import { getSeasonalSettings } from "@/actions/seasonal-settings"
+import { getChatSettings } from "@/actions/chat-settings"
 
 export default async function RootLayout({
   children,
@@ -36,6 +37,8 @@ export default async function RootLayout({
   const session = await auth()
   const seasonalSettings = await getSeasonalSettings()
 
+  const chatSettings = await getChatSettings()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
@@ -43,7 +46,7 @@ export default async function RootLayout({
           <ScrollToTop />
           <Navbar user={session?.user} />
           <SeasonalEffects config={seasonalSettings} />
-          <LiveChatWidget user={session?.user} />
+          <LiveChatWidget user={session?.user} config={chatSettings} />
           {children}
         </ThemeProvider>
       </body>

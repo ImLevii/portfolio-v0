@@ -9,6 +9,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
+import { type ChatSettingsConfig } from "@/actions/chat-settings"
+import { updatePresence, getOnlineCount } from "@/actions/presence"
+
 interface ChatMessage {
     id: string
     type: 'system' | 'user'
@@ -26,36 +29,55 @@ interface ChatMessage {
     }
 }
 
-export function LiveChatWidget({ user }: { user?: any }) {
+export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSettingsConfig }) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
 
-    const [messages, setMessages] = useState<ChatMessage[]>([
-        {
-            id: 'sys-1',
-            type: 'system',
-            text: "Ahoy! Welcome aboard our streaming ship, matey! ⚓ Say hello to **VEE**! 👋",
-            timestamp: "01:26 PM"
-        },
-        {
-            id: 'msg-1',
-            type: 'user',
-            text: "movies like if bale street could talk",
-            sender: {
-                name: "squirr",
-                isUser: true, // Simulate "user" badge
-                avatar: "/placeholder-user.jpg"
-            },
-            timestamp: "01:47 PM",
-            reactions: { likes: 0, dislikes: 0, hearts: 0 }
-        },
-        {
-            id: 'sys-2',
-            type: 'system',
-            text: "🎨 Welcome to the greatest streaming community!",
-            timestamp: "03:56 PM"
+    const [messages, setMessages] = useState<ChatMessage[]>([])
+    const [onlineCount, setOnlineCount] = useState(1)
+
+    useEffect(() => {
+        // Generate a random ID for this session if not exists
+        let presenceId = sessionStorage.getItem("presenceId")
+        if (!presenceId) {
+            presenceId = Math.random().toString(36).substring(7)
+            sessionStorage.setItem("presenceId", presenceId)
         }
-    ])
+
+        const pollPresence = async () => {
+            // 1. Heartbeat
+            if (presenceId) await updatePresence(presenceId)
+
+            // 2. Get Count
+            const { count } = await getOnlineCount()
+            setOnlineCount(count > 0 ? count : 1) // Always show at least 1 (yourself)
+        }
+
+        // Initial call
+        pollPresence()
+
+        // Poll every 10 seconds (faster than 30s for better UX feel)
+        const interval = setInterval(pollPresence, 10000)
+
+        return () => clearInterval(interval)
+    }, [])
+
+    useEffect(() => {
+        // Determine if we should show the initial system message
+        if (messages.length === 0 && config?.systemMessageText) {
+            setMessages([
+                {
+                    id: 'sys-init',
+                    type: 'system',
+                    text: config.systemMessageText,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }
+            ])
+        }
+    }, [config]) // Only re-run if config changes drastically, typically on mount
+
+    if (config && !config.enabled) return null
+
 
     const [inputText, setInputText] = useState("")
     const scrollRef = useRef<HTMLDivElement>(null)
@@ -124,7 +146,7 @@ export function LiveChatWidget({ user }: { user?: any }) {
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1 rounded-full bg-zinc-800 px-2 py-1 text-xs text-zinc-300">
                                     <Users className="h-3 w-3" />
-                                    <span>96</span>
+                                    <span>{onlineCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 ml-1">
                                     <button onClick={() => setIsMinimized(true)} className="text-zinc-400 hover:text-white">
@@ -138,15 +160,17 @@ export function LiveChatWidget({ user }: { user?: any }) {
                         </div>
 
                         {/* Pinned / Content Area */}
-                        <div className="border-b border-blue-900/30 bg-blue-950/10 p-4">
-                            <div className="flex items-center justify-center rounded-lg border border-blue-500/20 bg-black/40 p-2">
-                                <img
-                                    src="/placeholder-logo.png"
-                                    alt="Pinned Content"
-                                    className="h-12 w-auto object-contain opacity-80"
-                                />
+                        {config?.pinnedContentEnabled && (
+                            <div className="border-b border-blue-900/30 bg-blue-950/10 p-4">
+                                <div className="flex items-center justify-center rounded-lg border border-blue-500/20 bg-black/40 p-2">
+                                    <img
+                                        src={config.pinnedImageUrl || "/placeholder-logo.png"}
+                                        alt="Pinned Content"
+                                        className="h-12 w-auto object-contain opacity-80"
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Messages */}
                         <ScrollArea className="flex-1 bg-[#050505] p-4">
@@ -157,7 +181,7 @@ export function LiveChatWidget({ user }: { user?: any }) {
                                             <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-3 text-center">
                                                 <div className="mb-1 flex items-center justify-center gap-2 text-xs font-semibold text-amber-500">
                                                     <span className="h-2 w-2 rounded-full bg-amber-500"></span>
-                                                    System
+                                                    {config?.systemMessageTitle || "System"}
                                                     <span className="text-[10px] font-normal text-amber-500/70 ml-auto">{msg.timestamp}</span>
                                                 </div>
                                                 <p className="text-sm leading-relaxed text-amber-200/90">

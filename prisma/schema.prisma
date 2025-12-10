@@ -160,3 +160,8 @@ model SiteSettings {
   value     String   // JSON stringified configuration
   updatedAt DateTime @updatedAt
 }
+
+model Presence {
+  id        String   @id @default(cuid())
+  lastSeen  DateTime @default(now())
+}
