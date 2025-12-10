@@ -12,6 +12,8 @@ export interface SeasonalSettingsConfig {
     snowDensity: number // 1-100
     leavesDensity: number // 1-100
     musicEnabled: boolean
+    musicDuration: number // seconds
+    musicFadeOut: boolean
     audioVolume: number // 0-100
 }
 
@@ -21,6 +23,8 @@ const DEFAULT_SETTINGS: SeasonalSettingsConfig = {
     snowDensity: 50,
     leavesDensity: 30,
     musicEnabled: true,
+    musicDuration: 15,
+    musicFadeOut: true,
     audioVolume: 20
 }
 

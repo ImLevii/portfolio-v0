@@ -40,7 +40,11 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
         }
     }, [])
 
-    const settingsEnabled = season === "winter" && weatherEffects && soundEffects
+    // Use config mode if available, otherwise use date
+    const currentSeason = config?.mode === 'auto' || !config?.mode ? season : config.mode === 'none' ? null : config.mode
+
+    const settingsEnabled = (currentSeason === "winter" || currentSeason === "autumn") && weatherEffects && soundEffects && (config?.enabled ?? true)
+    const musicAllowed = settingsEnabled && (config?.musicEnabled ?? true)
 
     // Helper to safely play audio
     const safePlay = (audio: HTMLAudioElement, volume: number) => {
@@ -90,7 +94,7 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
                     }
                 } else if (pathname === "/") {
                     // Play melody
-                    if (melodyRef.current) {
+                    if (melodyRef.current && musicAllowed) {
                         safePlay(melodyRef.current, soundtrackVolume)
                         // Setup fade out timer
                         startFadeOutTimer()
@@ -118,7 +122,16 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
     const startFadeOutTimer = () => {
         if (stopTimeoutRef.current) clearTimeout(stopTimeoutRef.current)
 
+        // Configurable duration (default 15s)
+        const duration = (config?.musicDuration || 15) * 1000
+        const shouldFade = config?.musicFadeOut ?? true
+
         stopTimeoutRef.current = setTimeout(() => {
+            if (!shouldFade) {
+                stopMelody()
+                return
+            }
+
             const fadeAudio = melodyRef.current
             if (!fadeAudio) return
 
@@ -132,7 +145,7 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
                     stopMelody()
                 }
             }, fadeInterval)
-        }, 60000)
+        }, duration)
     }
 
     // Main Logic Effect (Runs on route changes / settings changes)
@@ -162,7 +175,7 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
 
         // --- Home Page ---
         if (pathname === "/") {
-            if (melodyRef.current && melodyRef.current.paused) {
+            if (melodyRef.current && melodyRef.current.paused && musicAllowed) {
                 safePlay(melodyRef.current, soundtrackVolume)
                 startFadeOutTimer()
             }
@@ -183,12 +196,12 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
         }
     }, [soundtrackVolume, generalVolume])
 
-    if (!season || !weatherEffects) return null
+    if (!currentSeason || !weatherEffects || (config?.mode === 'none')) return null
 
     return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-            {season === "winter" && <SnowEffect />}
-            {season === "autumn" && <LeavesEffect />}
+            {currentSeason === "winter" && <SnowEffect />}
+            {currentSeason === "autumn" && <LeavesEffect />}
         </div>
     )
 }
