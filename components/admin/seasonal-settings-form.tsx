@@ -133,40 +133,38 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                         />
                     </div>
 
-                    {settings.musicEnabled && (
-                        <>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <Label className="flex items-center gap-2">
-                                        <Clock className="h-4 w-4 text-blue-400" />
-                                        Duration (seconds)
-                                    </Label>
-                                    <span className="text-sm text-muted-foreground">{settings.musicDuration}s</span>
-                                </div>
-                                <Slider
-                                    value={[settings.musicDuration]}
-                                    min={5}
-                                    max={300}
-                                    step={5}
-                                    onValueChange={(val) => handleChange("musicDuration", val[0])}
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    How long the music plays before stopping (or fading out).
-                                </p>
-                            </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Label className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-blue-400" />
+                                Duration (seconds)
+                            </Label>
+                            <span className="text-sm text-muted-foreground">{settings.musicDuration}s</span>
+                        </div>
+                        <Slider
+                            value={[settings.musicDuration]}
+                            min={5}
+                            max={300}
+                            step={5}
+                            disabled={!settings.musicEnabled}
+                            onValueChange={(val) => handleChange("musicDuration", val[0])}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            How long the music plays before stopping (or fading out).
+                        </p>
+                    </div>
 
-                            <div className="flex items-center justify-between">
-                                < Label className="flex items-center gap-2" >
-                                    <Activity className="h-4 w-4 text-pink-400" />
-                                    Fade Out Effect
-                                </Label>
-                                <Switch
-                                    checked={settings.musicFadeOut}
-                                    onCheckedChange={(val) => handleChange("musicFadeOut", val)}
-                                />
-                            </div>
-                        </>
-                    )}
+                    <div className="flex items-center justify-between">
+                        < Label className="flex items-center gap-2" >
+                            <Activity className="h-4 w-4 text-pink-400" />
+                            Fade Out Effect
+                        </Label>
+                        <Switch
+                            checked={settings.musicFadeOut}
+                            disabled={!settings.musicEnabled}
+                            onCheckedChange={(val) => handleChange("musicFadeOut", val)}
+                        />
+                    </div>
 
 
                     <div className="space-y-2">

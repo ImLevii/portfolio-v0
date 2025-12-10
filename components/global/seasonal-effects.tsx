@@ -103,17 +103,17 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
             }
 
             // Remove listeners
-            ["click", "touchstart", "keydown"].forEach(event =>
+            ["click", "touchstart", "touchend", "pointerdown", "keydown"].forEach(event =>
                 window.removeEventListener(event, handleInteraction)
             )
         }
 
-        ["click", "touchstart", "keydown"].forEach(event =>
+        ["click", "touchstart", "touchend", "pointerdown", "keydown"].forEach(event =>
             window.addEventListener(event, handleInteraction)
         )
 
         return () => {
-            ["click", "touchstart", "keydown"].forEach(event =>
+            ["click", "touchstart", "touchend", "pointerdown", "keydown"].forEach(event =>
                 window.removeEventListener(event, handleInteraction)
             )
         }
