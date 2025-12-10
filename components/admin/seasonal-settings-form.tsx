@@ -86,7 +86,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                 <span className="text-sm text-muted-foreground">{settings.snowDensity}%</span>
                             </div>
                             <Slider
-                                value={[settings.snowDensity]}
+                                value={[settings.snowDensity || 50]}
                                 min={1}
                                 max={100}
                                 step={1}
@@ -103,7 +103,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                 <span className="text-sm text-muted-foreground">{settings.leavesDensity}%</span>
                             </div>
                             <Slider
-                                value={[settings.leavesDensity]}
+                                value={[settings.leavesDensity || 30]}
                                 min={1}
                                 max={100}
                                 step={1}
@@ -142,11 +142,10 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                             <span className="text-sm text-muted-foreground">{settings.musicDuration}s</span>
                         </div>
                         <Slider
-                            value={[settings.musicDuration]}
+                            value={[settings.musicDuration || 15]}
                             min={5}
                             max={300}
                             step={5}
-                            disabled={!settings.musicEnabled}
                             onValueChange={(val) => handleChange("musicDuration", val[0])}
                         />
                         <p className="text-xs text-muted-foreground">
@@ -155,36 +154,36 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                     </div>
 
                     <div className="flex items-center justify-between">
-                        < Label className="flex items-center gap-2" >
+                        <Label className="flex items-center gap-2">
                             <Activity className="h-4 w-4 text-pink-400" />
                             Fade Out Effect
                         </Label>
                         <Switch
                             checked={settings.musicFadeOut}
-                            disabled={!settings.musicEnabled}
                             onCheckedChange={(val) => handleChange("musicFadeOut", val)}
                         />
                     </div>
 
-
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <Label className="flex items-center gap-2">
-                                <Volume2 className="h-4 w-4" />
-                                Default Volume Limit
-                            </Label>
-                            <span className="text-sm text-muted-foreground">{settings.audioVolume}%</span>
+                    <div className="space-y-4 pt-4 border-t border-white/10">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <Label className="flex items-center gap-2">
+                                    <Volume2 className="h-4 w-4" />
+                                    Default Volume Limit
+                                </Label>
+                                <span className="text-sm text-muted-foreground">{settings.audioVolume}%</span>
+                            </div>
+                            <Slider
+                                value={[settings.audioVolume || 20]}
+                                min={0}
+                                max={100}
+                                step={1}
+                                onValueChange={(val) => handleChange("audioVolume", val[0])}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Limits the maximum volume users experience. Users can still lower it further in their local settings.
+                            </p>
                         </div>
-                        <Slider
-                            value={[settings.audioVolume]}
-                            min={0}
-                            max={100}
-                            step={1}
-                            onValueChange={(val) => handleChange("audioVolume", val[0])}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Limits the maximum volume users experience. Users can still lower it further in their local settings.
-                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -208,6 +207,6 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                     )}
                 </Button>
             </div>
-        </div >
+        </div>
     )
 }
