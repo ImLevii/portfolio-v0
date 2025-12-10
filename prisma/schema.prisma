@@ -165,3 +165,13 @@ model Presence {
   id        String   @id @default(cuid())
   lastSeen  DateTime @default(now())
 }
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  text      String
+  senderName String
+  senderAvatar String?
+  senderRole String?
+  createdAt DateTime @default(now())
+  reactions String? // JSON string: { likes: 0, dislikes: 0, hearts: 0 }
+}
