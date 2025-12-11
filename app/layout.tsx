@@ -38,7 +38,10 @@ export default async function RootLayout({
   let session = null
   try {
     session = await auth()
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.digest === 'DYNAMIC_SERVER_USAGE') {
+      throw error
+    }
     console.error("Failed to fetch session:", error)
     // Continue without session
   }
