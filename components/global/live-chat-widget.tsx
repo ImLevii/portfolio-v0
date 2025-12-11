@@ -320,13 +320,28 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             </div>
                             <div className="flex items-center gap-3">
                                 {activeTicket && view === 'chat' && (
-                                    <button
-                                        onClick={handleCloseTicket}
-                                        className="flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-2.5 py-1 text-[10px] font-medium text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:bg-red-500/10 transition-colors"
-                                        title="Close/Exit Ticket"
-                                    >
-                                        <span>EXIT</span>
-                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={handleCloseTicket}
+                                            className="flex items-center gap-1.5 rounded-lg border border-red-900/40 bg-red-950/40 px-3 py-1 text-[10px] font-bold text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:bg-red-900/60 hover:text-red-400 hover:shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all mr-2"
+                                            title="Permanently Close Ticket"
+                                        >
+                                            <X className="h-3 w-3" />
+                                            <span>CLOSE TICKET</span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => {
+                                                setActiveTicket(null)
+                                                setView('support')
+                                            }}
+                                            className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-zinc-400 hover:bg-white/10 hover:text-white transition-colors"
+                                            title="Exit Chat (Keep Ticket Open)"
+                                        >
+                                            <ArrowLeft className="h-3 w-3" />
+                                            <span>EXIT</span>
+                                        </button>
+                                    </div>
                                 )}
                                 {view === 'chat' && !activeTicket && (
                                     <button

@@ -117,6 +117,7 @@ export async function closeTicket(ticketId: string) {
             data: { status: "CLOSED" }
         })
         revalidatePath('/admin/support')
+        revalidatePath('/') // Revalidate home for user chat
         return { success: true }
     } catch (error) {
         return { success: false }
