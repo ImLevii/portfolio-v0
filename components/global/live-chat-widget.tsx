@@ -14,7 +14,7 @@ import { updatePresence, getOnlineCount } from "@/actions/presence"
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData } from "@/actions/chat"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
-import { playMessageSound } from "@/lib/audio"
+import { playMessageSound, unlockAudioContext } from "@/lib/audio"
 
 interface ChatMessage extends ChatMessageData {
     type?: 'system' | 'user' | 'announcement' // 'user' is default for DB messages
@@ -402,7 +402,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                     } else {
                         if (!isOpen) {
                             // Play sound on open to unlock AudioContext for iOS/Chrome autoplay policies
-                            playMessageSound()
+                            unlockAudioContext()
                         }
                         setIsOpen(!isOpen)
                     }

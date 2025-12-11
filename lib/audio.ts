@@ -10,6 +10,21 @@ const getAudioContext = () => {
     return audioContext;
 }
 
+// Function to unlock audio context on mobile/iOS
+export const unlockAudioContext = () => {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') {
+        ctx.resume();
+    }
+
+    // Play a silent buffer to force unlock
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+}
+
 export const playMessageSound = () => {
     try {
         const ctx = getAudioContext();
