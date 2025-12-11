@@ -165,7 +165,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             isCurrent = false
             clearInterval(interval)
         }
-    }, [activeTicket, isOpen, isMinimized, view]) // Added view to deps
+    }, [activeTicket, isOpen, isMinimized, view, localSystemMessages]) // Added view and localSystemMessages to deps
 
     const [inputText, setInputText] = useState("")
     const scrollRef = useRef<HTMLDivElement>(null)
