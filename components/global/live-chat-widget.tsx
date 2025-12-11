@@ -43,7 +43,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     // Ref to track previous message ID to detect NEW ones for sound
     const lastMessageIdRef = useRef<string | null>(null)
     // Ref to track last sponsored message injection time
-    const lastSponsoredTimeRef = useRef<number>(Date.now())
+    const lastSponsoredTimeRef = useRef<number>(0)
     // Ref to throttle DB checks for sponsored messages
     const lastSponsoredCheckRef = useRef<number>(0)
 
@@ -111,20 +111,25 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             // 5. Sponsored Message Injection Logic
             if (!activeTicket && view === 'chat') {
                 const now = Date.now()
-                // Throttle DB checks to every 60 seconds to avoid spamming server
+                // Throttle DB checks to every 10 seconds (was 60) for better responsiveness
                 // We use a separate ref for the "check" vs the "injection"
-                if (!lastSponsoredCheckRef.current || now - lastSponsoredCheckRef.current > 60 * 1000) {
+                if (!lastSponsoredCheckRef.current || now - lastSponsoredCheckRef.current > 10 * 1000) {
                     lastSponsoredCheckRef.current = now // Update check time immediately
-
+                    console.log("SPONSORED_DEBUG: Sponsored Check initiated.")
                     // Fetch to see what's active
                     const sponsored = await getActiveSponsoredMessage()
+                    console.log("SPONSORED_DEBUG: Fetched sponsored message:", sponsored)
 
                     if (sponsored && isCurrent) {
                         // Check if enough time passed since LAST INJECTION based on THIS message's frequency
                         // Default to 15m if frequency is missing/0
                         const frequencyMs = (sponsored.frequency || 15) * 60 * 1000
+                        const timeSinceLast = now - lastSponsoredTimeRef.current
 
-                        if (now - lastSponsoredTimeRef.current > frequencyMs) {
+                        console.log(`SPONSORED_DEBUG: Time since last: ${timeSinceLast}ms, Required: ${frequencyMs}ms`)
+
+                        if (timeSinceLast > frequencyMs) {
+                            console.log("SPONSORED_DEBUG: INJECTING MESSAGE NOW")
                             const newMessage: ChatMessage = {
                                 id: `sponsored-${now}`,
                                 text: sponsored.title,
@@ -137,6 +142,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             }
                             setLocalSystemMessages(prev => [...prev, newMessage])
                             lastSponsoredTimeRef.current = now
+                        } else {
+                            console.log("SPONSORED_DEBUG: Not time yet.")
                         }
                     }
                 }
