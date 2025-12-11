@@ -44,6 +44,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const lastMessageIdRef = useRef<string | null>(null)
     // Ref to track last sponsored message injection time
     const lastSponsoredTimeRef = useRef<number>(Date.now())
+    // Ref to throttle DB checks for sponsored messages
+    const lastSponsoredCheckRef = useRef<number>(0)
 
     // ... (useEffect deps logic remains same for restoreSession)
 
@@ -109,23 +111,20 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             // 5. Sponsored Message Injection Logic
             if (!activeTicket && view === 'chat') {
                 const now = Date.now()
-                // Default 15 mins if not set
-                // We don't know the frequency until we fetch. 
-                // We'll check against a default first, then use the fetched frequency to reset the timer appropriately?
-                // Actually, we just check if "enough time passed since last run". 
-                // Let's assume 15 mins default for the CHECK.
+                // Throttle DB checks to every 60 seconds to avoid spamming server
+                // We use a separate ref for the "check" vs the "injection"
+                if (!lastSponsoredCheckRef.current || now - lastSponsoredCheckRef.current > 60 * 1000) {
+                    lastSponsoredCheckRef.current = now // Update check time immediately
 
-                if (now - lastSponsoredTimeRef.current > 15 * 60 * 1000) {
+                    // Fetch to see what's active
                     const sponsored = await getActiveSponsoredMessage()
-                    if (sponsored && isCurrent) {
-                        // Use the frequency from the message for the NEXT interval
-                        // But we can't change the check interval dynamically easily in this poll loop 
-                        // without storing "nextRunTime". 
-                        // For now, we'll just update the timestamp. 
-                        // If we want per-message frequency, we should respect `sponsored.frequency`.
 
-                        // Double check we haven't already injected recently (async race)
-                        if (now - lastSponsoredTimeRef.current > 15 * 60 * 1000) {
+                    if (sponsored && isCurrent) {
+                        // Check if enough time passed since LAST INJECTION based on THIS message's frequency
+                        // Default to 15m if frequency is missing/0
+                        const frequencyMs = (sponsored.frequency || 15) * 60 * 1000
+
+                        if (now - lastSponsoredTimeRef.current > frequencyMs) {
                             const newMessage: ChatMessage = {
                                 id: `sponsored-${now}`,
                                 text: sponsored.title,

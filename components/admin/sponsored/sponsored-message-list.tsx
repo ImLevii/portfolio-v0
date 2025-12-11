@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Edit, Trash2, Plus, Megaphone, ExternalLink, RefreshCw } from "lucide-react"
 import { SponsoredMessageForm } from "./sponsored-message-form"
 import { useRouter } from "next/navigation"
+import { LiveTimer } from "./live-timer"
 
 interface SponsoredMessageListProps {
     initialMessages: SponsoredMessageData[]
@@ -110,12 +111,9 @@ export function SponsoredMessageList({ initialMessages }: SponsoredMessageListPr
                                         <span className="text-emerald-500 font-mono">Run Frequency: Every {msg.frequency}m</span>
                                     </div>
                                 </div>
-                                {/* Simulated Timer Badge */}
-                                <div className="bg-zinc-950/50 rounded-md p-2 border border-white/5 flex items-center justify-between">
-                                    <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Timer</span>
-                                    <span className="text-xs font-mono text-emerald-400 animate-pulse">
-                                        {msg.frequency}:00
-                                    </span>
+                                {/* Live Timer Badge */}
+                                <div className="mt-2">
+                                    <LiveTimer frequency={msg.frequency} />
                                 </div>
                             </div>
                         </CardContent>
