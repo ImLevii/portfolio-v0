@@ -9,7 +9,8 @@ export const metadata = {
 }
 
 export default async function SponsoredMessagesPage() {
-    const messages = await getSponsoredMessages()
+    const res = await getSponsoredMessages()
+    const messages = res.success ? res.messages || [] : []
 
     return (
         <div className="space-y-6">

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { type SponsoredMessageData, deleteSponsoredMessage } from "@/actions/sponsored"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,9 +13,15 @@ interface SponsoredMessageListProps {
     initialMessages: SponsoredMessageData[]
 }
 
+
 export function SponsoredMessageList({ initialMessages }: SponsoredMessageListProps) {
     const router = useRouter()
     const [messages, setMessages] = useState(initialMessages)
+
+    useEffect(() => {
+        setMessages(initialMessages)
+    }, [initialMessages])
+
     const [isFormOpen, setIsFormOpen] = useState(false)
     const [editingMessage, setEditingMessage] = useState<SponsoredMessageData | null>(null)
     const [isDeleting, setIsDeleting] = useState<string | null>(null)
