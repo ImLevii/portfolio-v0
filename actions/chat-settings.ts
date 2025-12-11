@@ -15,7 +15,7 @@ export interface ChatSettingsConfig {
 const DEFAULT_SETTINGS: ChatSettingsConfig = {
     enabled: true,
     systemMessageTitle: "System",
-    systemMessageText: "Ahoy! Welcome aboard our streaming ship, matey! ⚓ Say hello to **VEE**! 👋",
+    systemMessageText: "System Initialized. █ Welcome to the main terminal. How can I assist you with your project today? <span class='animate-pulse'>_</span>",
     pinnedContentEnabled: true,
     pinnedImageUrl: "/placeholder-logo.png"
 }
@@ -29,8 +29,11 @@ export async function getChatSettings(): Promise<ChatSettingsConfig> {
         if (!settings) return DEFAULT_SETTINGS
 
         return { ...DEFAULT_SETTINGS, ...JSON.parse(settings.value) }
-    } catch (error) {
-        console.error("Failed to fetch chat settings:", error)
+    } catch (error: any) {
+        const isPlanLimit = error?.code === 'P6003' || error?.code === 'P5000' || error?.message?.includes('planLimitReached')
+        if (!isPlanLimit) {
+            console.error("Failed to fetch chat settings:", error)
+        }
         return DEFAULT_SETTINGS
     }
 }

@@ -17,7 +17,7 @@ export async function getRevenueData() {
 
         return Object.entries(grouped).map(([name, total]) => ({
             name,
-            total: total / 100 // Convert cents to dollars
+            total: (total as number) / 100 // Convert cents to dollars
         }))
     }
 

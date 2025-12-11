@@ -36,6 +36,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     // Ref to track previous message ID to detect NEW ones for sound
     const lastMessageIdRef = useRef<string | null>(null)
 
+    // 1. Initialize & Restore Session (Run ONCE)
     useEffect(() => {
         // Generate a random ID for this session if not exists
         let presenceId = sessionStorage.getItem("presenceId")
@@ -49,10 +50,16 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             const tickets = await getUserTickets(presenceId || undefined)
             const active = tickets.find((t: any) => t.status !== 'CLOSED')
             if (active) {
-                setActiveTicket({ id: active.id, category: active.category })
+                // Check if we actually need to update to avoid unnecessary re-renders (though empty dep array prevents loop)
+                setActiveTicket({ id: active.id, category: active.category, status: active.status })
             }
         }
         restoreSession()
+    }, [])
+
+    // 2. Polling Logic (Runs when activeTicket changes + interval)
+    useEffect(() => {
+        const presenceId = sessionStorage.getItem("presenceId")
 
         const pollData = async () => {
             // 1. Heartbeat
@@ -93,12 +100,6 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
                 // If we have a previous Record, and the new latest ID is different -> New Message
                 if (previousLastId && latestMsg.id !== previousLastId) {
-                    // Check if it's NOT me (optional, but good UX to hear your own send? User said "When SENT")
-                    // Actually, usually you want to hear *others*. 
-                    // Let's play it regardless for "Activity", or maybe skip if sender == me?
-                    // User said "NEW MESSAGE IS SENT", ambiguous. 
-                    // I will play it for ALL new messages for feedback.
-
                     // Only play if it was created recently (within last 5 seconds) to avoid spam on page load
                     const isRecent = new Date(latestMsg.createdAt).getTime() > Date.now() - 5000
                     if (isRecent) {
@@ -106,11 +107,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             // If open/minimized, play sound
                             playMessageSound()
                         } else {
-                            // If closed, mark as unread (and sound will play on unlock/open if desired, OR play here if unlocked)
-                            // Actually, sound usually plays when message arrives. 
-                            // Let's set unread.
                             setHasUnread(true)
-                            // Try to play sound if context is unlocked
                             playMessageSound()
                         }
                     }
@@ -118,23 +115,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 lastMessageIdRef.current = latestMsg.id
             }
 
-            // MergeDB messages with local System messages (if needed)
-            // For now, we just use DB messages + System Message from config at HEAD if empty?
-            // Actually, we want persistent history, so we just use dbMessages. 
-            // BUT we need to inject the announcement if active.
-
             let displayMessages: ChatMessage[] = dbMessages.map(m => ({ ...m, type: 'user' }))
-
-            // Inject Active Announcement at the very bottom (most recent) if active
-            // OR distinct visual. For "Chat Stream", let's inject it if it's NEW.
-            // Simplified: Just put it at the top of the chat list or render distinct?
-            // User asked for "Inject Global Announcements into Chat Stream". 
-            // We'll trust the Database for history. 
-            // Layout: [Messages]
-
-            // If system message is configured, we can prepend it cleanly if list is empty?
-            // Or better: Just rely on DB. 
-
             setMessages(displayMessages)
         }
 
@@ -145,7 +126,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         const interval = setInterval(pollData, 3000)
 
         return () => clearInterval(interval)
-    }, [activeTicket])
+    }, [activeTicket, isOpen, isMinimized]) // Added isOpen/isMinimized for sound logic context if needed, though ref checks are better. Kept activeTicket.
 
     const [inputText, setInputText] = useState("")
     const scrollRef = useRef<HTMLDivElement>(null)
@@ -164,10 +145,20 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         // Let's just send and wait for poll or manually trigger fetch.
 
         startTransition(async () => {
-            await sendMessage(inputText, activeTicket?.id)
-            setInputText("")
-            // Re-fetch immediately for responsiveness
-            // We rely on polling or we could manually trigger pollData logic here if refactored
+            const res = await sendMessage(inputText, activeTicket?.id)
+            if (!res.success) {
+                if (res.error === "This ticket strictly no longer exists.") {
+                    setActiveTicket(null)
+                    setView('support')
+                    // Force refresh ticket list
+                    const presenceId = sessionStorage.getItem("presenceId")
+                    const tickets = await getUserTickets(presenceId || undefined)
+                    setUserTickets(tickets)
+                }
+            } else {
+                setInputText("")
+                // Re-fetch immediately for responsiveness
+            }
         })
     }
 
@@ -331,11 +322,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                     <div className="flex items-center gap-1">
                                         <button
                                             onClick={handleCloseTicket}
-                                            className="flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all mr-2"
+                                            className="group relative flex items-center gap-1.5 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-1 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all hover:bg-red-500/20 hover:text-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] mr-2"
                                             title="Permanently Close Ticket"
                                         >
-                                            <X className="h-3 w-3" />
-                                            <span>CLOSE TICKET</span>
+                                            <span className="absolute inset-0 rounded-lg bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            <X className="h-3 w-3 relative z-10" />
+                                            <span className="relative z-10">CLOSE TICKET</span>
                                         </button>
 
                                         <button
@@ -343,22 +335,22 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                 setActiveTicket(null)
                                                 setView('support')
                                             }}
-                                            className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-zinc-400 hover:bg-white/10 hover:text-white transition-colors"
+                                            className="group relative flex items-center gap-1.5 rounded-lg border border-zinc-500/30 bg-zinc-500/10 px-3 py-1 text-[10px] font-bold text-zinc-400 shadow-[0_0_10px_rgba(113,113,122,0.1)] transition-all hover:bg-zinc-500/20 hover:text-white hover:border-zinc-500/50 hover:shadow-[0_0_15px_rgba(113,113,122,0.3)]"
                                             title="Exit Chat (Keep Ticket Open)"
                                         >
-                                            <ArrowLeft className="h-3 w-3" />
-                                            <span>EXIT</span>
+                                            <ArrowLeft className="h-3 w-3 relative z-10" />
+                                            <span className="relative z-10">EXIT</span>
                                         </button>
                                     </div>
                                 )}
                                 {view === 'chat' && !activeTicket && (
                                     <button
                                         onClick={() => setView('support')}
-                                        className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-1 text-[10px] font-medium text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:bg-emerald-500/10 transition-colors"
+                                        className="group relative flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)] transition-all hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/60 hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
                                         title="Support Hub"
                                     >
-                                        <HeadphonesIcon className="h-3 w-3" />
-                                        <span>SUPPORT</span>
+                                        <HeadphonesIcon className="h-3 w-3 relative z-10" />
+                                        <span className="relative z-10">SUPPORT</span>
                                     </button>
                                 )}
                                 <div className="flex items-center gap-1 ml-1">

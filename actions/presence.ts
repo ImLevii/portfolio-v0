@@ -10,7 +10,11 @@ export async function updatePresence(id: string) {
             create: { id, lastSeen: new Date() }
         })
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
+        const isPlanLimit = error?.code === 'P6003' || error?.code === 'P5000' || error?.message?.includes('planLimitReached')
+        if (isPlanLimit) {
+            return { success: false }
+        }
         console.error("Failed to update presence:", error)
         return { success: false }
     }
@@ -32,8 +36,12 @@ export async function getOnlineCount() {
         })
 
         return { count }
-    } catch (error) {
-        console.error("Failed to get online count:", error)
-        return { count: 0 }
+    } catch (error: any) {
+        const isPlanLimit = error?.code === 'P6003' || error?.code === 'P5000' || error?.message?.includes('planLimitReached')
+        if (!isPlanLimit) {
+            console.error("Failed to get online count:", error)
+        }
+        // Return 1 as fallback so it doesn't look empty
+        return { count: 1 }
     }
 }

@@ -37,8 +37,11 @@ export async function getSeasonalSettings(): Promise<SeasonalSettingsConfig> {
         if (!settings) return DEFAULT_SETTINGS
 
         return { ...DEFAULT_SETTINGS, ...JSON.parse(settings.value) }
-    } catch (error) {
-        console.error("Failed to fetch seasonal settings:", error)
+    } catch (error: any) {
+        const isPlanLimit = error?.code === 'P6003' || error?.code === 'P5000' || error?.message?.includes('planLimitReached')
+        if (!isPlanLimit) {
+            console.error("Failed to fetch seasonal settings:", error)
+        }
         return DEFAULT_SETTINGS
     }
 }

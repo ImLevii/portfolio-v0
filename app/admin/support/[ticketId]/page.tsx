@@ -19,7 +19,8 @@ interface PageProps {
 }
 
 export default async function TicketDetailPage({ params }: PageProps) {
-    const ticket = await getTicket(params.ticketId)
+    const { ticketId } = await params
+    const ticket = await getTicket(ticketId)
 
     if (!ticket) {
         notFound()
@@ -61,7 +62,7 @@ export default async function TicketDetailPage({ params }: PageProps) {
                 {ticket.status !== 'CLOSED' && (
                     <form action={async () => {
                         "use server"
-                        await closeTicket(params.ticketId)
+                        await closeTicket(ticketId)
                     }}>
                         <Button variant="outline" className="border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300">
                             Close Ticket
@@ -71,7 +72,7 @@ export default async function TicketDetailPage({ params }: PageProps) {
 
                 <form action={async () => {
                     "use server"
-                    await deleteTicket(params.ticketId)
+                    await deleteTicket(ticketId)
                     redirect('/admin/support')
                 }}>
                     <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-colors" title="Delete Ticket">

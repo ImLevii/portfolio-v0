@@ -43,8 +43,14 @@ export async function sendMessage(text: string, ticketId?: string) {
         })
 
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Failed to send message:", error)
+
+        // Handle Foreign Key Constraint (Ticket deleted or invalid)
+        if (error.code === 'P2003') {
+            return { success: false, error: "This ticket strictly no longer exists." }
+        }
+
         return { success: false, error: "Failed to send message" }
     }
 }
