@@ -28,6 +28,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [onlineCount, setOnlineCount] = useState(1)
     const [announcement, setAnnouncement] = useState<AnnouncementConfig | null>(null)
+    const [hasUnread, setHasUnread] = useState(false)
 
     // Ref to track previous message ID to detect NEW ones for sound
     const lastMessageIdRef = useRef<string | null>(null)
@@ -70,8 +71,18 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
                     // Only play if it was created recently (within last 5 seconds) to avoid spam on page load
                     const isRecent = new Date(latestMsg.createdAt).getTime() > Date.now() - 5000
-                    if (isRecent && (isOpen || isMinimized)) { // Play sound only if widget is open or minimized
-                        playMessageSound()
+                    if (isRecent) {
+                        if (isOpen || isMinimized) {
+                            // If open/minimized, play sound
+                            playMessageSound()
+                        } else {
+                            // If closed, mark as unread (and sound will play on unlock/open if desired, OR play here if unlocked)
+                            // Actually, sound usually plays when message arrives. 
+                            // Let's set unread.
+                            setHasUnread(true)
+                            // Try to play sound if context is unlocked
+                            playMessageSound()
+                        }
                     }
                 }
                 lastMessageIdRef.current = latestMsg.id
@@ -198,14 +209,14 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[#0a0a0a] shadow-2xl sm:h-[600px] sm:w-[380px]"
+                        className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between border-b border-zinc-800 bg-[#111] p-3">
+                        <div className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md">
                             <div className="flex items-center gap-3">
                                 <div className="relative flex h-3 w-3">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
-                                    <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                                    <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-white">Live Chat</h3>
@@ -253,7 +264,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         )}
 
                         {/* Messages */}
-                        <ScrollArea className="flex-1 bg-[#050505] p-4">
+                        <ScrollArea className="flex-1 bg-transparent p-4">
                             <div className="flex flex-col gap-4">
                                 {/* System Welcome Message */}
                                 {config?.systemMessageText && (
@@ -347,7 +358,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         </ScrollArea>
 
                         {/* Input Area */}
-                        <div className="border-t border-zinc-800 bg-[#111] p-3">
+                        <div className="border-t border-white/5 bg-black/40 p-3 backdrop-blur-md">
                             {user ? (
                                 <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
                                     <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending} />
@@ -356,7 +367,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                         onChange={(e) => setInputText(e.target.value)}
                                         placeholder="Send a message..."
                                         disabled={isPending}
-                                        className="h-10 rounded-full border-zinc-700 bg-zinc-900 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:ring-zinc-600 focus-visible:ring-offset-0"
+                                        className="h-10 rounded-full border-white/10 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-0"
                                     />
                                     <Button
                                         type="submit"
@@ -395,7 +406,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
             {/* Floating Toggle */}
             <motion.button
-                className="group relative flex h-16 w-16 items-center justify-center rounded-2xl bg-[#111] border border-zinc-800 shadow-xl transition-all hover:bg-zinc-800 hover:border-zinc-700"
+                className="group relative flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl transition-all hover:bg-black/80 hover:scale-105 active:scale-95"
                 onClick={() => {
                     if (isOpen && isMinimized) {
                         setIsMinimized(false)
@@ -403,6 +414,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         if (!isOpen) {
                             // Play sound on open to unlock AudioContext for iOS/Chrome autoplay policies
                             unlockAudioContext()
+                            setHasUnread(false)
                         }
                         setIsOpen(!isOpen)
                     }
@@ -410,12 +422,17 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
             >
-                <span className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-green-500 border-2 border-[#111]"></span>
+                {hasUnread && !isOpen && (
+                    <span className="absolute right-0 top-0 flex h-4 w-4">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
+                    </span>
+                )}
 
                 {isOpen && !isMinimized ? (
-                    <X className="h-8 w-8 text-zinc-400 group-hover:text-white" />
+                    <X className="h-6 w-6 text-zinc-300 group-hover:text-white" />
                 ) : (
-                    <MessageCircle className="h-8 w-8 text-zinc-400 group-hover:text-white" />
+                    <MessageCircle className="h-6 w-6 text-zinc-300 group-hover:text-white" />
                 )}
             </motion.button>
 
