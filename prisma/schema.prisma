@@ -166,6 +166,18 @@ model Presence {
   lastSeen  DateTime @default(now())
 }
 
+
+model Ticket {
+  id        String   @id @default(cuid())
+  userId    String?
+  guestId   String?
+  category  String
+  status    String   @default("OPEN") // OPEN, IN_PROGRESS, CLOSED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  ChatMessage[]
+}
+
 model ChatMessage {
   id        String   @id @default(cuid())
   text      String
@@ -174,4 +186,7 @@ model ChatMessage {
   senderRole String?
   createdAt DateTime @default(now())
   reactions String? // JSON string: { likes: 0, dislikes: 0, hearts: 0 }
+  
+  ticketId  String?
+  ticket    Ticket?   @relation(fields: [ticketId], references: [id], onDelete: SetNull)
 }

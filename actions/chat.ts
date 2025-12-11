@@ -20,7 +20,7 @@ export interface ChatMessageData {
     }
 }
 
-export async function sendMessage(text: string) {
+export async function sendMessage(text: string, ticketId?: string) {
     try {
         const session = await auth()
         const user = session?.user
@@ -37,7 +37,8 @@ export async function sendMessage(text: string) {
                 senderName: user.name || "Anonymous",
                 senderAvatar: user.image,
                 senderRole: (user as any).role || "USER",
-                reactions: JSON.stringify({ likes: 0, dislikes: 0, hearts: 0 })
+                reactions: JSON.stringify({ likes: 0, dislikes: 0, hearts: 0 }),
+                ticketId: ticketId || null
             }
         })
 
@@ -71,6 +72,7 @@ export async function deleteMessage(messageId: string) {
 export async function getRecentMessages(): Promise<ChatMessageData[]> {
     try {
         const messages = await prisma.chatMessage.findMany({
+            where: { ticketId: null },
             orderBy: { createdAt: 'desc' },
             take: 50
         })
