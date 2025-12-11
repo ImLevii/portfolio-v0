@@ -1,22 +1,10 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, Megaphone, Bell } from "lucide-react"
-import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
+import { playAnnouncementSound } from "@/lib/audio"
 
 // Simple sound hook
 const useNotificationSound = (type: 'notification' | 'alert' | 'none') => {
     const play = () => {
         if (type === 'none') return
-        // Using a public placeholder sound or browser API would be ideal.
-        // For now, let's assume we have a simple beep or use a data URI for a tiny blip.
-        // A simple "glass ping" sound data URI (shortened for brevity, use real file in prod)
-        // This is a placeholder; in real app, user should provide "/sounds/notification.mp3"
-        // I will attempt to play a standard HTML5 audio if file exists, else silent.
-        const audio = new Audio('/sounds/notification.mp3') // Assuming user has this or I need to create it. 
-        // fallback to silent for now to avoid errors if file missing.
-        audio.play().catch(e => console.log("Audio play failed (user interaction needed first usually):", e))
+        playAnnouncementSound()
     }
     return play
 }
@@ -40,11 +28,7 @@ export function GlobalAnnouncementOverlay() {
 
                     // Play sound
                     if (latest.soundType !== 'none') {
-                        const audio = new Audio(latest.soundType === 'alert'
-                            ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' // Alert
-                            : 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3') // Notification (using same placeholder)
-                        audio.volume = 0.5
-                        audio.play().catch(() => { })
+                        playAnnouncementSound()
                     }
                 }
             } else {

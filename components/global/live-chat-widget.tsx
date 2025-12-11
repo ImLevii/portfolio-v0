@@ -14,6 +14,7 @@ import { updatePresence, getOnlineCount } from "@/actions/presence"
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData } from "@/actions/chat"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
+import { playMessageSound } from "@/lib/audio"
 
 interface ChatMessage extends ChatMessageData {
     type?: 'system' | 'user' | 'announcement' // 'user' is default for DB messages
@@ -27,6 +28,9 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [onlineCount, setOnlineCount] = useState(1)
     const [announcement, setAnnouncement] = useState<AnnouncementConfig | null>(null)
+
+    // Ref to track previous message ID to detect NEW ones for sound
+    const lastMessageIdRef = useRef<string | null>(null)
 
     useEffect(() => {
         // Generate a random ID for this session if not exists
@@ -50,6 +54,28 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             // 4. Get Announcement context
             const latestAnnouncement = await getAnnouncement()
             setAnnouncement(latestAnnouncement)
+
+            // Sound Logic: If we have new messages that are NOT our own (crudely checked by timestamp or just ID change)
+            if (dbMessages.length > 0) {
+                const latestMsg = dbMessages[dbMessages.length - 1]
+                const previousLastId = lastMessageIdRef.current
+
+                // If we have a previous Record, and the new latest ID is different -> New Message
+                if (previousLastId && latestMsg.id !== previousLastId) {
+                    // Check if it's NOT me (optional, but good UX to hear your own send? User said "When SENT")
+                    // Actually, usually you want to hear *others*. 
+                    // Let's play it regardless for "Activity", or maybe skip if sender == me?
+                    // User said "NEW MESSAGE IS SENT", ambiguous. 
+                    // I will play it for ALL new messages for feedback.
+
+                    // Only play if it was created recently (within last 5 seconds) to avoid spam on page load
+                    const isRecent = new Date(latestMsg.createdAt).getTime() > Date.now() - 5000
+                    if (isRecent && (isOpen || isMinimized)) { // Play sound only if widget is open or minimized
+                        playMessageSound()
+                    }
+                }
+                lastMessageIdRef.current = latestMsg.id
+            }
 
             // MergeDB messages with local System messages (if needed)
             // For now, we just use DB messages + System Message from config at HEAD if empty?
