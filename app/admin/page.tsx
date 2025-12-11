@@ -4,6 +4,8 @@ import { getDashboardStats } from "@/lib/admin"
 import { RevenueChart } from "@/components/admin/revenue-chart"
 import { StatsCard } from "@/components/admin/stats-card"
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminDashboard() {
     const { revenueData, stats } = await getDashboardStats()
 

@@ -3,6 +3,8 @@ import Link from "next/link"
 import { HeadphonesIcon, Clock, CheckCircle, AlertCircle, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+export const dynamic = 'force-dynamic'
+
 export default async function SupportDashboard() {
     const tickets = await getAllTickets()
 

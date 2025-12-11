@@ -3,6 +3,8 @@ import { getSponsoredMessages } from "@/actions/sponsored"
 import { SponsoredMessageList } from "@/components/admin/sponsored/sponsored-message-list"
 import { Loader2 } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
     title: "Sponsored Messages | Admin Dashboard",
     description: "Manage automated sponsored messages and announcements in the live chat."
