@@ -35,16 +35,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  let session = null
-  try {
-    session = await auth()
-  } catch (error: any) {
-    if (error?.digest === 'DYNAMIC_SERVER_USAGE') {
-      throw error
-    }
-    console.error("Failed to fetch session:", error)
-    // Continue without session
-  }
+  const session = await auth()
   const seasonalSettings = await getSeasonalSettings()
 
   const chatSettings = await getChatSettings()
