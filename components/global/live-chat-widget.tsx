@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useTransition } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,7 @@ import { cn } from "@/lib/utils"
 
 import { type ChatSettingsConfig } from "@/actions/chat-settings"
 import { updatePresence, getOnlineCount } from "@/actions/presence"
-import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData } from "@/actions/chat"
+import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { createTicket, getTicket, getUserTickets, closeTicket } from "@/actions/tickets"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
@@ -32,6 +33,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [hasUnread, setHasUnread] = useState(false)
     const [activeTicket, setActiveTicket] = useState<{ id: string; category: string; status: string } | null>(null)
     const [userTickets, setUserTickets] = useState<any[]>([])
+    const [products, setProducts] = useState<{ id: string, name: string }[]>([])
 
     // Ref to track previous message ID to detect NEW ones for sound
     const lastMessageIdRef = useRef<string | null>(null)
@@ -55,6 +57,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             }
         }
         restoreSession()
+        getChatProducts().then(setProducts)
     }, [])
 
     // 2. Polling Logic (Runs when activeTicket changes + interval)
@@ -268,14 +271,77 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         }
     }
 
-    // Helper to parse mild markdown for system messages (bolding)
+    // Helper to parse mild markdown for system messages (bolding) + License Keys + Mentions
     const parseText = (text: string) => {
+        // Regex patterns
+        // License Key: 4 groups of 4 alphanumeric chars (e.g. A1B2-C3D4-E5F6-G7H8)
+        const licenseRegex = /(\b[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b)/g
+        // Mentions: @Name
+        const mentionRegex = /(@[a-zA-Z0-9_]+)/g
+
+        // 1. Split by Bold
         const parts = text.split(/(\*\*.*?\*\*)/g)
+
         return parts.map((part, i) => {
             if (part.startsWith('**') && part.endsWith('**')) {
-                return <span key={i} className="font-bold text-white">{part.slice(2, -2)}</span>
+                return <span key={`bold-${i}`} className="font-bold text-white">{part.slice(2, -2)}</span>
             }
-            return part
+
+            // 2. Split by License Key
+            const subParts = part.split(licenseRegex)
+            return subParts.map((subPart, j) => {
+                if (/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(subPart)) {
+                    return (
+                        <span
+                            key={`license-${i}-${j}`}
+                            className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 select-all cursor-pointer hover:bg-emerald-500/20 transition-colors"
+                            title="License Key"
+                            onClick={() => {
+                                navigator.clipboard.writeText(subPart)
+                                // Optional: Toast feedback could go here
+                            }}
+                        >
+                            <ShieldCheck className="h-3 w-3" />
+                            {subPart}
+                        </span>
+                    )
+                }
+
+                // 3. Split by Mentions
+                const subSubParts = subPart.split(mentionRegex)
+                return subSubParts.map((subSubPart, k) => {
+                    if (subSubPart.startsWith('@')) {
+                        // Check if it matches a known product (fuzzy: ignore spaces)
+                        const mentionHandle = subSubPart.slice(1).toLowerCase()
+                        const product = products.find(p => p.name.replace(/\s+/g, '').toLowerCase() === mentionHandle)
+
+                        if (product) {
+                            return (
+                                <Link
+                                    key={`mention-${i}-${j}-${k}`}
+                                    href={`/shop/${product.id}`}
+                                    target="_blank"
+                                    className="font-bold text-blue-400 hover:text-blue-300 hover:underline cursor-pointer transition-colors"
+                                    title={`View ${product.name}`}
+                                >
+                                    {subSubPart}
+                                </Link>
+                            )
+                        }
+
+                        // Default highlight
+                        return (
+                            <span
+                                key={`mention-${i}-${j}-${k}`}
+                                className="font-bold text-blue-400 hover:text-blue-300 hover:underline cursor-pointer transition-colors"
+                            >
+                                {subSubPart}
+                            </span>
+                        )
+                    }
+                    return subSubPart
+                })
+            })
         })
     }
 
@@ -289,11 +355,9 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     // Support Hub Data
     const supportCategories = [
         { id: 'deposits', title: 'Deposits', subtitle: 'We are here if you have any m...', time: '8:44 PM', icon: <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-500"><CreditCard className="h-5 w-5" /></div> },
-        { id: 'game_issues', title: 'Game Issues', subtitle: 'We are here if you have any m...', time: '1:59 AM', icon: <div className="p-2 rounded-full bg-red-500/10 text-red-500"><Gamepad2 className="h-5 w-5" /></div> },
-        { id: 'kyc', title: 'KYC', subtitle: 'Hi,', time: '', icon: <div className="p-2 rounded-full bg-blue-500/10 text-blue-500"><ShieldCheck className="h-5 w-5" /></div> },
+        { id: 'license_issues', title: 'License Issues', subtitle: 'Assistance with keys & activation', time: '1:59 AM', icon: <div className="p-2 rounded-full bg-red-500/10 text-red-500"><Gamepad2 className="h-5 w-5" /></div> },
         { id: 'support', title: 'Support', subtitle: 'Let us know if you need anyth...', time: '1:33 AM', icon: <div className="p-2 rounded-full bg-purple-500/10 text-purple-500"><HeadphonesIcon className="h-5 w-5" /></div> },
-        { id: 'limits', title: 'Withdrawal Limits', subtitle: 'Thank you for your message. ...', time: '', icon: <div className="p-2 rounded-full bg-orange-500/10 text-orange-500"><Gauge className="h-5 w-5" /></div> },
-        { id: 'withdrawals', title: 'Withdrawals', subtitle: 'Hi,', time: '', icon: <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-500"><DollarSign className="h-5 w-5" /></div> },
+        { id: 'withdrawals', title: 'Withdrawals', subtitle: 'Cashout inquiries', time: '', icon: <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-500"><DollarSign className="h-5 w-5" /></div> },
     ]
 
     return (
@@ -334,15 +398,15 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             </div>
                             <div className="flex items-center gap-3">
                                 {activeTicket && view === 'chat' && (
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-2">
                                         <button
                                             onClick={handleCloseTicket}
-                                            className="group relative flex items-center gap-1.5 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-1 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all hover:bg-red-500/20 hover:text-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] mr-2"
+                                            className="group relative flex h-7 w-20 items-center justify-center gap-1.5 rounded-lg border border-red-500/50 bg-red-500/10 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all hover:bg-red-500/20 hover:text-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]"
                                             title="Permanently Close Ticket"
                                         >
                                             <span className="absolute inset-0 rounded-lg bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                             <X className="h-3 w-3 relative z-10" />
-                                            <span className="relative z-10">CLOSE TICKET</span>
+                                            <span className="relative z-10">CLOSE</span>
                                         </button>
 
                                         <button
@@ -350,7 +414,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                 setActiveTicket(null)
                                                 setView('support')
                                             }}
-                                            className="group relative flex items-center gap-1.5 rounded-lg border border-zinc-500/30 bg-zinc-500/10 px-3 py-1 text-[10px] font-bold text-zinc-400 shadow-[0_0_10px_rgba(113,113,122,0.1)] transition-all hover:bg-zinc-500/20 hover:text-white hover:border-zinc-500/50 hover:shadow-[0_0_15px_rgba(113,113,122,0.3)]"
+                                            className="group relative flex h-7 w-20 items-center justify-center gap-1.5 rounded-lg border border-zinc-500/30 bg-zinc-500/10 text-[10px] font-bold text-zinc-400 shadow-[0_0_10px_rgba(113,113,122,0.1)] transition-all hover:bg-zinc-500/20 hover:text-white hover:border-zinc-500/50 hover:shadow-[0_0_15px_rgba(113,113,122,0.3)]"
                                             title="Exit Chat (Keep Ticket Open)"
                                         >
                                             <ArrowLeft className="h-3 w-3 relative z-10" />

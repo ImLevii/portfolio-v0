@@ -32,7 +32,7 @@ export default async function SupportDashboard() {
                                 <div className="flex items-start gap-4">
                                     <div className={cn("p-3 rounded-full mt-1",
                                         ticket.category === 'Deposits' ? "bg-emerald-500/10 text-emerald-500" :
-                                            ticket.category === 'Game Issues' ? "bg-red-500/10 text-red-500" :
+                                            (ticket.category === 'Game Issues' || ticket.category === 'License Issues') ? "bg-red-500/10 text-red-500" :
                                                 "bg-blue-500/10 text-blue-500"
                                     )}>
                                         <AlertCircle className="h-5 w-5" />

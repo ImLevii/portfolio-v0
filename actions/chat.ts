@@ -115,3 +115,17 @@ export async function addReaction(messageId: string, type: 'likes' | 'dislikes' 
         return { success: false }
     }
 }
+
+export async function getChatProducts() {
+    try {
+        const products = await prisma.product.findMany({
+            select: {
+                id: true,
+                name: true
+            }
+        })
+        return products
+    } catch (error) {
+        return []
+    }
+}
