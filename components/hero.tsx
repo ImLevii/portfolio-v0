@@ -302,11 +302,11 @@ export default function Hero({ geo }: HeroProps) {
         <MatrixRain
           color="#ff0000"
           glowIntensity={0.3}
-          density={isMobile ? 0.5 : 0.3}
+          density={isMobile ? 0.2 : 0.3}
           speed={0.8}
           opacity={0.4}
           interactive={false}
-          enabled={!isMobile}
+          enabled={true}
         />
       )}
 
