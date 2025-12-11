@@ -59,15 +59,21 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
     // 2. Polling Logic (Runs when activeTicket changes + interval)
     useEffect(() => {
+        let isCurrent = true
         const presenceId = sessionStorage.getItem("presenceId")
+
+        // Reset messages immediately when switching contexts to prevent ghosting
+        setMessages([])
+        lastMessageIdRef.current = null
 
         const pollData = async () => {
             // 1. Heartbeat
             if (presenceId) await updatePresence(presenceId)
+            if (!isCurrent) return
 
             // 2. Get Count
             const { count } = await getOnlineCount()
-            setOnlineCount(count > 0 ? count : 1)
+            if (isCurrent) setOnlineCount(count > 0 ? count : 1)
 
             // 3. Get Messages
             let dbMessages: ChatMessageData[] = []
@@ -89,9 +95,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 dbMessages = await getRecentMessages()
             }
 
+            if (!isCurrent) return
+
             // 4. Get Announcement context
             const latestAnnouncement = await getAnnouncement()
-            setAnnouncement(latestAnnouncement)
+            if (isCurrent) setAnnouncement(latestAnnouncement)
 
             // Sound Logic: If we have new messages that are NOT our own (crudely checked by timestamp or just ID change)
             if (dbMessages.length > 0) {
@@ -107,7 +115,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             // If open/minimized, play sound
                             playMessageSound()
                         } else {
-                            setHasUnread(true)
+                            if (isCurrent) setHasUnread(true)
                             playMessageSound()
                         }
                     }
@@ -116,7 +124,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             }
 
             let displayMessages: ChatMessage[] = dbMessages.map(m => ({ ...m, type: 'user' }))
-            setMessages(displayMessages)
+            if (isCurrent) setMessages((prev) => {
+                // Optional: Reduce flicker by checking if content actually changed, 
+                // but for now simple replacement is strict and correct for "ghosting"
+                return displayMessages
+            })
         }
 
         // Initial call
@@ -125,7 +137,10 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         // Poll every 3 seconds for "Live" feel
         const interval = setInterval(pollData, 3000)
 
-        return () => clearInterval(interval)
+        return () => {
+            isCurrent = false
+            clearInterval(interval)
+        }
     }, [activeTicket, isOpen, isMinimized]) // Added isOpen/isMinimized for sound logic context if needed, though ref checks are better. Kept activeTicket.
 
     const [inputText, setInputText] = useState("")

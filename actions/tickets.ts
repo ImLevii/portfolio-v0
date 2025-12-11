@@ -69,10 +69,15 @@ export async function getTicket(ticketId: string) {
             where: { id: ticketId },
             include: {
                 messages: {
-                    orderBy: { createdAt: 'asc' }
+                    orderBy: { createdAt: 'desc' },
+                    take: 50
                 }
             }
         })
+
+        if (ticket) {
+            ticket.messages.reverse()
+        }
 
         return ticket
     } catch (error) {
