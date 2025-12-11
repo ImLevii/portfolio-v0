@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 import { type ChatSettingsConfig } from "@/actions/chat-settings"
 import { updatePresence, getOnlineCount } from "@/actions/presence"
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData } from "@/actions/chat"
-import { createTicket, getTicket, getUserTickets } from "@/actions/tickets"
+import { createTicket, getTicket, getUserTickets, closeTicket } from "@/actions/tickets"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
 import { playMessageSound, unlockAudioContext } from "@/lib/audio"
@@ -197,9 +197,17 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
     const handleCloseTicket = async () => {
         if (!activeTicket) return
+
+        const ticketId = activeTicket.id
         // Optimistic close
         setActiveTicket(null)
         setView('support')
+
+        try {
+            await closeTicket(ticketId)
+        } catch (error) {
+            console.error("Failed to close ticket", error)
+        }
 
         // Force refresh ticket list
         const presenceId = sessionStorage.getItem("presenceId")
