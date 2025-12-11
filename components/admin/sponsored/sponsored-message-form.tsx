@@ -26,6 +26,7 @@ export function SponsoredMessageForm({ open, onOpenChange, initialData, onSucces
     const [description, setDescription] = useState(initialData?.description || "")
     const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "")
     const [linkUrl, setLinkUrl] = useState(initialData?.linkUrl || "")
+    const [frequency, setFrequency] = useState(initialData?.frequency || 15)
     const [isActive, setIsActive] = useState(initialData?.isActive ?? true)
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -37,6 +38,7 @@ export function SponsoredMessageForm({ open, onOpenChange, initialData, onSucces
                 description,
                 imageUrl,
                 linkUrl,
+                frequency,
                 isActive
             }
 
@@ -118,6 +120,18 @@ export function SponsoredMessageForm({ open, onOpenChange, initialData, onSucces
                             value={linkUrl}
                             onChange={(e) => setLinkUrl(e.target.value)}
                             placeholder="https://..."
+                            className="bg-black/50 border-zinc-700 focus-visible:border-emerald-500/50 focus-visible:ring-0"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="frequency" className="text-zinc-300">Frequency (Minutes)</Label>
+                        <Input
+                            id="frequency"
+                            type="number"
+                            min="1"
+                            value={frequency}
+                            onChange={(e) => setFrequency(parseInt(e.target.value) || 15)}
                             className="bg-black/50 border-zinc-700 focus-visible:border-emerald-500/50 focus-visible:ring-0"
                         />
                     </div>

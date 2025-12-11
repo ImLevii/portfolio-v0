@@ -99,14 +99,23 @@ export function SponsoredMessageList({ initialMessages }: SponsoredMessageListPr
                             </p>
 
                             {/* Preview specific fields */}
-                            <div className="text-xs space-y-1 text-zinc-500">
-                                <div className="flex items-center gap-2 truncate">
-                                    <ExternalLink className="h-3 w-3" />
-                                    {msg.linkUrl ? <span className="text-blue-400">{msg.linkUrl}</span> : "No link"}
+                            <div className="flex flex-col gap-2 mt-2">
+                                <div className="text-xs space-y-1 text-zinc-500">
+                                    <div className="flex items-center gap-2 truncate">
+                                        <ExternalLink className="h-3 w-3" />
+                                        {msg.linkUrl ? <span className="text-blue-400">{msg.linkUrl}</span> : "No link"}
+                                    </div>
+                                    <div className="flex items-center gap-2 truncate">
+                                        <RefreshCw className="h-3 w-3" />
+                                        <span className="text-emerald-500 font-mono">Run Frequency: Every {msg.frequency}m</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 truncate">
-                                    <RefreshCw className="h-3 w-3" />
-                                    <span>Runs every {msg.frequency}m</span>
+                                {/* Simulated Timer Badge */}
+                                <div className="bg-zinc-950/50 rounded-md p-2 border border-white/5 flex items-center justify-between">
+                                    <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Timer</span>
+                                    <span className="text-xs font-mono text-emerald-400 animate-pulse">
+                                        {msg.frequency}:00
+                                    </span>
                                 </div>
                             </div>
                         </CardContent>
