@@ -198,7 +198,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="mb-4 flex h-[600px] w-[380px] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[#0a0a0a] shadow-2xl"
+                        className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[#0a0a0a] shadow-2xl sm:h-[600px] sm:w-[380px]"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between border-b border-zinc-800 bg-[#111] p-3">
@@ -400,6 +400,10 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                     if (isOpen && isMinimized) {
                         setIsMinimized(false)
                     } else {
+                        if (!isOpen) {
+                            // Play sound on open to unlock AudioContext for iOS/Chrome autoplay policies
+                            playMessageSound()
+                        }
                         setIsOpen(!isOpen)
                     }
                 }}

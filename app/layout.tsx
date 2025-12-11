@@ -28,7 +28,7 @@ import { auth } from "@/auth"
 
 import { getSeasonalSettings } from "@/actions/seasonal-settings"
 import { getChatSettings } from "@/actions/chat-settings"
-import { GlobalAnnouncementOverlay } from "@/components/global/global-announcement-overlay"
+
 
 export default async function RootLayout({
   children,
@@ -48,7 +48,7 @@ export default async function RootLayout({
           <Navbar user={session?.user} />
           <SeasonalEffects config={seasonalSettings} />
           <LiveChatWidget user={session?.user} config={chatSettings} />
-          <GlobalAnnouncementOverlay />
+
           {children}
         </ThemeProvider>
       </body>
