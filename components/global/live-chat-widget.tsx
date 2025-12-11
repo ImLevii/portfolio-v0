@@ -219,13 +219,13 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                     <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold text-white">Live Chat</h3>
-                                    <p className="text-xs text-zinc-400">Community discussion</p>
+                                    <h3 className="text-sm font-bold text-white tracking-wide">LIVE CHAT</h3>
+                                    <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-medium">Community</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1 rounded-full bg-zinc-800 px-2 py-1 text-xs text-zinc-300">
-                                    <Users className="h-3 w-3" />
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1.5 rounded-full border border-white/5 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-zinc-300">
+                                    <Users className="h-3 w-3 text-emerald-500" />
                                     <span>{onlineCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 ml-1">
@@ -305,15 +305,15 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex items-baseline gap-2">
-                                                        <span className={cn("text-sm font-bold", isAdmin ? "text-red-500" : "text-white")}>{msg.senderName}</span>
+                                                        <span className={cn("text-xs font-bold tracking-wide", isAdmin ? "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-zinc-200")}>{msg.senderName}</span>
                                                         {isAdmin && (
-                                                            <span className="rounded-full bg-red-500/20 px-1.5 py-0.5 text-[10px] font-medium text-red-500 border border-red-500/30">
+                                                            <span className="text-[9px] font-bold text-red-500 opacity-80 tracking-widest border-l border-red-500/20 pl-2">
                                                                 ADMIN
                                                             </span>
                                                         )}
                                                         {!isAdmin && msg.senderRole === "user" && (
-                                                            <span className="rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-medium text-blue-400 border border-blue-500/30">
-                                                                user
+                                                            <span className="text-[9px] font-medium text-blue-400/80 tracking-widest border-l border-blue-500/20 pl-2">
+                                                                USER
                                                             </span>
                                                         )}
                                                         <span className="text-[10px] text-zinc-500">
@@ -323,7 +323,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                 </div>
 
                                                 <div className="ml-10">
-                                                    <div className={cn("rounded-2xl rounded-tl-sm border px-4 py-2 text-sm", isAdmin ? "border-red-500/20 bg-red-950/10 text-red-100" : "border-zinc-800 bg-zinc-900/50 text-zinc-200")}>
+                                                    <div className={cn("relative rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm backdrop-blur-md shadow-sm border transition-all duration-300",
+                                                        isAdmin
+                                                            ? "bg-gradient-to-br from-red-600/10 to-red-900/5 border-red-500/10 text-red-100/90"
+                                                            : "bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 border-white/5 text-zinc-200 hover:border-white/10"
+                                                    )}>
                                                         {msg.text}
                                                     </div>
 
@@ -406,7 +410,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
             {/* Floating Toggle */}
             <motion.button
-                className="group relative flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl transition-all hover:bg-black/80 hover:scale-105 active:scale-95"
+                className={cn(
+                    "group relative flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/60 backdrop-blur-xl transition-all duration-500 hover:scale-105 active:scale-95",
+                    "hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]",
+                    // Pulse glow when unread or just generic subtle glow
+                    hasUnread && !isOpen ? "shadow-[0_0_20px_rgba(16,185,129,0.4)] border-emerald-500/40" : "shadow-2xl"
+                )}
                 onClick={() => {
                     if (isOpen && isMinimized) {
                         setIsMinimized(false)
