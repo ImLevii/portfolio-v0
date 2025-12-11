@@ -70,10 +70,8 @@ export default async function SupportDashboard() {
                                         </div>
                                     </div>
                                     {/* Link to Detail Page */}
-                                    <Link href={`/admin/support/${ticket.id}`}>
-                                        <button className="h-10 w-10 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors">
-                                            <MessageSquare className="h-4 w-4" />
-                                        </button>
+                                    <Link href={`/admin/support/${ticket.id}`} className="h-10 w-10 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors">
+                                        <MessageSquare className="h-4 w-4" />
                                     </Link>
                                 </div>
                             </div>

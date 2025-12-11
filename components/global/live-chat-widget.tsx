@@ -331,7 +331,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                     <div className="flex items-center gap-1">
                                         <button
                                             onClick={handleCloseTicket}
-                                            className="flex items-center gap-1.5 rounded-lg border border-red-900/40 bg-red-950/40 px-3 py-1 text-[10px] font-bold text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:bg-red-900/60 hover:text-red-400 hover:shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all mr-2"
+                                            className="flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all mr-2"
                                             title="Permanently Close Ticket"
                                         >
                                             <X className="h-3 w-3" />

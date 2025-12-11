@@ -123,3 +123,17 @@ export async function closeTicket(ticketId: string) {
         return { success: false }
     }
 }
+
+export async function deleteTicket(ticketId: string) {
+    try {
+        await prisma.ticket.delete({
+            where: { id: ticketId }
+        })
+        revalidatePath('/admin/support')
+        revalidatePath('/')
+        return { success: true }
+    } catch (error) {
+        console.error("Failed to delete ticket", error)
+        return { success: false }
+    }
+}

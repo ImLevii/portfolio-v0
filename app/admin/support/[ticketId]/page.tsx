@@ -1,5 +1,5 @@
 
-import { getTicket, closeTicket } from "@/actions/tickets"
+import { getTicket, closeTicket, deleteTicket } from "@/actions/tickets"
 import { sendMessage } from "@/actions/chat"
 import { auth } from "@/auth"
 import { notFound, redirect } from "next/navigation"
@@ -68,6 +68,16 @@ export default async function TicketDetailPage({ params }: PageProps) {
                         </Button>
                     </form>
                 )}
+
+                <form action={async () => {
+                    "use server"
+                    await deleteTicket(params.ticketId)
+                    redirect('/admin/support')
+                }}>
+                    <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-colors" title="Delete Ticket">
+                        <Trash2 className="h-5 w-5" />
+                    </Button>
+                </form>
             </div>
 
             {/* Chat Area */}
