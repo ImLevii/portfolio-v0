@@ -36,6 +36,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [hasUnread, setHasUnread] = useState(false)
     const [activeTicket, setActiveTicket] = useState<{ id: string; category: string; status: string } | null>(null)
     const [userTickets, setUserTickets] = useState<any[]>([])
+    const [view, setView] = useState<'chat' | 'support'>('chat')
     const [products, setProducts] = useState<{ id: string, name: string }[]>([])
 
     // Ref to track previous message ID to detect NEW ones for sound
@@ -416,7 +417,6 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
     const annColors = announcement ? getAnnouncementColor(announcement.color) : getAnnouncementColor('green')
 
-    const [view, setView] = useState<'chat' | 'support'>('chat')
 
     // Support Hub Data
     const supportCategories = [
