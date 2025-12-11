@@ -1,4 +1,10 @@
+"use client"
+
 import { playAnnouncementSound } from "@/lib/audio"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { X, Bell } from "lucide-react"
+import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 
 // Simple sound hook
 const useNotificationSound = (type: 'notification' | 'alert' | 'none') => {
