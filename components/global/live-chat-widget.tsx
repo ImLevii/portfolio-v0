@@ -371,13 +371,13 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                         onChange={(e) => setInputText(e.target.value)}
                                         placeholder="Send a message..."
                                         disabled={isPending}
-                                        className="h-10 rounded-full border-white/10 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-0"
+                                        className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all"
                                     />
                                     <Button
                                         type="submit"
                                         size="icon"
                                         disabled={isPending}
-                                        className="h-10 w-10 shrink-0 rounded-lg bg-zinc-700 text-zinc-300 hover:bg-zinc-600 hover:text-white"
+                                        className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500/20"
                                     >
                                         <Send className="h-4 w-4" />
                                     </Button>
@@ -388,12 +388,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                         <Input
                                             disabled
                                             placeholder="Please login to chat..."
-                                            className="h-10 rounded-full border-zinc-800 bg-zinc-900/50 text-sm placeholder:text-zinc-600 disabled:opacity-100"
+                                            className="h-10 rounded-xl border-white/5 bg-white/5 text-sm placeholder:text-zinc-600 disabled:opacity-50"
                                         />
                                         <Button
                                             disabled
                                             size="icon"
-                                            className="absolute right-0 top-0 h-10 w-10 rounded-l-none rounded-r-full bg-zinc-600 opacity-50"
+                                            className="absolute right-0 top-0 h-10 w-10 rounded-l-none rounded-r-xl bg-zinc-800 opacity-50"
                                         >
                                             <Send className="h-4 w-4" />
                                         </Button>
