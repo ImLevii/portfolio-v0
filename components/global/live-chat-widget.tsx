@@ -30,7 +30,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [onlineCount, setOnlineCount] = useState(1)
     const [announcement, setAnnouncement] = useState<AnnouncementConfig | null>(null)
     const [hasUnread, setHasUnread] = useState(false)
-    const [activeTicket, setActiveTicket] = useState<{ id: string; category: string } | null>(null)
+    const [activeTicket, setActiveTicket] = useState<{ id: string; category: string; status: string } | null>(null)
+    const [userTickets, setUserTickets] = useState<any[]>([])
 
     // Ref to track previous message ID to detect NEW ones for sound
     const lastMessageIdRef = useRef<string | null>(null)
@@ -175,7 +176,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         const res = await createTicket(category, presenceId || undefined)
 
         if (res.success && res.ticket) {
-            setActiveTicket({ id: res.ticket.id, category: res.ticket.category })
+            setActiveTicket({ id: res.ticket.id, category: res.ticket.category, status: 'OPEN' })
+            // Refresh ticket list
+            const tickets = await getUserTickets(presenceId || undefined)
+            setUserTickets(tickets)
+
             setView('chat')
             // Inject a local system message for immediate feedback
             setMessages([{
@@ -188,6 +193,23 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 senderRole: "SYSTEM"
             }])
         }
+    }
+
+    const handleCloseTicket = async () => {
+        if (!activeTicket) return
+        // Optimistic close
+        setActiveTicket(null)
+        setView('support')
+
+        // Force refresh ticket list
+        const presenceId = sessionStorage.getItem("presenceId")
+        const tickets = await getUserTickets(presenceId || undefined)
+        setUserTickets(tickets)
+    }
+
+    const handleResumeTicket = (ticket: any) => {
+        setActiveTicket({ id: ticket.id, category: ticket.category, status: ticket.status })
+        setView('chat')
     }
 
     const handleDeleteMessage = async (msgId: string) => {
@@ -292,12 +314,21 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                         {view === 'support' ? 'SUPPORT HUB' : (activeTicket ? `SUPPORT: ${activeTicket.category}` : 'LIVE CHAT')}
                                     </h3>
                                     <p className="text-[10px] text-emerald-500/60 uppercase tracking-widest font-medium">
-                                        {view === 'support' ? 'Help Center' : 'Community'}
+                                        {view === 'support' ? 'Help Center' : (activeTicket ? `Ticket #${activeTicket.id.slice(-4)}` : 'Community')}
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                {view === 'chat' && (
+                                {activeTicket && view === 'chat' && (
+                                    <button
+                                        onClick={handleCloseTicket}
+                                        className="flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-2.5 py-1 text-[10px] font-medium text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:bg-red-500/10 transition-colors"
+                                        title="Close/Exit Ticket"
+                                    >
+                                        <span>EXIT</span>
+                                    </button>
+                                )}
+                                {view === 'chat' && !activeTicket && (
                                     <button
                                         onClick={() => setView('support')}
                                         className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-1 text-[10px] font-medium text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:bg-emerald-500/10 transition-colors"
@@ -323,6 +354,43 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             <div className="flex flex-col h-full bg-black/40">
                                 <ScrollArea className="flex-1">
                                     <div className="p-2 space-y-1">
+                                        {/* My Tickets Section */}
+                                        {userTickets.length > 0 && (
+                                            <div className="mb-4">
+                                                <h4 className="px-4 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">Your Tickets</h4>
+                                                {userTickets.map((ticket) => (
+                                                    <button
+                                                        key={ticket.id}
+                                                        onClick={() => handleResumeTicket(ticket)}
+                                                        className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5 mx-1"
+                                                    >
+                                                        <div className={cn("p-2 rounded-full",
+                                                            ticket.status === 'CLOSED' ? "bg-zinc-800 text-zinc-500" : "bg-emerald-500/10 text-emerald-500"
+                                                        )}>
+                                                            <MessageSquare className="h-4 w-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex justify-between items-start">
+                                                                <span className={cn("font-bold text-sm", ticket.status === 'CLOSED' ? "text-zinc-500" : "text-zinc-200")}>
+                                                                    {ticket.category}
+                                                                </span>
+                                                                <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded",
+                                                                    ticket.status === 'OPEN' ? "bg-green-500/20 text-green-400" : "bg-zinc-800 text-zinc-500"
+                                                                )}>
+                                                                    {ticket.status}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-zinc-500 truncate">
+                                                                {new Date(ticket.updatedAt).toLocaleDateString()}
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                                <div className="my-2 border-t border-white/5 mx-4" />
+                                            </div>
+                                        )}
+
+                                        <h4 className="px-4 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">New Request</h4>
                                         {supportCategories.map((cat) => (
                                             <button
                                                 key={cat.id}
@@ -411,6 +479,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
                                         {messages.map((msg) => {
                                             const isAdmin = msg.senderRole === "ADMIN" || msg.senderRole === "Admin"
+                                            const isSupport = msg.senderRole === "SUPPORT" || msg.senderRole === "Support"
                                             const isSelf = msg.senderName === user?.name // weak check but sufficient for UI
                                             const canDelete = (user as any)?.role === "ADMIN" || (user as any)?.role === "Admin"
 
@@ -428,20 +497,34 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                         )}
 
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <Avatar className={cn("h-8 w-8 border", isAdmin ? "border-red-500/50" : "border-zinc-700")}>
+                                                            <Avatar className={cn("h-8 w-8 border",
+                                                                isAdmin ? "border-red-500/50" :
+                                                                    isSupport ? "border-emerald-500/50" : "border-zinc-700"
+                                                            )}>
                                                                 <AvatarImage src={msg.senderAvatar || undefined} />
-                                                                <AvatarFallback className={cn("text-xs", isAdmin ? "bg-red-950 text-red-400" : "bg-zinc-800 text-zinc-400")}>
+                                                                <AvatarFallback className={cn("text-xs",
+                                                                    isAdmin ? "bg-red-950 text-red-400" :
+                                                                        isSupport ? "bg-emerald-950 text-emerald-400" : "bg-zinc-800 text-zinc-400"
+                                                                )}>
                                                                     {msg.senderName?.slice(0, 2).toUpperCase()}
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                             <div className="flex items-baseline gap-2">
-                                                                <span className={cn("text-xs font-bold tracking-wide", isAdmin ? "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-zinc-200")}>{msg.senderName}</span>
+                                                                <span className={cn("text-xs font-bold tracking-wide",
+                                                                    isAdmin ? "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" :
+                                                                        isSupport ? "text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "text-zinc-200"
+                                                                )}>{msg.senderName}</span>
                                                                 {isAdmin && (
                                                                     <span className="text-[9px] font-bold text-red-500 opacity-80 tracking-widest border-l border-red-500/20 pl-2">
                                                                         ADMIN
                                                                     </span>
                                                                 )}
-                                                                {!isAdmin && msg.senderRole === "user" && (
+                                                                {isSupport && (
+                                                                    <span className="text-[9px] font-bold text-emerald-500 opacity-80 tracking-widest border-l border-emerald-500/20 pl-2">
+                                                                        SUPPORT
+                                                                    </span>
+                                                                )}
+                                                                {!isAdmin && !isSupport && msg.senderRole === "user" && (
                                                                     <span className="text-[9px] font-medium text-blue-400/80 tracking-widest border-l border-blue-500/20 pl-2">
                                                                         USER
                                                                     </span>
@@ -456,7 +539,9 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                             <div className={cn("relative rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm backdrop-blur-md shadow-sm border transition-all duration-300",
                                                                 isAdmin
                                                                     ? "bg-gradient-to-br from-red-600/10 to-red-900/5 border-red-500/10 text-red-100/90"
-                                                                    : "bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 border-white/5 text-zinc-200 hover:border-white/10"
+                                                                    : isSupport
+                                                                        ? "bg-gradient-to-br from-emerald-600/10 to-emerald-900/5 border-emerald-500/10 text-emerald-100/90"
+                                                                        : "bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 border-white/5 text-zinc-200 hover:border-white/10"
                                                             )}>
                                                                 {msg.text}
                                                             </div>
