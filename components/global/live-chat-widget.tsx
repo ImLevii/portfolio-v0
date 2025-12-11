@@ -219,12 +219,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                     <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold text-white tracking-wide">LIVE CHAT</h3>
-                                    <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-medium">Community</p>
+                                    <h3 className="text-sm font-black text-emerald-500 tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">LIVE CHAT</h3>
+                                    <p className="text-[10px] text-emerald-500/60 uppercase tracking-widest font-medium">Community</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-1.5 rounded-full border border-white/5 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-zinc-300">
+                                <div className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-1 text-[10px] font-medium text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                                     <Users className="h-3 w-3 text-emerald-500" />
                                     <span>{onlineCount}</span>
                                 </div>
@@ -411,10 +411,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             {/* Floating Toggle */}
             <motion.button
                 className={cn(
-                    "group relative flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/60 backdrop-blur-xl transition-all duration-500 hover:scale-105 active:scale-95",
-                    "hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]",
-                    // Pulse glow when unread or just generic subtle glow
-                    hasUnread && !isOpen ? "shadow-[0_0_20px_rgba(16,185,129,0.4)] border-emerald-500/40" : "shadow-2xl"
+                    "group relative flex h-14 w-14 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500",
+                    "border-emerald-500/30",
+                    "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
+                    "hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:border-emerald-500/50 hover:scale-105 active:scale-95",
+                    // Pulse glow when unread
+                    hasUnread && !isOpen && "animate-pulse shadow-[0_0_30px_rgba(16,185,129,0.6)] border-emerald-500"
                 )}
                 onClick={() => {
                     if (isOpen && isMinimized) {
@@ -432,16 +434,16 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 whileTap={{ scale: 0.95 }}
             >
                 {hasUnread && !isOpen && (
-                    <span className="absolute right-0 top-0 flex h-4 w-4">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
-                        <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
                     </span>
                 )}
 
                 {isOpen && !isMinimized ? (
-                    <X className="h-6 w-6 text-zinc-300 group-hover:text-white" />
+                    <X className="h-6 w-6 text-emerald-500/80 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)] group-hover:text-emerald-400" />
                 ) : (
-                    <MessageCircle className="h-6 w-6 text-zinc-300 group-hover:text-white" />
+                    <MessageCircle className="h-6 w-6 text-emerald-500/80 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)] group-hover:text-emerald-400" />
                 )}
             </motion.button>
 
