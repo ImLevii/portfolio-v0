@@ -24,7 +24,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { createSupportCategory, deleteSupportCategory, type getSupportCategories, ALLOWED_ICONS } from "@/actions/categories"
+import { createSupportCategory, deleteSupportCategory, type getSupportCategories } from "@/actions/categories"
+
+export const ALLOWED_ICONS = ["credit-card", "gamepad", "headphones", "dollar-sign", "shield-check", "message-square"]
 
 // Map string icon names to components for display
 export const iconMap: Record<string, React.ReactNode> = {

@@ -4,8 +4,7 @@ import { auth } from "@/auth"
 import { db as prisma } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
-// Constants for allowed icons (could be expanded)
-export const ALLOWED_ICONS = ["credit-card", "gamepad", "headphones", "dollar-sign", "shield-check", "message-square"]
+
 
 export async function getSupportCategories() {
     try {
