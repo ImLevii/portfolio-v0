@@ -63,7 +63,9 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                             ? "Configure Stripe payments"
                             : method.name === "paypal"
                                 ? "Configure PayPal settings"
-                                : "Configure manual bank transfer details"}
+                                : method.name === "crypto"
+                                    ? "Configure manual crypto wallet addresses"
+                                    : "Configure manual bank transfer details"}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -79,10 +81,14 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                 </div>
             </div>
 
-            {(method.name === "bank_transfer" || method.name === "paypal") && (
+            {(method.name === "bank_transfer" || method.name === "paypal" || method.name === "crypto") && (
                 <div className="space-y-2 pt-4 border-t border-white/10">
                     <label className="text-sm font-medium text-gray-300">
-                        {method.name === "paypal" ? "PayPal Credentials (JSON)" : "Bank Details & Instructions (JSON)"}
+                        {method.name === "paypal"
+                            ? "PayPal Credentials (JSON)"
+                            : method.name === "crypto"
+                                ? "Wallet Addresses (JSON or Text)"
+                                : "Bank Details & Instructions (JSON)"}
                     </label>
                     <Textarea
                         value={config}
@@ -90,7 +96,9 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                         className="font-mono text-sm bg-black/50 border-white/10 min-h-[150px]"
                         placeholder={method.name === "paypal"
                             ? '{"clientId": "...", "clientSecret": "...", "mode": "sandbox"}'
-                            : '{"bankName": "...", "accountNumber": "..."}'}
+                            : method.name === "crypto"
+                                ? '{"BTC": "...", "ETH": "..."}'
+                                : '{"bankName": "...", "accountNumber": "..."}'}
                     />
                     <div className="flex justify-end">
                         <TechButton

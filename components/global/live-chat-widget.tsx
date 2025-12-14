@@ -456,8 +456,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                     >
                                         <ArrowLeft className="h-4 w-4" />
                                     </button>
-                                ) : (
-                                    /* LIVE USER COUNT PILL */
+                                ) : !activeTicket ? (
+                                    /* LIVE USER COUNT PILL (Only in Global Chat to save space in Ticket view) */
                                     <div className="flex items-center gap-2 bg-zinc-800/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5 shadow-inner">
                                         <div className="relative">
                                             <Users className="h-3.5 w-3.5 text-zinc-400" />
@@ -470,7 +470,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                             {onlineCount}
                                         </span>
                                     </div>
-                                )}
+                                ) : null}
                                 <div>
                                     <h3 className="text-sm font-black text-emerald-500 tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">
                                         {view === 'support' ? 'SUPPORT HUB' : (activeTicket ? activeTicket.category : 'LIVE CHAT')}
@@ -485,7 +485,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={handleCloseTicket}
-                                            className="group relative flex h-7 w-20 items-center justify-center gap-1.5 rounded-lg border border-red-500/50 bg-red-500/10 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all hover:bg-red-500/20 hover:text-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]"
+                                            className="group relative flex h-7 w-auto px-3 items-center justify-center gap-1.5 rounded-lg border border-red-500/50 bg-red-500/10 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all hover:bg-red-500/20 hover:text-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]"
                                             title="Permanently Close Ticket"
                                         >
                                             <span className="absolute inset-0 rounded-lg bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -498,7 +498,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                 setActiveTicket(null)
                                                 setView('support')
                                             }}
-                                            className="group relative flex h-7 w-20 items-center justify-center gap-1.5 rounded-lg border border-zinc-500/30 bg-zinc-500/10 text-[10px] font-bold text-zinc-400 shadow-[0_0_10px_rgba(113,113,122,0.1)] transition-all hover:bg-zinc-500/20 hover:text-white hover:border-zinc-500/50 hover:shadow-[0_0_15px_rgba(113,113,122,0.3)]"
+                                            className="group relative flex h-7 w-auto px-3 items-center justify-center gap-1.5 rounded-lg border border-zinc-500/30 bg-zinc-500/10 text-[10px] font-bold text-zinc-400 shadow-[0_0_10px_rgba(113,113,122,0.1)] transition-all hover:bg-zinc-500/20 hover:text-white hover:border-zinc-500/50 hover:shadow-[0_0_15px_rgba(113,113,122,0.3)]"
                                             title="Exit Chat (Keep Ticket Open)"
                                         >
                                             <ArrowLeft className="h-3 w-3 relative z-10" />
