@@ -380,12 +380,47 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
 
     // Support Hub Data
-    const supportCategories = [
-        { id: 'deposits', title: 'Deposits', subtitle: 'We are here if you have any m...', time: '8:44 PM', icon: <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-500"><CreditCard className="h-5 w-5" /></div> },
-        { id: 'license_issues', title: 'License Issues', subtitle: 'Assistance with keys & activation', time: '1:59 AM', icon: <div className="p-2 rounded-full bg-red-500/10 text-red-500"><Gamepad2 className="h-5 w-5" /></div> },
-        { id: 'support', title: 'Support', subtitle: 'Let us know if you need anyth...', time: '1:33 AM', icon: <div className="p-2 rounded-full bg-purple-500/10 text-purple-500"><HeadphonesIcon className="h-5 w-5" /></div> },
-        { id: 'withdrawals', title: 'Withdrawals', subtitle: 'Cashout inquiries', time: '', icon: <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-500"><DollarSign className="h-5 w-5" /></div> },
-    ]
+    const [supportCategories, setSupportCategories] = useState<{ id: string, title: string, subtitle: string, icon: string, time?: string }[]>([])
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            // We can import the server action directly here as it's a "use server" function
+            const { getSupportCategories } = await import("@/actions/categories")
+            const cats = await getSupportCategories()
+
+            setSupportCategories(cats.map(c => ({
+                id: c.id,
+                title: c.title,
+                subtitle: c.subtitle || "",
+                icon: c.icon, // string name
+                time: "" // We removed time from the model, can leave empty or remove from UI
+            })))
+        }
+        fetchCategories()
+    }, [])
+
+    // Map string icons to components
+    const getIcon = (iconName: string) => {
+        switch (iconName) {
+            case 'credit-card': return <CreditCard className="h-5 w-5" />
+            case 'gamepad': return <Gamepad2 className="h-5 w-5" />
+            case 'headphones': return <HeadphonesIcon className="h-5 w-5" />
+            case 'dollar-sign': return <DollarSign className="h-5 w-5" />
+            case 'shield-check': return <ShieldCheck className="h-5 w-5" />
+            case 'message-square': return <MessageSquare className="h-5 w-5" />
+            default: return <HeadphonesIcon className="h-5 w-5" />
+        }
+    }
+
+    const getIconColor = (iconName: string) => {
+        switch (iconName) {
+            case 'credit-card': return "bg-emerald-500/10 text-emerald-500"
+            case 'gamepad': return "bg-red-500/10 text-red-500"
+            case 'headphones': return "bg-purple-500/10 text-purple-500"
+            case 'dollar-sign': return "bg-emerald-500/10 text-emerald-500"
+            default: return "bg-blue-500/10 text-blue-500"
+        }
+    }
 
     return (
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end print:hidden">
@@ -527,7 +562,9 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                 onClick={() => handleCreateTicket(cat.title)}
                                                 className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5"
                                             >
-                                                {cat.icon}
+                                                <div className={`p-2 rounded-full ${getIconColor(cat.icon)}`}>
+                                                    {getIcon(cat.icon)}
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex justify-between items-start mb-0.5">
                                                         <span className="font-bold text-sm text-zinc-200 group-hover:text-white transition-colors">

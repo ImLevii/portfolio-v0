@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 
 import { filterProfanity } from "@/lib/profanity"
 
+
 export interface ChatMessageData {
     id: string
     text: string
@@ -70,8 +71,31 @@ export async function deleteMessage(messageId: string) {
 
         return { success: true }
     } catch (error) {
-        console.error("Failed to delete message:", error)
         return { success: false, error: "Failed to delete" }
+    }
+}
+
+export async function clearGlobalChat() {
+    try {
+        const session = await auth()
+        const role = (session?.user as any)?.role
+
+        if (role !== "ADMIN" && role !== "Admin") {
+            return { success: false, error: "Unauthorized" }
+        }
+
+        // Delete all messages that are NOT associated with a ticket
+        await prisma.chatMessage.deleteMany({
+            where: {
+                ticketId: null
+            }
+        })
+
+        revalidatePath("/")
+        return { success: true }
+    } catch (error) {
+        console.error("Failed to clear chat:", error)
+        return { success: false, error: "Failed to clear chat" }
     }
 }
 

@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/card"
 import { toast } from "sonner"
 import { updateChatSettings, type ChatSettingsConfig } from "@/actions/chat-settings"
+import { clearGlobalChat } from "@/actions/chat"
+import { AlertCircle } from "lucide-react"
 
 const formSchema = z.object({
     enabled: z.boolean(),
@@ -204,6 +206,44 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Danger Zone */}
+                <Card className="border-red-500/20 bg-black/40 backdrop-blur-xl">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-red-500">
+                            <AlertCircle className="h-5 w-5" />
+                            Danger Zone
+                        </CardTitle>
+                        <CardDescription>Irreversible actions for chat management</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between rounded-lg border border-red-500/10 p-4 bg-red-500/5">
+                            <div className="space-y-0.5">
+                                <span className="text-base font-bold text-red-400">Clear Global Chat</span>
+                                <p className="text-sm text-red-400/60">
+                                    Permanently delete all public messages. Active tickets are preserved.
+                                </p>
+                            </div>
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={async () => {
+                                    if (confirm("Are you sure? This will delete ALL public chat history for everyone. This cannot be undone.")) {
+                                        const res = await clearGlobalChat();
+                                        if (res.success) {
+                                            toast.success("Global chat cleared successfully");
+                                        } else {
+                                            toast.error("Failed to clear chat");
+                                        }
+                                    }
+                                }}
+                                className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20"
+                            >
+                                Clear Chat History
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
 
                 <div className="flex justify-end">
                     <Button

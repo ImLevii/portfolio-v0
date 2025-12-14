@@ -1,12 +1,15 @@
 import { getAllTickets } from "@/actions/tickets"
+import { getSupportCategories } from "@/actions/categories"
 import Link from "next/link"
 import { HeadphonesIcon, Clock, CheckCircle, AlertCircle, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { SupportCategoryManager } from "@/components/admin/support-category-manager"
 
 export const dynamic = 'force-dynamic'
 
 export default async function SupportDashboard() {
     const tickets = await getAllTickets()
+    const categories = await getSupportCategories()
 
     return (
         <div className="space-y-6">
@@ -18,6 +21,13 @@ export default async function SupportDashboard() {
                     <h1 className="text-2xl font-bold tracking-tight font-orbitron text-white">Support Hub</h1>
                     <p className="text-zinc-400">Manage support tickets and user inquiries.</p>
                 </div>
+            </div>
+
+            {/* Category Management */}
+            <SupportCategoryManager initialCategories={categories} />
+
+            <div className="flex items-center gap-2 mt-8 mb-4">
+                <h2 className="text-xl font-bold text-white">Recent Tickets</h2>
             </div>
 
             <div className="grid gap-4">

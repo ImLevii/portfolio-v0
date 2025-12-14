@@ -202,3 +202,13 @@ model SponsoredMessage {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model SupportCategory {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  icon        String   // e.g. "credit-card", "gamepad", "headphones"
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
