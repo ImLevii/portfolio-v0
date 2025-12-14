@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useTransition } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare } from "lucide-react"
+import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare, Megaphone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -622,7 +622,19 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                 {/* Global Announcement In-Chat Injection - ONLY for Global Chat, not Tickets */}
                                 {!activeTicket && announcement && announcement.active && (
                                     <div className={`bg-gradient-to-r ${annColors.bg} p-3 mx-4 mt-4 rounded-lg border ${annColors.border} flex items-start gap-3 relative overflow-hidden group/ann`}>
-                                        <div className={`mt-1 h-2 w-2 rounded-full ${annColors.icon} animate-pulse shrink-0`} />
+                                        {announcement.imageUrl ? (
+                                            <div className="shrink-0 h-10 w-10 mt-0.5 rounded-md overflow-hidden border border-white/20 shadow-sm relative">
+                                                <img
+                                                    src={announcement.imageUrl}
+                                                    alt="Announcement"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="shrink-0 h-10 w-10 mt-0.5 rounded-md overflow-hidden bg-white/10 flex items-center justify-center border border-white/20 shadow-sm relative">
+                                                <Megaphone className={`h-5 w-5 ${annColors.text} animate-pulse`} />
+                                            </div>
+                                        )}
                                         <div className="flex-1 relative z-10">
                                             {announcement.title && (
                                                 <p className={`text-xs font-black uppercase tracking-wider ${annColors.text} mb-0.5`}>
