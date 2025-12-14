@@ -34,10 +34,6 @@ import { AlertCircle } from "lucide-react"
 
 const formSchema = z.object({
     enabled: z.boolean(),
-    systemMessageTitle: z.string().min(1, "Title is required"),
-    systemMessageText: z.string().min(1, "Message text is required"),
-    pinnedContentEnabled: z.boolean(),
-    pinnedImageUrl: z.string().optional(),
 })
 
 interface ChatSettingsFormProps {
@@ -52,10 +48,6 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             enabled: initialConfig.enabled,
-            systemMessageTitle: initialConfig.systemMessageTitle,
-            systemMessageText: initialConfig.systemMessageText,
-            pinnedContentEnabled: initialConfig.pinnedContentEnabled,
-            pinnedImageUrl: initialConfig.pinnedImageUrl || "",
         },
     })
 
@@ -113,98 +105,6 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
                         </CardContent>
                     </Card>
 
-                    {/* System Message Settings */}
-                    <Card className="border-cyan-500/20 bg-black/40 backdrop-blur-xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-cyan-100">
-                                <MessageSquare className="h-5 w-5 text-amber-500" />
-                                System Message
-                            </CardTitle>
-                            <CardDescription>Configure the welcome message for users</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="systemMessageTitle"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-zinc-200">Sender Name</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} className="border-zinc-800 bg-zinc-900/50" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="systemMessageText"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-zinc-200">Message Text</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                {...field}
-                                                className="min-h-[100px] border-zinc-800 bg-zinc-900/50"
-                                                placeholder="Welcome message..."
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            Supports basic markdown like **bold** text
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </CardContent>
-                    </Card>
-
-                    {/* Pinned Content Settings */}
-                    <Card className="border-cyan-500/20 bg-black/40 backdrop-blur-xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-cyan-100">
-                                <Pin className="h-5 w-5 text-blue-500" />
-                                Pinned Content
-                            </CardTitle>
-                            <CardDescription>Featured content at the top of the chat</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="pinnedContentEnabled"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-cyan-500/10 p-4 shadow-sm transition-all hover:bg-cyan-500/5">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base text-cyan-100">Show Pinned Content</FormLabel>
-                                            <FormDescription>
-                                                Display a featured image/product area
-                                            </FormDescription>
-                                        </div>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                className="data-[state=checked]:bg-blue-500"
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="pinnedImageUrl"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-zinc-200">Image URL</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} className="border-zinc-800 bg-zinc-900/50" placeholder="/placeholder-logo.png" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </CardContent>
-                    </Card>
                 </div>
 
                 {/* Danger Zone */}

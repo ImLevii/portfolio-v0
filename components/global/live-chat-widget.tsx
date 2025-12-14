@@ -295,6 +295,9 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             case 'red': return { bg: 'from-red-900/40 to-rose-900/40', border: 'border-red-500/30', text: 'text-red-300', icon: 'bg-red-400' }
             case 'purple': return { bg: 'from-purple-900/40 to-violet-900/40', border: 'border-purple-500/30', text: 'text-purple-300', icon: 'bg-purple-400' }
             case 'orange': return { bg: 'from-orange-900/40 to-amber-900/40', border: 'border-orange-500/30', text: 'text-orange-300', icon: 'bg-orange-400' }
+            case 'pink': return { bg: 'from-pink-900/40 to-fuchsia-900/40', border: 'border-pink-500/30', text: 'text-pink-300', icon: 'bg-pink-400' }
+            case 'yellow': return { bg: 'from-yellow-900/40 to-amber-900/40', border: 'border-yellow-500/30', text: 'text-yellow-300', icon: 'bg-yellow-400' }
+            case 'teal': return { bg: 'from-teal-900/40 to-emerald-900/40', border: 'border-teal-500/30', text: 'text-teal-300', icon: 'bg-teal-400' }
             default: return { bg: 'from-green-900/40 to-emerald-900/40', border: 'border-green-500/30', text: 'text-green-300', icon: 'bg-green-400' }
         }
     }
@@ -604,26 +607,31 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         ) : (
                             /* CHAT VIEW */
                             <>
-                                {/* Pinned / Content Area */}
-                                {config?.pinnedContentEnabled && (
-                                    <div className="border-b border-blue-900/30 bg-blue-950/10 p-4">
-                                        <div className="flex items-center justify-center rounded-lg border border-blue-500/20 bg-black/40 p-2">
-                                            <img
-                                                src={config.pinnedImageUrl || "/placeholder-logo.png"}
-                                                alt="Pinned Content"
-                                                className="h-12 w-auto object-contain opacity-80"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
+
 
                                 {/* Global Announcement In-Chat Injection */}
                                 {announcement && announcement.active && (
-                                    <div className={`bg-gradient-to-r ${annColors.bg} p-3 mx-4 mt-4 rounded-lg border ${annColors.border} flex items-start gap-3`}>
+                                    <div className={`bg-gradient-to-r ${annColors.bg} p-3 mx-4 mt-4 rounded-lg border ${annColors.border} flex items-start gap-3 relative overflow-hidden group/ann`}>
                                         <div className={`mt-1 h-2 w-2 rounded-full ${annColors.icon} animate-pulse shrink-0`} />
-                                        <div>
-                                            <p className={`text-xs font-bold ${annColors.text} mb-1`}>ANNOUNCEMENT</p>
-                                            <p className={`text-sm ${annColors.text} opacity-90 leading-snug`}>{announcement.text}</p>
+                                        <div className="flex-1 relative z-10">
+                                            {announcement.title && (
+                                                <p className={`text-xs font-black uppercase tracking-wider ${annColors.text} mb-0.5`}>
+                                                    {announcement.title}
+                                                </p>
+                                            )}
+                                            <p className={`text-sm ${annColors.text} opacity-90 leading-snug`}>
+                                                {announcement.text}
+                                            </p>
+                                            {announcement.linkUrl && (
+                                                <a
+                                                    href={announcement.linkUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="mt-2 inline-flex items-center text-[10px] font-bold uppercase tracking-widest border border-white/20 px-2 py-1 rounded hover:bg-white/10 transition-colors"
+                                                >
+                                                    Open Link <ArrowLeft className="h-3 w-3 ml-1 rotate-180" />
+                                                </a>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -631,18 +639,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                 {/* Messages */}
                                 <ScrollArea className="flex-1 bg-transparent p-4">
                                     <div className="flex flex-col gap-4">
-                                        {/* System Welcome Message */}
-                                        {config?.systemMessageText && (
-                                            <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-3 text-center">
-                                                <div className="mb-1 flex items-center justify-center gap-2 text-xs font-semibold text-amber-500">
-                                                    <span className="h-2 w-2 rounded-full bg-amber-500"></span>
-                                                    {config.systemMessageTitle || "System"}
-                                                </div>
-                                                <p className="text-sm leading-relaxed text-amber-200/90">
-                                                    {parseText(config.systemMessageText)}
-                                                </p>
-                                            </div>
-                                        )}
+
 
                                         {messages.map((msg) => {
                                             // 1. Sponsored Message

@@ -9,9 +9,11 @@ export interface AnnouncementConfig {
     text: string
     imageUrl?: string
     soundType: 'notification' | 'alert' | 'none'
-    color: 'green' | 'blue' | 'red' | 'purple' | 'orange'
+    color: 'green' | 'blue' | 'red' | 'purple' | 'orange' | 'pink' | 'yellow' | 'teal'
     timestamp: number // Used to detect "new" announcements on client
-    autoHideAfter?: number // seconds, optional
+    autoHideAfter?: number // seconds, optional. 0 = permanent
+    title?: string
+    linkUrl?: string
 }
 
 export async function getAnnouncement(): Promise<AnnouncementConfig | null> {
@@ -27,7 +29,15 @@ export async function getAnnouncement(): Promise<AnnouncementConfig | null> {
     }
 }
 
-export async function broadcastAnnouncement(data: { text: string, imageUrl?: string, soundType: 'notification' | 'alert' | 'none', color: 'green' | 'blue' | 'red' | 'purple' | 'orange' }) {
+export async function broadcastAnnouncement(data: {
+    text: string,
+    imageUrl?: string,
+    soundType: 'notification' | 'alert' | 'none',
+    color: 'green' | 'blue' | 'red' | 'purple' | 'orange' | 'pink' | 'yellow' | 'teal',
+    title?: string,
+    linkUrl?: string,
+    duration?: number
+}) {
     try {
         const session = await auth()
         const role = (session?.user as any)?.role
@@ -42,7 +52,9 @@ export async function broadcastAnnouncement(data: { text: string, imageUrl?: str
             soundType: data.soundType,
             color: data.color || 'green',
             timestamp: Date.now(),
-            autoHideAfter: 10 // default 10s
+            autoHideAfter: data.duration !== undefined ? data.duration : 10,
+            title: data.title,
+            linkUrl: data.linkUrl
         }
 
         await prisma.siteSettings.upsert({

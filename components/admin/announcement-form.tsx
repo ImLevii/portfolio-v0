@@ -29,10 +29,13 @@ export function AnnouncementForm() {
     const [isPending, startTransition] = useTransition()
 
     // Simple state form
+    const [title, setTitle] = useState("")
     const [text, setText] = useState("")
     const [imageUrl, setImageUrl] = useState("")
+    const [linkUrl, setLinkUrl] = useState("")
     const [sound, setSound] = useState<'notification' | 'alert' | 'none'>('notification')
-    const [color, setColor] = useState<'green' | 'blue' | 'red' | 'purple' | 'orange'>('green')
+    const [color, setColor] = useState<'green' | 'blue' | 'red' | 'purple' | 'orange' | 'pink' | 'yellow' | 'teal'>('green')
+    const [duration, setDuration] = useState<string>("10") // string for select, parsed to number
 
     const handleBroadcast = () => {
         if (!text) {
@@ -43,9 +46,12 @@ export function AnnouncementForm() {
         startTransition(async () => {
             const result = await broadcastAnnouncement({
                 text,
+                title,
                 imageUrl,
+                linkUrl,
                 soundType: sound,
-                color
+                color,
+                duration: parseInt(duration) // 0 = permanent
             })
             if (result.success) {
                 toast.success("Announcement broadcasted successfully!")
@@ -78,13 +84,50 @@ export function AnnouncementForm() {
                 <CardDescription>Send a live pop-up message to all active users</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label className="text-zinc-200">Title (Optional)</Label>
+                        <Input
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="e.g. MAINTENANCE ALERT"
+                            className="bg-zinc-900/50 border-zinc-800 text-white font-bold"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-zinc-200">Duration</Label>
+                        <Select value={duration} onValueChange={setDuration}>
+                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
+                                <SelectItem value="5">5 Seconds</SelectItem>
+                                <SelectItem value="10">10 Seconds (Default)</SelectItem>
+                                <SelectItem value="30">30 Seconds</SelectItem>
+                                <SelectItem value="60">1 Minute</SelectItem>
+                                <SelectItem value="0" className="text-red-400 font-bold">Permanent (Until Cleared)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
                 <div className="space-y-2">
                     <Label className="text-zinc-200">Message</Label>
                     <Textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Types something exciting..."
-                        className="bg-zinc-900/50 border-zinc-800 min-h-[100px] text-white"
+                        className="bg-zinc-900/50 border-zinc-800 min-h-[80px] text-white"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="text-zinc-200">Link URL (Optional)</Label>
+                    <Input
+                        value={linkUrl}
+                        onChange={(e) => setLinkUrl(e.target.value)}
+                        placeholder="https://example.com/promo"
+                        className="bg-zinc-900/50 border-zinc-800 text-white text-sm font-mono"
                     />
                 </div>
 
@@ -123,6 +166,9 @@ export function AnnouncementForm() {
                                 <SelectItem value="purple" className="text-purple-500 font-bold">Royal Purple</SelectItem>
                                 <SelectItem value="red" className="text-red-500 font-bold">Alert Red</SelectItem>
                                 <SelectItem value="orange" className="text-orange-500 font-bold">Warning Orange</SelectItem>
+                                <SelectItem value="pink" className="text-pink-500 font-bold">Hot Pink</SelectItem>
+                                <SelectItem value="yellow" className="text-yellow-500 font-bold">Electric Yellow</SelectItem>
+                                <SelectItem value="teal" className="text-teal-500 font-bold">Aqua Teal</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
