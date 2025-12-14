@@ -88,7 +88,17 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
 
             // 4. Get Announcement context
             const latestAnnouncement = await getAnnouncement()
-            if (isCurrent) setAnnouncement(latestAnnouncement)
+
+            // Check for expiration
+            let validAnnouncement = latestAnnouncement
+            if (latestAnnouncement?.active && latestAnnouncement.autoHideAfter && latestAnnouncement.autoHideAfter > 0) {
+                const expiresAt = latestAnnouncement.timestamp + (latestAnnouncement.autoHideAfter * 1000)
+                if (Date.now() > expiresAt) {
+                    validAnnouncement = null
+                }
+            }
+
+            if (isCurrent) setAnnouncement(validAnnouncement)
 
             // Sound Logic
             if (dbMessages.length > 0) {
@@ -463,7 +473,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                 )}
                                 <div>
                                     <h3 className="text-sm font-black text-emerald-500 tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">
-                                        {view === 'support' ? 'SUPPORT HUB' : (activeTicket ? `SUPPORT: ${activeTicket.category}` : 'LIVE CHAT')}
+                                        {view === 'support' ? 'SUPPORT HUB' : (activeTicket ? activeTicket.category : 'LIVE CHAT')}
                                     </h3>
                                     <p className="text-[10px] text-emerald-500/60 uppercase tracking-widest font-medium">
                                         {view === 'support' ? 'Help Center' : (activeTicket ? `Ticket #${activeTicket.id.slice(-4)}` : 'Community')}
@@ -609,8 +619,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                             <>
 
 
-                                {/* Global Announcement In-Chat Injection */}
-                                {announcement && announcement.active && (
+                                {/* Global Announcement In-Chat Injection - ONLY for Global Chat, not Tickets */}
+                                {!activeTicket && announcement && announcement.active && (
                                     <div className={`bg-gradient-to-r ${annColors.bg} p-3 mx-4 mt-4 rounded-lg border ${annColors.border} flex items-start gap-3 relative overflow-hidden group/ann`}>
                                         <div className={`mt-1 h-2 w-2 rounded-full ${annColors.icon} animate-pulse shrink-0`} />
                                         <div className="flex-1 relative z-10">
