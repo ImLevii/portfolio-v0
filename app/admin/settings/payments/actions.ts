@@ -34,22 +34,28 @@ export async function getPaymentMethods() {
             // Seed default payment methods
             const defaults = [
                 {
-                    name: "Stripe",
+                    name: "stripe",
+                    displayName: "Stripe",
                     isEnabled: false,
-                    config: JSON.stringify({ publishableKey: "", secretKey: "" }),
-                    icon: "credit-card"
+                    config: JSON.stringify({ publishableKey: "", secretKey: "" })
                 },
                 {
-                    name: "PayPal",
+                    name: "paypal",
+                    displayName: "PayPal",
                     isEnabled: false,
-                    config: JSON.stringify({ clientId: "", clientSecret: "" }),
-                    icon: "dollar-sign"
+                    config: JSON.stringify({ clientId: "", clientSecret: "" })
                 },
                 {
-                    name: "Crypto",
+                    name: "crypto",
+                    displayName: "Crypto",
                     isEnabled: false,
-                    config: JSON.stringify({ walletAddress: "" }),
-                    icon: "bitcoin"
+                    config: JSON.stringify({ walletAddress: "" })
+                },
+                {
+                    name: "bank_transfer",
+                    displayName: "Bank Transfer",
+                    isEnabled: false,
+                    config: JSON.stringify({ bankName: "", accountNumber: "" })
                 }
             ]
 
