@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { Product } from '@/lib/products'
-import { toast } from 'sonner'
+import { showTerminalToast } from '@/components/global/terminal-toast'
 
 interface CartItem extends Product {
     quantity: number
@@ -23,15 +23,15 @@ const useCart = create(
                 const existingItem = currentItems.find((item) => item.id === data.id)
 
                 if (existingItem) {
-                    return toast.info('Item already in cart.')
+                    return showTerminalToast.info('Already in Cart', 'This item is already in your cart.')
                 }
 
                 set({ items: [...get().items, { ...data, quantity: 1 }] })
-                toast.success('Item added to cart.')
+                showTerminalToast.success('Added to Cart', `${data.name} has been added to your cart.`)
             },
             removeItem: (id: string) => {
                 set({ items: [...get().items.filter((item) => item.id !== id)] })
-                toast.success('Item removed from cart.')
+                showTerminalToast.success('Removed from Cart', 'Item has been removed from your cart.')
             },
             removeAll: () => set({ items: [] }),
         }),

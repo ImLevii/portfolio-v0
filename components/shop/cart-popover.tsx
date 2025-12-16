@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 import { getEnabledPaymentMethods, validateCoupon } from "@/app/shop/actions"
 import { PaymentMethod } from "@prisma/client"
@@ -86,7 +86,7 @@ export function CartPopover({ user }: { user?: any }) {
                 setAppliedCoupon(null)
             } else if (result.coupon) {
                 setAppliedCoupon(result.coupon)
-                toast.success("Coupon applied!")
+                showTerminalToast.success("Coupon Applied", "Discount has been applied to your cart.")
             }
         } catch (error) {
             setCouponError("Failed to apply coupon")
@@ -97,14 +97,14 @@ export function CartPopover({ user }: { user?: any }) {
 
     const onCheckout = async () => {
         if (!user) {
-            toast.error("Please sign in to checkout.")
+            showTerminalToast.error("Sign In Required", "Please sign in to checkout.")
             router.push("/auth/signin")
             setIsOpen(false)
             return
         }
 
         if (!selectedMethod) {
-            toast.error("No payment methods are available right now.")
+            showTerminalToast.error("Payment Method", "No payment methods are available right now.")
             return
         }
 
@@ -131,10 +131,10 @@ export function CartPopover({ user }: { user?: any }) {
                 const errorMessage = data.details
                     ? `${data.error}: ${data.details}`
                     : data.error || "Something went wrong."
-                toast.error(errorMessage)
+                showTerminalToast.error("Checkout Failed", errorMessage)
             }
         } catch (error) {
-            toast.error("Something went wrong.")
+            showTerminalToast.error("System Error", "Something went wrong during checkout.")
         } finally {
             setLoading(false)
         }
@@ -269,25 +269,25 @@ export function CartPopover({ user }: { user?: any }) {
                         </div>
 
                         {isPayPalSelected ? (
-                                <div className="relative group">
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 blur-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                    {paypalError && (
-                                        <div className="mb-2 rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300">
-                                            {paypalError}
-                                        </div>
-                                    )}
-                                    <button
-                                        onClick={onCheckout}
-                                        disabled={loading}
-                                        className="relative w-full h-auto overflow-hidden rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
-                                    >
-                                        <img
-                                            src="/paypal-button.png"
-                                            alt="Pay with PayPal"
-                                            className="w-full h-auto object-contain"
-                                        />
-                                    </button>
-                                </div>
+                            <div className="relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 blur-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                {paypalError && (
+                                    <div className="mb-2 rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300">
+                                        {paypalError}
+                                    </div>
+                                )}
+                                <button
+                                    onClick={onCheckout}
+                                    disabled={loading}
+                                    className="relative w-full h-auto overflow-hidden rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
+                                >
+                                    <img
+                                        src="/paypal-button.png"
+                                        alt="Pay with PayPal"
+                                        className="w-full h-auto object-contain"
+                                    />
+                                </button>
+                            </div>
                         ) : (
                             <Button
                                 onClick={onCheckout}

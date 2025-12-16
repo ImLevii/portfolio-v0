@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { ProductCard } from "@/components/shop/product-card"
 import { ShopCarousel } from "@/components/shop/shop-carousel"
-import { ShopNav } from "@/components/shop/shop-nav"
+import { ShopToolbar } from "@/components/shop/shop-toolbar"
 
 interface Product {
     id: string
@@ -12,6 +12,7 @@ interface Product {
     price: number
     image: string
     category: string
+    stock: number
     features: string // JSON string
 }
 
@@ -32,9 +33,25 @@ export function ShopContent({ products }: ShopContentProps) {
     const categories = Array.from(new Set(parsedProducts.map(p => p.category)))
     const [activeCategory, setActiveCategory] = useState("All")
 
-    const filteredProducts = activeCategory === "All"
-        ? parsedProducts
-        : parsedProducts.filter(p => p.category === activeCategory)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [sortOption, setSortOption] = useState("newest")
+
+    const filteredProducts = parsedProducts.filter(product => {
+        const matchesCategory = activeCategory === "All" || product.category === activeCategory
+        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.description.toLowerCase().includes(searchQuery.toLowerCase())
+        return matchesCategory && matchesSearch
+    }).sort((a, b) => {
+        switch (sortOption) {
+            case "price-asc": return a.price - b.price
+            case "price-desc": return b.price - a.price
+            case "name-asc": return a.name.localeCompare(b.name)
+            case "newest": default:
+                // Assuming newer products have higher IDs or we rely on default DB order (desc createdAt) 
+                // But since we can't easily parse ID as timestamp, we'll assume the array 'products' came sorted by Date Desc from server
+                return 0
+        }
+    })
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-950 text-white overflow-hidden font-bold relative pt-20 md:pt-24">
@@ -55,10 +72,14 @@ export function ShopContent({ products }: ShopContentProps) {
 
                 <ShopCarousel />
 
-                <ShopNav
+                <ShopToolbar
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
                     categories={categories}
                     activeCategory={activeCategory}
-                    onSelectCategory={setActiveCategory}
+                    onCategoryChange={setActiveCategory}
+                    sortOption={sortOption}
+                    onSortChange={setSortOption}
                 />
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

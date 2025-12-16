@@ -50,14 +50,24 @@ const ErrorIcon = () => (
         <div className="absolute bottom-0 left-0 w-1 h-1 border-b border-l border-red-500/50 rounded-bl-[1px]" />
         <div className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-red-500/50 rounded-br-[1px]" />
 
-        <X className="w-4 h-4 text-red-500" />
+    </div>
+)
+
+const InfoIcon = () => (
+    <div className="relative w-8 h-8 flex items-center justify-center rounded bg-blue-500/10 border border-blue-500/20">
+        <div className="absolute top-0 left-0 w-1 h-1 border-t border-l border-blue-500/50 rounded-tl-[1px]" />
+        <div className="absolute top-0 right-0 w-1 h-1 border-t border-r border-blue-500/50 rounded-tr-[1px]" />
+        <div className="absolute bottom-0 left-0 w-1 h-1 border-b border-l border-blue-500/50 rounded-bl-[1px]" />
+        <div className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-blue-500/50 rounded-br-[1px]" />
+
+        <Terminal className="w-4 h-4 text-blue-500" />
     </div>
 )
 
 // --- Toast Component ---
 
 interface ToastProps {
-    type: 'loading' | 'success' | 'error'
+    type: 'loading' | 'success' | 'error' | 'info'
     title: string
     message?: string
     t: string | number
@@ -79,6 +89,11 @@ const TerminalToast = ({ type, title, message, t }: ToastProps) => {
         borderColor = 'border-red-500/20'
         glowColor = 'shadow-red-500/10'
         TitleColor = 'text-red-500'
+    } else if (type === 'info') {
+        Icon = InfoIcon
+        borderColor = 'border-blue-500/20'
+        glowColor = 'shadow-blue-500/10'
+        TitleColor = 'text-blue-500'
     }
 
     return (
@@ -121,6 +136,10 @@ export const showTerminalToast = {
     error: (title: string, message?: string, id?: string | number) => {
         if (id) toast.dismiss(id)
         return toast.custom((t) => <TerminalToast type="error" title={title} message={message} t={t} />)
+    },
+    info: (title: string, message?: string, id?: string | number) => {
+        if (id) toast.dismiss(id)
+        return toast.custom((t) => <TerminalToast type="info" title={title} message={message} t={t} />)
     },
     dismiss: (id: string | number) => toast.dismiss(id)
 }
