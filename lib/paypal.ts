@@ -11,18 +11,33 @@ export async function getPayPalAccessToken() {
     let clientSecret = process.env.PAYPAL_CLIENT_SECRET || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_SECRET
     let apiUrl = process.env.PAYPAL_API_URL || process.env.NEXT_PUBLIC_PAYPAL_API_URL || PAYPAL_API_URL
 
+    // Trim Env vars if they exist
+    if (clientId) clientId = clientId.trim()
+    if (clientSecret) clientSecret = clientSecret.trim()
+    if (apiUrl) apiUrl = apiUrl.trim()
+
+    let useDbConfig = false
+
     if (method && method.config) {
         try {
             const config = JSON.parse(method.config)
 
-            // Only use DB config if ENV vars are not present (ENV takes priority)
-            if (config.clientId && !process.env.PAYPAL_CLIENT_ID && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
-                clientId = config.clientId
+            // Check if we should use DB config
+            // We use DB config if Env vars are missing OR if they are effectively empty
+            const envIdMissing = !clientId || clientId === ""
+            const envSecretMissing = !clientSecret || clientSecret === ""
+
+            if (envIdMissing && config.clientId) {
+                clientId = config.clientId.trim()
+                useDbConfig = true
             }
-            if (config.clientSecret && !process.env.PAYPAL_CLIENT_SECRET && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_SECRET) {
-                clientSecret = config.clientSecret
+
+            if (envSecretMissing && config.clientSecret) {
+                clientSecret = config.clientSecret.trim()
+                useDbConfig = true
             }
-            if (config.mode === "sandbox" && !process.env.PAYPAL_API_URL && !process.env.NEXT_PUBLIC_PAYPAL_API_URL) {
+
+            if (config.mode === "sandbox" && (!apiUrl || apiUrl === "")) {
                 apiUrl = "https://api-m.sandbox.paypal.com"
             }
         } catch (e) {
@@ -31,10 +46,12 @@ export async function getPayPalAccessToken() {
     }
 
     // Logging to debug source of truth without leaking secrets
-    const source = (method && method.config) ? "DB (may be overridden by Env)" : "Env"
+    const source = useDbConfig ? "DB (Fallback)" : "Env"
     const isSandbox = apiUrl.includes("sandbox")
+    const maskedId = clientId ? `${clientId.substring(0, 4)}...${clientId.substring(clientId.length - 4)}` : "MISSING"
 
-    console.log(`PayPal Config: Source=[${source}], Mode=[${isSandbox ? "SANDBOX" : "LIVE"}], ClientIDPresent=[${!!clientId}]`)
+    console.log(`PayPal Config Debug: Source=[${source}], Mode=[${isSandbox ? "SANDBOX" : "LIVE"}]`)
+    console.log(`PayPal Config Detail: URL=[${apiUrl}], ClientID=[${maskedId}]`)
 
     if (!clientId || !clientSecret) {
         throw new Error("Missing PayPal credentials. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in .env.local or Admin Dashboard.")
@@ -53,7 +70,9 @@ export async function getPayPalAccessToken() {
 
     if (!response.ok) {
         const error = await response.text()
+        console.error("PayPal Auth Failed. Response Status:", response.status)
         console.error("PayPal Token Error Response:", error)
+        console.error("Used Client ID:", maskedId) // Log masked ID to verify correct one used
         throw new Error(`PayPal auth failed: ${error}`)
     }
 
