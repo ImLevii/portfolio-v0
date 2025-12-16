@@ -14,9 +14,17 @@ export async function getPayPalAccessToken() {
     if (method && method.config) {
         try {
             const config = JSON.parse(method.config)
-            if (config.clientId) clientId = config.clientId
-            if (config.clientSecret) clientSecret = config.clientSecret
-            if (config.mode === "sandbox") apiUrl = "https://api-m.sandbox.paypal.com"
+
+            // Only use DB config if ENV vars are not present (ENV takes priority)
+            if (config.clientId && !process.env.PAYPAL_CLIENT_ID && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID) {
+                clientId = config.clientId
+            }
+            if (config.clientSecret && !process.env.PAYPAL_CLIENT_SECRET && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_SECRET) {
+                clientSecret = config.clientSecret
+            }
+            if (config.mode === "sandbox" && !process.env.PAYPAL_API_URL && !process.env.NEXT_PUBLIC_PAYPAL_API_URL) {
+                apiUrl = "https://api-m.sandbox.paypal.com"
+            }
         } catch (e) {
             console.error("Failed to parse PayPal config from DB", e)
         }

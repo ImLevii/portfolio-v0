@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     if (!productIds || productIds.length === 0) {
         console.log("Checkout error: Product IDs are required")
-        return new NextResponse("Product IDs are required", { status: 400 })
+        return NextResponse.json({ error: "Product IDs are required" }, { status: 400 })
     }
 
     const items = await db.product.findMany({
@@ -83,15 +83,16 @@ export async function POST(req: Request) {
 
     if (items.length === 0) {
         console.log("Checkout error: No valid products found", { productIds })
-        return new NextResponse("No valid products found for checkout", {
-            status: 400,
-        })
+        return NextResponse.json({
+            error: "No valid products found for checkout",
+            details: "The products you are trying to purchase do not exist or are invalid."
+        }, { status: 400 })
     }
 
     // Handle Free Orders
     if (totalAmount === 0) {
         if (!session?.user?.email) {
-            return new NextResponse("Authentication required for free orders", { status: 401 })
+            return NextResponse.json({ error: "Authentication required for free orders" }, { status: 401 })
         }
 
         try {
@@ -234,7 +235,7 @@ export async function POST(req: Request) {
             cancel_url: `${baseUrl}/shop?canceled=1`,
             metadata: {
                 productIds: JSON.stringify(productIds),
-                couponId: couponId
+                couponId: couponId || null
             },
             customer_email: session?.user?.email || undefined, // Prefill email if logged in
         })
@@ -246,7 +247,7 @@ export async function POST(req: Request) {
             }
         )
     } catch (error: any) {
-        console.error("Stripe checkout error:", error)
+        console.error("Stripe checkout error detailed:", JSON.stringify(error, null, 2))
 
         const message =
             error?.message ||
@@ -257,7 +258,7 @@ export async function POST(req: Request) {
             : 500
 
         return NextResponse.json(
-            { error: message },
+            { error: message, details: error.type },
             {
                 status,
                 headers: corsHeaders,
