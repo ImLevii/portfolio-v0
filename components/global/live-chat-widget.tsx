@@ -291,6 +291,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 type: 'system',
                 senderRole: "SYSTEM"
             }])
+        } else {
+            alert(res.error || "Failed to create ticket")
         }
     }
 
@@ -834,19 +836,19 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                 <div className="border-t border-white/5 bg-black/40 p-3 backdrop-blur-md">
                                     {user ? (
                                         <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
-                                            <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending} />
+                                            <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending || activeTicket?.status === 'CLOSED'} />
                                             <Input
                                                 value={inputText}
                                                 onChange={(e) => setInputText(e.target.value)}
-                                                placeholder="Send a message..."
-                                                disabled={isPending}
-                                                className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all"
+                                                placeholder={activeTicket?.status === 'CLOSED' ? "This ticket is closed." : "Send a message..."}
+                                                disabled={isPending || activeTicket?.status === 'CLOSED'}
+                                                className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                             />
                                             <Button
                                                 type="submit"
                                                 size="icon"
-                                                disabled={isPending}
-                                                className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500/20"
+                                                disabled={isPending || activeTicket?.status === 'CLOSED'}
+                                                className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Send className="h-4 w-4" />
                                             </Button>

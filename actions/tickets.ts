@@ -13,6 +13,21 @@ export async function createTicket(category: string, guestId?: string) {
             return { success: false, error: "Authentication required" }
         }
 
+        // Check for existing OPEN tickets
+        const existingTicket = await prisma.ticket.findFirst({
+            where: {
+                OR: [
+                    userId ? { userId } : {},
+                    guestId ? { guestId } : {}
+                ],
+                status: "OPEN"
+            }
+        })
+
+        if (existingTicket) {
+            return { success: false, error: "You already have an open ticket. Please resolve it before creating a new one." }
+        }
+
         const ticket = await prisma.ticket.create({
             data: {
                 category,
@@ -131,6 +146,12 @@ export async function closeTicket(ticketId: string) {
 
 export async function deleteTicket(ticketId: string) {
     try {
+        // First delete all messages associated with this ticket
+        // This prevents them from becoming "global" messages (ticketId=null) due to SetNull in schema
+        await prisma.chatMessage.deleteMany({
+            where: { ticketId: ticketId }
+        })
+
         await prisma.ticket.delete({
             where: { id: ticketId }
         })

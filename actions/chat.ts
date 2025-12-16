@@ -40,6 +40,26 @@ export async function sendMessage(text: string, ticketId?: string) {
 
         console.log(`[sendMessage] Sender: ${user.name}, TicketId: ${effectiveTicketId} (Raw: ${ticketId})`)
 
+        if (effectiveTicketId) {
+            const ticket = await prisma.ticket.findUnique({
+                where: { id: effectiveTicketId },
+                select: { status: true }
+            })
+
+            if (!ticket) {
+                return { success: false, error: "Ticket not found" }
+            }
+
+            if (ticket.status === 'CLOSED') {
+                // Allow admins to reply to closed tickets (e.g. for final remarks)
+                // Block customers/users
+                const role = (user as any).role
+                if (role !== "ADMIN" && role !== "Admin") {
+                    return { success: false, error: "This ticket is closed. You cannot reply to it." }
+                }
+            }
+        }
+
         await prisma.chatMessage.create({
             data: {
                 text: cleanText,
