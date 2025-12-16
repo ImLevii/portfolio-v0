@@ -53,6 +53,18 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     // Ref to throttle DB checks for sponsored messages
     const lastSponsoredCheckRef = useRef<number>(0)
 
+    // Force refresh tickets when entering Support View to ensure "My Tickets" is up to date
+    useEffect(() => {
+        if (view === 'support') {
+            const fetchTickets = async () => {
+                const presenceId = sessionStorage.getItem("presenceId")
+                const tickets = await getUserTickets(presenceId || undefined)
+                setUserTickets(tickets)
+            }
+            fetchTickets()
+        }
+    }, [view])
+
     // ... (useEffect deps logic remains same for restoreSession)
 
     // 2. Polling Logic (Runs when activeTicket changes + interval)
@@ -227,8 +239,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         // Initial call
         pollData()
 
-        // Poll every 3 seconds for "Live" feel
-        const interval = setInterval(pollData, 3000)
+        // Poll every 1 second for "Live" feel
+        const interval = setInterval(pollData, 1000)
 
         return () => {
             isCurrent = false

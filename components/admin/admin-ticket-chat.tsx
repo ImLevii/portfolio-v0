@@ -105,7 +105,7 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
             } catch (error) {
                 console.error("Polling error:", error)
             }
-        }, 3000)
+        }, 1000)
 
         return () => {
             isMounted = false
