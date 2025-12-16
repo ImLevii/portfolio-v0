@@ -160,17 +160,20 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
                     <Button
                         type="submit"
                         disabled={isPending}
-                        className="h-12 px-8 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white border-0 shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-all hover:scale-105 active:scale-95 rounded-xl font-bold tracking-wide"
+                        className="h-12 px-8 bg-[#0a0a0a] border border-white/10 hover:bg-neutral-900 text-white shadow-lg transition-all hover:scale-105 active:scale-95 rounded-xl group relative overflow-hidden"
                     >
+                        <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         {isPending ? (
                             <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                Saving...
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin text-cyan-500" />
+                                <span className="font-orbitron font-bold tracking-wider text-cyan-500">SAVING...</span>
                             </>
                         ) : (
                             <>
-                                <Save className="mr-2 h-5 w-5" />
-                                Save Configuration
+                                <Save className="mr-2 h-5 w-5 text-cyan-500 group-hover:text-cyan-400 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
+                                <span className="font-orbitron font-bold tracking-wider text-cyan-500 group-hover:text-cyan-400 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] transition-all">
+                                    SAVE CONFIGURATION
+                                </span>
                             </>
                         )}
                     </Button>

@@ -188,19 +188,29 @@ export function AnnouncementForm() {
                     <Button
                         onClick={handleBroadcast}
                         disabled={isPending}
-                        className="flex-1 h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-0 shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all active:scale-[0.98] rounded-xl font-bold tracking-wide text-base"
+                        className="flex-1 h-12 bg-[#0a0a0a] border border-white/10 hover:bg-neutral-900 text-white shadow-lg transition-all active:scale-[0.98] rounded-xl group relative overflow-hidden"
                     >
-                        {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Send className="mr-2 h-5 w-5" />}
-                        Broadcast Announcement
+                        <div className="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {isPending ? (
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin text-purple-500" />
+                        ) : (
+                            <Send className="mr-2 h-5 w-5 text-purple-500 group-hover:text-purple-400 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] transition-all" />
+                        )}
+                        <span className="font-orbitron font-bold tracking-wider text-purple-500 group-hover:text-purple-400 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] transition-all">
+                            BROADCAST ANNOUNCEMENT
+                        </span>
                     </Button>
                     <Button
                         onClick={handleClear}
                         disabled={isPending}
-                        variant="outline"
-                        className="h-12 px-6 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/50 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all rounded-xl font-medium"
+                        variant="ghost"
+                        className="h-12 px-6 bg-[#0a0a0a] border border-white/10 hover:bg-neutral-900 text-red-500 hover:text-red-400 hover:border-red-500/30 transition-all rounded-xl font-medium group relative overflow-hidden"
                     >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Clear Active
+                        <div className="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <Trash2 className="mr-2 h-4 w-4 group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                        <span className="font-orbitron font-bold tracking-wider group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]">
+                            CLEAR ACTIVE
+                        </span>
                     </Button>
                 </div>
             </CardContent>

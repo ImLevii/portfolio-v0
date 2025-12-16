@@ -29,25 +29,36 @@ export const playMessageSound = () => {
     try {
         const ctx = getAudioContext();
         if (ctx.state === 'suspended') ctx.resume();
+        const now = ctx.currentTime;
 
+        // Fundamental
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
-        // "Pop" sound
         osc.connect(gain);
         gain.connect(ctx.destination);
 
         osc.type = 'sine';
-        // Pitch drop for "bubble" effect
-        osc.frequency.setValueAtTime(1000, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(880, now); // A5
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.1, now + 0.02); // Fast attack
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); // Long tail
 
-        // Volume envelope
-        gain.gain.setValueAtTime(0.1, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.start(now);
+        osc.stop(now + 1.5);
 
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.1);
+        // Harmonic (Octave up) for brightness
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1760, now); // A6
+        gain2.gain.setValueAtTime(0, now);
+        gain2.gain.linearRampToValueAtTime(0.05, now + 0.02);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5); // Shorter tail
+
+        osc2.start(now);
+        osc2.stop(now + 0.5);
     } catch (e) {
         console.error("Audio playback failed", e);
     }

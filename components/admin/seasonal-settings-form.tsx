@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
+import { NeonSlider } from "@/components/ui/neon-slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Save, Snowflake, Leaf, Music, Volume2, Clock, Activity, Wand2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
@@ -115,13 +115,13 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                     </Label>
                                     <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded border border-cyan-500/20">{settings.snowDensity}%</span>
                                 </div>
-                                <Slider
+                                <NeonSlider
                                     value={[settings.snowDensity || 50]}
                                     min={1}
                                     max={100}
                                     step={1}
                                     onValueChange={(val) => handleChange("snowDensity", val[0])}
-                                    className="data-[range=true]:bg-cyan-500"
+                                    className="data-[range=true]:bg-cyan-500 text-cyan-500"
                                 />
                             </div>
 
@@ -133,12 +133,13 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                     </Label>
                                     <span className="font-mono text-xs text-orange-400 bg-orange-500/10 px-2 py-1 rounded border border-orange-500/20">{settings.leavesDensity}%</span>
                                 </div>
-                                <Slider
+                                <NeonSlider
                                     value={[settings.leavesDensity || 30]}
                                     min={1}
                                     max={100}
                                     step={1}
                                     onValueChange={(val) => handleChange("leavesDensity", val[0])}
+                                    className="text-orange-500"
                                 />
                             </div>
                         </div>
@@ -198,12 +199,13 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                     </Label>
                                     <span className="font-mono text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded border border-purple-500/20">{settings.musicDuration}s</span>
                                 </div>
-                                <Slider
+                                <NeonSlider
                                     value={[settings.musicDuration || 15]}
                                     min={5}
                                     max={300}
                                     step={5}
                                     onValueChange={(val) => handleChange("musicDuration", val[0])}
+                                    className="text-purple-500"
                                 />
                                 <p className="text-[10px] text-zinc-500 text-right">
                                     Music will auto-stop after this time
@@ -218,12 +220,13 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                     </Label>
                                     <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">{settings.audioVolume}%</span>
                                 </div>
-                                <Slider
+                                <NeonSlider
                                     value={[settings.audioVolume || 20]}
                                     min={0}
                                     max={100}
                                     step={1}
                                     onValueChange={(val) => handleChange("audioVolume", val[0])}
+                                    className="text-emerald-500"
                                 />
                             </div>
                         </div>
@@ -238,19 +241,13 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                 <Button
                     onClick={handleSave}
                     disabled={isPending}
-                    className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white border-0 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-all hover:scale-105 active:scale-95 rounded-xl font-bold tracking-wide"
+                    className="h-12 px-8 bg-[#0a0a0a] border border-white/10 hover:bg-neutral-900 text-white shadow-lg transition-all hover:scale-105 active:scale-95 rounded-xl group relative overflow-hidden"
                 >
-                    {isPending ? (
-                        <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Saving Changes...
-                        </>
-                    ) : (
-                        <>
-                            <Save className="mr-2 h-5 w-5" />
-                            Save Configuration
-                        </>
-                    )}
+                    <div className="absolute inset-0 bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <Save className="mr-2 h-5 w-5 text-green-500 group-hover:text-green-400 group-hover:drop-shadow-[0_0_8px_rgba(74,222,128,0.8)] transition-all" />
+                    <span className="font-orbitron font-bold tracking-wider text-green-500 group-hover:text-green-400 group-hover:drop-shadow-[0_0_8px_rgba(74,222,128,0.6)] transition-all">
+                        {isPending ? "SAVING..." : "SAVE CONFIGURATION"}
+                    </span>
                 </Button>
             </div>
         </div>
