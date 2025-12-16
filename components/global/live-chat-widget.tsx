@@ -82,16 +82,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                     if (isCurrent) {
                         setActiveTicket(null)
                         setView('support')
-                        // Alert user?
-                        setLocalSystemMessages(prev => [...prev, {
-                            id: `sys-del-${Date.now()}`,
-                            text: "**System:** This ticket has been deleted by an administrator.",
-                            senderName: "System",
-                            senderRole: "SYSTEM",
-                            createdAt: new Date(),
-                            reactions: { likes: 0, dislikes: 0, hearts: 0 },
-                            type: 'system'
-                        }])
+                        // Force refresh ticket list
                         const presenceId = sessionStorage.getItem("presenceId")
                         const tickets = await getUserTickets(presenceId || undefined)
                         setUserTickets(tickets)
