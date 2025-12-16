@@ -367,8 +367,8 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
         // Let's just send and wait for poll or manually trigger fetch.
 
         startTransition(async () => {
-            const guestId = sessionStorage.getItem("chat_guest_id") || undefined
-            const res = await sendMessage(inputText, activeTicket?.id, guestNickname || undefined, guestId)
+            // guestId is now from state
+            const res = await sendMessage(inputText, activeTicket?.id, guestNickname || undefined, guestId || undefined)
             if (!res.success) {
                 if (res.error === "This ticket strictly no longer exists.") {
                     setActiveTicket(null)
