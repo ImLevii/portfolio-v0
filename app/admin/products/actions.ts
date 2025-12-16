@@ -43,6 +43,10 @@ export async function createProduct(formData: FormData) {
     const rawPrice = parseFloat(formData.get("price") as string)
     const price = Math.round(rawPrice * 100)
 
+    const rawSalePrice = formData.get("salePrice") as string
+    const salePrice = rawSalePrice ? Math.round(parseFloat(rawSalePrice) * 100) : null
+    const isSale = formData.get("isSale") === "true"
+
     const image = formData.get("image") as string
     const category = formData.get("category") as string
     const features = formData.get("features") as string
@@ -61,6 +65,8 @@ export async function createProduct(formData: FormData) {
             name,
             description,
             price,
+            salePrice,
+            isSale,
             image,
             category,
             features,
@@ -84,6 +90,10 @@ export async function updateProduct(id: string, formData: FormData) {
     const rawPrice = parseFloat(formData.get("price") as string)
     const price = Math.round(rawPrice * 100)
 
+    const rawSalePrice = formData.get("salePrice") as string
+    const salePrice = rawSalePrice ? Math.round(parseFloat(rawSalePrice) * 100) : null
+    const isSale = formData.get("isSale") === "true"
+
     const image = formData.get("image") as string
     const category = formData.get("category") as string
     const features = formData.get("features") as string
@@ -96,6 +106,8 @@ export async function updateProduct(id: string, formData: FormData) {
         name,
         description,
         price,
+        salePrice,
+        isSale,
         image,
         category,
         features,

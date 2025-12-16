@@ -63,7 +63,10 @@ model Product {
   name        String
   description String      @db.Text
   price       Int
+  salePrice   Int?        // Price in cents
+  isSale      Boolean     @default(false)
   image       String
+
   category    String
   features    String      @db.Text // JSON string
   stock       Int         @default(0)
