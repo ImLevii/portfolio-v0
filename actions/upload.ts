@@ -48,6 +48,7 @@ export async function uploadChatMedia(formData: FormData) {
 
         // Ensure upload directory exists
         const uploadDir = join(process.cwd(), "storage", "chat")
+        console.log(`Debug Info: CWD=${process.cwd()}, UploadDir=${uploadDir}`)
         console.log(`Target directory: ${uploadDir}`)
 
         try {
