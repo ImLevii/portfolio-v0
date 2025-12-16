@@ -21,7 +21,7 @@ export default auth((req) => {
     if (isAdminRoute) {
         if (!isLoggedIn) {
             console.log("Middleware: Admin route accessed, not logged in. Redirecting to signin.")
-            return NextResponse.redirect(new URL("/api/auth/signin", req.nextUrl))
+            return NextResponse.redirect(new URL("/auth/signin", req.nextUrl))
         }
 
         // @ts-ignore

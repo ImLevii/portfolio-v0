@@ -37,7 +37,7 @@ export default async function CustomersPage() {
         <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-4xl font-bold font-orbitron text-white">Customers</h1>
+                    <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Customers</h1>
                     <p className="text-gray-400 mt-2">Manage your customer base</p>
                 </div>
             </div>

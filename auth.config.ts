@@ -4,6 +4,10 @@ import Google from "next-auth/providers/google"
 
 export default {
     providers: [GitHub, Google],
+    pages: {
+        signIn: "/auth/signin",
+        error: "/auth/signin",
+    },
     callbacks: {
         async session({ session, token }) {
             if (token.sub && session.user) {

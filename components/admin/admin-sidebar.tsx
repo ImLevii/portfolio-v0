@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake, MessageSquare, HeadphonesIcon, Megaphone } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { handleSignOut } from "@/app/actions"
 
 export function AdminSidebar() {
     const pathname = usePathname()
@@ -79,13 +80,13 @@ export function AdminSidebar() {
                         )
                     })}
 
-                    <Link
-                        href="/"
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all duration-300 mt-8 border-t border-white/10 pt-4 group"
+                    <button
+                        onClick={() => handleSignOut()}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all duration-300 mt-8 border-t border-white/10 pt-4 group text-left"
                     >
                         <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                        <span>Exit Admin</span>
-                    </Link>
+                        <span>Sign Out</span>
+                    </button>
                 </nav>
 
                 {/* Decorative background element */}
