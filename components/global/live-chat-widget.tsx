@@ -23,6 +23,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
 
+interface ChatMessage {
+    id: string
+    text: string
+    senderName: string
+    senderId?: string | null
+    senderAvatar?: string | null
+    senderRole?: string | null
+    createdAt: Date
+    reactions: {
+        likes: number
+        dislikes: number
+        hearts: number
+    }
+    type?: 'user' | 'system' | 'sponsored'
+    sponsoredData?: any
+}
 
 const MAX_CHARS = 500
 
@@ -389,11 +405,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
         await deleteMessage(msgId)
     }
 
-    const handleClearChat = async () => {
-        if (!confirm("Are you sure you want to clear ALL chat history? This cannot be undone.")) return
-        setMessages([]) // Optimistic clear
-        await clearChat()
-    }
+
 
     const handleEmojiSelect = (emoji: string) => {
         setInputText(prev => prev + emoji)
