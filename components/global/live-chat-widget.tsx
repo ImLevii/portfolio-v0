@@ -73,7 +73,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         const presenceId = sessionStorage.getItem("presenceId")
 
         // Reset messages immediately when switching contexts to prevent ghosting
-        // setMessages([]) -- Removed to prevent flicker, handled by state update
+        setMessages([])
         lastMessageIdRef.current = null
 
         const pollData = async () => {
