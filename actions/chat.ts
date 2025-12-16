@@ -3,7 +3,6 @@
 import { auth } from "@/auth"
 import { db as prisma } from "@/lib/db"
 import { revalidatePath } from "next/cache"
-
 import { filterProfanity } from "@/lib/profanity"
 
 
@@ -32,6 +31,10 @@ export async function sendMessage(text: string, ticketId?: string) {
 
         const cleanText = filterProfanity(text)
 
+        // Ensure ticketId is handled correctly. If it's an empty string, treat as null (Global).
+        // If it's a valid string, use it.
+        const effectiveTicketId = ticketId && ticketId.trim().length > 0 ? ticketId : null
+
         await prisma.chatMessage.create({
             data: {
                 text: cleanText,
@@ -39,7 +42,7 @@ export async function sendMessage(text: string, ticketId?: string) {
                 senderAvatar: user.image,
                 senderRole: (user as any).role || "USER",
                 reactions: JSON.stringify({ likes: 0, dislikes: 0, hearts: 0 }),
-                ticketId: ticketId || null
+                ticketId: effectiveTicketId
             }
         })
 

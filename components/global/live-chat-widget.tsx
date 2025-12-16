@@ -40,6 +40,12 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [products, setProducts] = useState<{ id: string, name: string }[]>([])
     const [localSystemMessages, setLocalSystemMessages] = useState<ChatMessage[]>([])
 
+    // Clear local messages when context changes to prevent leaks (e.g. global ads in private tickets)
+    useEffect(() => {
+        setLocalSystemMessages([])
+    }, [activeTicket?.id, view])
+
+
     // Ref to track previous message ID to detect NEW ones for sound
     const lastMessageIdRef = useRef<string | null>(null)
     // Ref to track last sponsored message injection time
@@ -70,6 +76,49 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             let dbMessages: ChatMessageData[] = []
             if (activeTicket) {
                 const ticketData = await getTicket(activeTicket.id)
+
+                if (!ticketData) {
+                    // Ticket has been deleted
+                    if (isCurrent) {
+                        setActiveTicket(null)
+                        setView('support')
+                        // Alert user?
+                        setLocalSystemMessages(prev => [...prev, {
+                            id: `sys-del-${Date.now()}`,
+                            text: "**System:** This ticket has been deleted by an administrator.",
+                            senderName: "System",
+                            senderRole: "SYSTEM",
+                            createdAt: new Date(),
+                            reactions: { likes: 0, dislikes: 0, hearts: 0 },
+                            type: 'system'
+                        }])
+                        const presenceId = sessionStorage.getItem("presenceId")
+                        const tickets = await getUserTickets(presenceId || undefined)
+                        setUserTickets(tickets)
+                    }
+                    return
+                }
+
+                // Check for Status Change (e.g. Closed)
+                if (ticketData.status !== activeTicket.status) {
+                    if (isCurrent) {
+                        setActiveTicket(prev => prev ? { ...prev, status: ticketData.status } : null)
+
+                        // If closed, maybe add a system message locally if not already there
+                        if (ticketData.status === 'CLOSED' && activeTicket.status !== 'CLOSED') {
+                            setLocalSystemMessages(prev => [...prev, {
+                                id: `sys-close-${Date.now()}`,
+                                text: "**System:** This ticket has been closed.",
+                                senderName: "System",
+                                senderRole: "SYSTEM",
+                                createdAt: new Date(),
+                                reactions: { likes: 0, dislikes: 0, hearts: 0 },
+                                type: 'system'
+                            }])
+                        }
+                    }
+                }
+
                 if (ticketData) {
                     dbMessages = ticketData.messages.map(m => ({
                         id: m.id,
