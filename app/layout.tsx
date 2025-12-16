@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import { SeasonalEffects } from "@/components/global/seasonal-effects"
 import { LiveChatWidget } from "@/components/global/live-chat-widget"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -56,8 +57,8 @@ export default async function RootLayout({
             config={chatSettings}
             initialMessages={initialMessages}
           />
-
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
