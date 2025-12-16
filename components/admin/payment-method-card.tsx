@@ -13,6 +13,14 @@ interface PaymentMethodCardProps {
     method: PaymentMethod
 }
 
+const safeParseConfig = (jsonString: string) => {
+    try {
+        return JSON.parse(jsonString || "{}");
+    } catch {
+        return {};
+    }
+};
+
 export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
     const [isEnabled, setIsEnabled] = useState(method.isEnabled)
     const [config, setConfig] = useState(method.config || "")
@@ -82,24 +90,89 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
             </div>
 
             {(method.name === "bank_transfer" || method.name === "paypal" || method.name === "crypto") && (
-                <div className="space-y-2 pt-4 border-t border-white/10">
-                    <label className="text-sm font-medium text-gray-300">
-                        {method.name === "paypal"
-                            ? "PayPal Credentials (JSON)"
-                            : method.name === "crypto"
-                                ? "Wallet Addresses (JSON or Text)"
-                                : "Bank Details & Instructions (JSON)"}
-                    </label>
-                    <Textarea
-                        value={config}
-                        onChange={(e) => setConfig(e.target.value)}
-                        className="font-mono text-sm bg-black/50 border-white/10 min-h-[150px]"
-                        placeholder={method.name === "paypal"
-                            ? '{"clientId": "...", "clientSecret": "...", "mode": "sandbox"}'
-                            : method.name === "crypto"
-                                ? '{"BTC": "...", "ETH": "..."}'
-                                : '{"bankName": "...", "accountNumber": "..."}'}
-                    />
+                <div className="space-y-4 pt-4 border-t border-white/10">
+                    {method.name === "paypal" ? (
+                        <>
+                            <div className="grid gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Environment Mode</label>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={() => {
+                                                const currentConfig = safeParseConfig(config)
+                                                const newConfig = { ...currentConfig, mode: "sandbox" }
+                                                setConfig(JSON.stringify(newConfig, null, 2))
+                                            }}
+                                            className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all border ${safeParseConfig(config).mode === "sandbox"
+                                                ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-300 shadow-[0_0_10px_rgba(234,179,8,0.2)]"
+                                                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                                }`}
+                                        >
+                                            SANDBOX
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const currentConfig = safeParseConfig(config)
+                                                const newConfig = { ...currentConfig, mode: "live" }
+                                                setConfig(JSON.stringify(newConfig, null, 2))
+                                            }}
+                                            className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all border ${safeParseConfig(config).mode !== "sandbox" // Default to live if undefined/other
+                                                ? "bg-green-500/20 border-green-500/50 text-green-300 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
+                                                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                                }`}
+                                        >
+                                            LIVE
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Client ID</label>
+                                    <input
+                                        type="text"
+                                        value={safeParseConfig(config).clientId || ""}
+                                        onChange={(e) => {
+                                            const currentConfig = safeParseConfig(config)
+                                            const newConfig = { ...currentConfig, clientId: e.target.value }
+                                            setConfig(JSON.stringify(newConfig, null, 2))
+                                        }}
+                                        className="w-full bg-black/50 border border-white/10 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors font-mono"
+                                        placeholder="Enter PayPal Client ID"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Client Secret</label>
+                                    <input
+                                        type="password"
+                                        value={safeParseConfig(config).clientSecret || ""}
+                                        onChange={(e) => {
+                                            const currentConfig = safeParseConfig(config)
+                                            const newConfig = { ...currentConfig, clientSecret: e.target.value }
+                                            setConfig(JSON.stringify(newConfig, null, 2))
+                                        }}
+                                        className="w-full bg-black/50 border border-white/10 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors font-mono"
+                                        placeholder="Enter PayPal Client Secret"
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <label className="text-sm font-medium text-gray-300">
+                                {method.name === "crypto"
+                                    ? "Wallet Addresses (JSON or Text)"
+                                    : "Bank Details & Instructions (JSON)"}
+                            </label>
+                            <Textarea
+                                value={config}
+                                onChange={(e) => setConfig(e.target.value)}
+                                className="font-mono text-sm bg-black/50 border-white/10 min-h-[150px]"
+                                placeholder={method.name === "crypto"
+                                    ? '{"BTC": "...", "ETH": "..."}'
+                                    : '{"bankName": "...", "accountNumber": "..."}'}
+                            />
+                        </>
+                    )}
+
                     <div className="flex justify-end">
                         <TechButton
                             onClick={handleSaveConfig}
