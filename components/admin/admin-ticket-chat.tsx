@@ -64,6 +64,20 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
                 const updatedTicket = await getTicket(initialTicket.id)
 
                 if (updatedTicket && isMounted) {
+                    // Check for Status Change
+                    // We need a local status state if we want to react without full refresh, 
+                    // OR we just trigger router.refresh() if status changes.
+                    // Accessing props 'initialTicket' is static, so we compare against that OR a ref.
+                    // But wait, if we router.refresh(), the component might re-mount with new props.
+                    // Let's compare with the LAST KNOWN status.
+                    // We can store status in a ref or state.
+
+                    // But simpler: If the polled status is CLOSED and we thought it was OPEN, refresh.
+                    if (updatedTicket.status !== initialTicket.status) {
+                        // Status changed!
+                        router.refresh()
+                    }
+
                     setMessages(prev => {
                         // 1. Remove optimistic messages that have been confirmed (assume real messages replace them)
                         // Actually, simplified: Just compare length or content.
@@ -83,6 +97,10 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
                         }
                         return prev
                     })
+                } else if (!updatedTicket && isMounted) {
+                    // Ticket Deleted!
+                    alert("This ticket has been deleted.")
+                    router.push("/admin/support")
                 }
             } catch (error) {
                 console.error("Polling error:", error)
@@ -98,6 +116,12 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!input.trim() || isSending) return
+
+        if (!initialTicket.id) {
+            console.error("AdminTicketChat: No ticket ID found!")
+            alert("Error: Ticket ID is missing. Cannot send message.")
+            return
+        }
 
         const tempId = `temp-${Date.now()}`
         const optimisticMsg = {
@@ -117,6 +141,8 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
 
         // Immediate scroll
         setTimeout(() => scrollToBottom(), 10)
+
+        console.log(`Sending message to ticket: ${initialTicket.id}`)
 
         try {
             await sendMessage(optimisticMsg.text, initialTicket.id)

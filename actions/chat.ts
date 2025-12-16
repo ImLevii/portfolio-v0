@@ -31,9 +31,14 @@ export async function sendMessage(text: string, ticketId?: string) {
 
         const cleanText = filterProfanity(text)
 
-        // Ensure ticketId is handled correctly. If it's an empty string, treat as null (Global).
+        // Ensure ticketId is handled correctly. If it's an empty string or "undefined", treat as null (Global).
         // If it's a valid string, use it.
-        const effectiveTicketId = ticketId && ticketId.trim().length > 0 ? ticketId : null
+        let effectiveTicketId: string | null = null
+        if (ticketId && typeof ticketId === 'string' && ticketId.trim().length > 0 && ticketId !== "undefined" && ticketId !== "null") {
+            effectiveTicketId = ticketId
+        }
+
+        console.log(`[sendMessage] Sender: ${user.name}, TicketId: ${effectiveTicketId} (Raw: ${ticketId})`)
 
         await prisma.chatMessage.create({
             data: {
