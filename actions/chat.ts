@@ -21,13 +21,23 @@ export interface ChatMessageData {
     }
 }
 
-export async function sendMessage(text: string, ticketId?: string) {
+export async function sendMessage(text: string, ticketId?: string, guestName?: string, guestId?: string) {
     try {
         const session = await auth()
-        const user = session?.user
+        let user = session?.user
 
+        // If no logged-in user, check for guest mode
         if (!user) {
-            return { success: false, error: "Unauthorized" }
+            if (!guestName) {
+                return { success: false, error: "Unauthorized" }
+            }
+            // Create a mock user object for the guest
+            user = {
+                id: guestId || "guest", // Use provided guestId or fallback
+                name: guestName,
+                image: null,
+                // Add any other required properties, or cast to any if needed
+            } as any
         }
 
         const cleanText = filterProfanity(text)
@@ -65,9 +75,9 @@ export async function sendMessage(text: string, ticketId?: string) {
             data: {
                 text: cleanText,
                 senderName: user.name || "Anonymous",
-                senderId: user.id,
+                senderId: session?.user?.id || null, // Only link real User ID if logged in
                 senderAvatar: user.image,
-                senderRole: (user as any).role || "USER",
+                senderRole: (user as any).role || "GUEST",
                 reactions: JSON.stringify({ likes: 0, dislikes: 0, hearts: 0 }),
                 ticketId: effectiveTicketId
             }

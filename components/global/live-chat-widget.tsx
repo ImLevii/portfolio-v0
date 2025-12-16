@@ -73,11 +73,45 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     const [products, setProducts] = useState<{ id: string, name: string }[]>([])
     const [localSystemMessages, setLocalSystemMessages] = useState<ChatMessage[]>([])
 
+    // Guest State
+    const [guestNickname, setGuestNickname] = useState<string>("")
+    const [isGuestLoggedIn, setIsGuestLoggedIn] = useState(false)
+
+    useEffect(() => {
+        // Restore guest session
+        const storedName = sessionStorage.getItem("chat_guest_name")
+        const storedId = sessionStorage.getItem("chat_guest_id")
+        if (storedName && storedId) {
+            setGuestNickname(storedName)
+            setIsGuestLoggedIn(true)
+        }
+    }, [])
+
+    const handleGuestLogin = (item: React.FormEvent) => {
+        item.preventDefault()
+        if (!guestNickname.trim()) return
+
+        const guestId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        sessionStorage.setItem("chat_guest_name", guestNickname)
+        sessionStorage.setItem("chat_guest_id", guestId) // New ID if just joining
+        // If we want to persist ID across renames we should check if one exists first, 
+        // but for "Join" distinct action implies new session or setting it up.
+        // Actually best to keep ID if it exists? 
+        // Let's simple check:
+        if (!sessionStorage.getItem("chat_guest_id")) {
+            sessionStorage.setItem("chat_guest_id", guestId)
+        }
+
+        setIsGuestLoggedIn(true)
+    }
+
     // Poll for typing users
     useEffect(() => {
         if (!isOpen) return
         const interval = setInterval(async () => {
-            const users = await getTypingUsers(user?.id || 'guest')
+            // Use guest ID for typing check exclusion
+            const myId = user?.id || sessionStorage.getItem("chat_guest_id") || 'guest'
+            const users = await getTypingUsers(myId)
             setTypingUsers(users)
         }, 2000)
         return () => clearInterval(interval)
@@ -86,10 +120,10 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     const handleTyping = () => {
         playTypingSound()
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
-        else setTypingStatus(user?.id || 'guest', true, user?.name || 'Guest')
+        else setTypingStatus(user?.id || sessionStorage.getItem("chat_guest_id") || 'guest', true, user?.name || guestNickname || 'Guest')
 
         typingTimeoutRef.current = setTimeout(() => {
-            setTypingStatus(user?.id || 'guest', false)
+            setTypingStatus(user?.id || sessionStorage.getItem("chat_guest_id") || 'guest', false)
             typingTimeoutRef.current = null
         }, 3000)
     }
@@ -333,7 +367,8 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
         // Let's just send and wait for poll or manually trigger fetch.
 
         startTransition(async () => {
-            const res = await sendMessage(inputText, activeTicket?.id)
+            const guestId = sessionStorage.getItem("chat_guest_id") || undefined
+            const res = await sendMessage(inputText, activeTicket?.id, guestNickname || undefined, guestId)
             if (!res.success) {
                 if (res.error === "This ticket strictly no longer exists.") {
                     setActiveTicket(null)
@@ -993,7 +1028,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
-                                    {user ? (
+                                    {user || isGuestLoggedIn ? (
                                         <div className="flex flex-col gap-1 w-full">
                                             {inputText.length > 0 && (
                                                 <div className={cn(
@@ -1077,23 +1112,35 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                             </form>
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col gap-2">
-                                            <div className="relative">
-                                                <Input
-                                                    disabled
-                                                    placeholder="Please login to chat..."
-                                                    className="h-10 rounded-xl border-white/5 bg-white/5 text-sm placeholder:text-zinc-600 disabled:opacity-50"
-                                                />
-                                                <Button
-                                                    disabled
-                                                    size="icon"
-                                                    className="absolute right-0 top-0 h-10 w-10 rounded-l-none rounded-r-xl bg-zinc-800 opacity-50"
-                                                >
-                                                    <Send className="h-4 w-4" />
-                                                </Button>
+                                        <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <div className="h-px flex-1 bg-white/10"></div>
+                                                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest">Guest Access</span>
+                                                <div className="h-px flex-1 bg-white/10"></div>
                                             </div>
-                                            <p className="text-center text-xs text-zinc-500">
-                                                <span className="font-bold text-white hover:underline cursor-pointer">Login</span> or <span className="font-bold text-white hover:underline cursor-pointer">Sign up</span> to join the conversation
+                                            <form onSubmit={handleGuestLogin} className="flex flex-col gap-2">
+                                                <div className="relative">
+                                                    <Input
+                                                        value={guestNickname}
+                                                        onChange={(e) => setGuestNickname(e.target.value)}
+                                                        placeholder="Enter a temporary nickname..."
+                                                        className="h-10 rounded-xl border-white/5 bg-white/5 text-sm placeholder:text-zinc-500 text-zinc-200 focus-visible:border-emerald-500/50 focus-visible:ring-0 transition-all pr-10"
+                                                        maxLength={20}
+                                                        autoFocus
+                                                    />
+                                                    <Users className="absolute right-3 top-3 h-4 w-4 text-zinc-500" />
+                                                </div>
+                                                <Button
+                                                    type="submit"
+                                                    className="w-full h-9 rounded-xl bg-zinc-800 hover:bg-emerald-600 hover:text-white text-zinc-300 transition-all font-bold text-xs tracking-wide"
+                                                    disabled={!guestNickname.trim()}
+                                                >
+                                                    JOIN CHAT
+                                                </Button>
+                                            </form>
+
+                                            <p className="text-center text-[10px] text-zinc-600 mt-1">
+                                                <Link href="/auth/login" className="font-bold text-zinc-500 hover:text-white hover:underline transition-colors">Login with Account</Link> to save history & stats
                                             </p>
                                         </div>
                                     )}
