@@ -21,7 +21,9 @@ import { playMessageSound, unlockAudioContext, playSendSound, playTypingSound } 
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
+import { uploadChatMedia } from "@/actions/upload"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
+import { toast } from "sonner"
 
 interface ChatMessage {
     id: string
@@ -1015,27 +1017,29 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                                 const file = e.target.files?.[0]
                                                                 if (!file) return
 
-                                                                // Optimistic loading state or toast could go here
                                                                 const formData = new FormData()
                                                                 formData.append('file', file)
 
-                                                                // Import dynamically or at top. Using dynamic for now to keep diff clean if possible, but cleaner to add import at top.
-                                                                // Retrying with top-level import is better. I will assume I need to add import.
+                                                                const loadingToast = toast.loading("Uploading media...")
+
                                                                 try {
-                                                                    // Show some loading indicator if we had one, for now just append text on completion
-                                                                    const { uploadChatMedia } = await import("@/actions/upload")
+                                                                    // Use top-level import
                                                                     const result = await uploadChatMedia(formData)
+
+                                                                    toast.dismiss(loadingToast)
 
                                                                     if (result.success && result.url) {
                                                                         const prefix = result.type === 'video' ? '[video]' : '![image]'
                                                                         const markdown = ` ${prefix}(${result.url}) `
                                                                         setInputText(prev => prev + markdown)
+                                                                        toast.success("Upload successful")
                                                                     } else {
-                                                                        alert(result.error || "Upload failed")
+                                                                        toast.error(result.error || "Upload failed")
                                                                     }
                                                                 } catch (err) {
                                                                     console.error(err)
-                                                                    alert("Upload failed")
+                                                                    toast.dismiss(loadingToast)
+                                                                    toast.error("Upload failed")
                                                                 }
 
                                                                 // Reset input
