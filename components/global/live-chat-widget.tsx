@@ -20,10 +20,8 @@ import { SponsoredMessageCard } from "@/components/global/sponsored-message-card
 import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
 import { playMessageSound, unlockAudioContext, playSendSound, playTypingSound } from "@/lib/audio"
 
-interface ChatMessage extends ChatMessageData {
-    type?: 'system' | 'user' | 'announcement' | 'sponsored' // 'user' is default for DB messages
-    sponsoredData?: SponsoredMessageData
-}
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
 
 
 const MAX_CHARS = 500
@@ -866,6 +864,28 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                                 isAdmin ? "border-red-500/50" :
                                                                     isSupport ? "border-emerald-500/50" : "border-zinc-700"
                                                             )}>
+                                                            isSupport ? "border-emerald-500/50" : "border-zinc-700"
+                                                    )}>
+                                                        {msg.senderId ? (
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <button className="cursor-pointer hover:opacity-80 transition-opacity">
+                                                                        <AvatarImage src={msg.senderAvatar || undefined} />
+                                                                        <AvatarFallback className={cn("text-xs",
+                                                                            isAdmin ? "bg-red-950 text-red-400" :
+                                                                                isSupport ? "bg-emerald-950 text-emerald-400" : "bg-zinc-800 text-zinc-400"
+                                                                        )}>
+                                                                            {msg.senderName?.slice(0, 2).toUpperCase()}
+                                                                        </AvatarFallback>
+                                                                    </button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-0 border-none bg-transparent" side="right" align="start">
+                                                                    <ChatUserProfileCard userId={msg.senderId} name={msg.senderName} initialRole={msg.senderRole || "USER"} />
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        ) : (
+                                                            // Guest / System (No Profile)
+                                                            <>
                                                                 <AvatarImage src={msg.senderAvatar || undefined} />
                                                                 <AvatarFallback className={cn("text-xs",
                                                                     isAdmin ? "bg-red-950 text-red-400" :
@@ -873,7 +893,9 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                                 )}>
                                                                     {msg.senderName?.slice(0, 2).toUpperCase()}
                                                                 </AvatarFallback>
-                                                            </Avatar>
+                                                            </>
+                                                        )}
+                                                    </Avatar>
                                                             <div className="flex items-baseline gap-2">
                                                                 <span className={cn("text-xs font-bold tracking-wide",
                                                                     isAdmin ? "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" :

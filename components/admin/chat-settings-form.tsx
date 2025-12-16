@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/card"
 import { toast } from "sonner"
 import { updateChatSettings, type ChatSettingsConfig } from "@/actions/chat-settings"
-import { clearGlobalChat } from "@/actions/chat"
+import { clearChat } from "@/actions/chat"
 import { AlertCircle } from "lucide-react"
 
 const formSchema = z.object({
@@ -136,16 +136,7 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
                                 </div>
                                 <Button
                                     type="button"
-                                    onClick={async () => {
-                                        if (confirm("Are you sure? This will delete ALL public chat history for everyone. This cannot be undone.")) {
-                                            const res = await clearGlobalChat();
-                                            if (res.success) {
-                                                toast.success("Global chat cleared successfully");
-                                            } else {
-                                                toast.error("Failed to clear chat");
-                                            }
-                                        }
-                                    }}
+                                    onClick={handleClearChat}
                                     className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all font-bold tracking-wide"
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />

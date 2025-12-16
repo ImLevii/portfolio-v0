@@ -19,6 +19,8 @@ model User {
   orders        Order[]
   role          String    @default("CUSTOMER")
   licenseKeys   LicenseKey[]
+  chatMessages  ChatMessage[]
+  chatReactions ChatReaction[]
 }
 
 model Account {
@@ -191,6 +193,24 @@ model ChatMessage {
   
   ticketId  String?
   ticket    Ticket?   @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  senderId  String?   // For logged in users
+  user      User?     @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  reactionList ChatReaction[]
+}
+
+model ChatReaction {
+  id        String      @id @default(cuid())
+  messageId String
+  userId    String      // Can be session ID for guests if needed, but primarily User ID
+  type      String      // 'likes', 'dislikes', 'hearts'
+  createdAt DateTime    @default(now())
+
+  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, type]) // Anti-Abuse: One reaction of type per user per message
 }
 
 model SponsoredMessage {

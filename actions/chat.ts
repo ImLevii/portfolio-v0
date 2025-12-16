@@ -6,10 +6,10 @@ import { revalidatePath } from "next/cache"
 import { filterProfanity } from "@/lib/profanity"
 
 
-export interface ChatMessageData {
     id: string
     text: string
     senderName: string
+    senderId?: string | null
     senderAvatar?: string | null
     senderRole?: string | null
     createdAt: Date
@@ -64,6 +64,7 @@ export async function sendMessage(text: string, ticketId?: string) {
             data: {
                 text: cleanText,
                 senderName: user.name || "Anonymous",
+                senderId: user.id,
                 senderAvatar: user.image,
                 senderRole: (user as any).role || "USER",
                 reactions: JSON.stringify({ likes: 0, dislikes: 0, hearts: 0 }),
@@ -136,6 +137,7 @@ export async function getRecentMessages(): Promise<ChatMessageData[]> {
             id: msg.id,
             text: msg.text,
             senderName: msg.senderName,
+            senderId: msg.senderId,
             senderAvatar: msg.senderAvatar,
             senderRole: msg.senderRole,
             createdAt: msg.createdAt,
@@ -146,21 +148,116 @@ export async function getRecentMessages(): Promise<ChatMessageData[]> {
     }
 }
 
+export async function getChatUserProfile(userId: string) {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                image: true,
+                role: true,
+                createdAt: true // Join Date
+            }
+        })
+        
+        if (!user) return null
+
+        // Calculate Stats
+        const messagesSent = await prisma.chatMessage.count({
+            where: { senderId: userId }
+        })
+
+        // Total likes received on their messages
+        // Since we store JSON in ChatMessage, we have to aggregate carefully or rely on ChatRelation inverse
+        // But simpler: Count ChatReaction where message.senderId = userId
+        const likesReceived = await prisma.chatReaction.count({
+            where: {
+                message: {
+                    senderId: userId
+                },
+                type: 'likes'
+            }
+        })
+
+        const heartsReceived = await prisma.chatReaction.count({
+             where: {
+                message: {
+                    senderId: userId
+                },
+                type: 'hearts'
+            }
+        })
+
+         return {
+            ...user,
+            stats: {
+                messagesSent,
+                likesReceived,
+                heartsReceived
+            }
+        }
+
+    } catch (error) {
+        return null
+    }
+}
+
 export async function addReaction(messageId: string, type: 'likes' | 'dislikes' | 'hearts') {
     try {
-        const message = await prisma.chatMessage.findUnique({ where: { id: messageId } })
-        if (!message) return { success: false }
+        const session = await auth()
+        if (!session?.user?.id) return { success: false, error: "Must be logged in" }
+        const userId = session.user.id
 
-        const reactions = message.reactions ? JSON.parse(message.reactions) : { likes: 0, dislikes: 0, hearts: 0 }
-        reactions[type]++
+        // 1. Check if reaction exists (Toggle Logic)
+        const existing = await prisma.chatReaction.findUnique({
+            where: {
+                messageId_userId_type: {
+                    messageId,
+                    userId,
+                    type
+                }
+            }
+        })
+
+        if (existing) {
+            // REMOVE reaction (Toggle Off)
+            await prisma.chatReaction.delete({
+                where: { id: existing.id }
+            })
+        } else {
+            // ADD reaction
+            await prisma.chatReaction.create({
+                data: {
+                    messageId,
+                    userId,
+                    type
+                }
+            })
+        }
+
+        // 2. Recalculate totals for the message to keep JSON cache in sync
+        const counts = await prisma.chatReaction.groupBy({
+            by: ['type'],
+            where: { messageId },
+            _count: true
+        })
+        
+        const newReactions = { likes: 0, dislikes: 0, hearts: 0 }
+        counts.forEach(c => {
+            if (c.type === 'likes') newReactions.likes = c._count
+            if (c.type === 'dislikes') newReactions.dislikes = c._count
+            if (c.type === 'hearts') newReactions.hearts = c._count
+        })
 
         await prisma.chatMessage.update({
             where: { id: messageId },
-            data: { reactions: JSON.stringify(reactions) }
+            data: { reactions: JSON.stringify(newReactions) }
         })
 
-        return { success: true }
+        return { success: true, newState: !existing }
     } catch (error) {
+        console.error(error)
         return { success: false }
     }
 }
