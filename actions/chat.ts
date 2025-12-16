@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { filterProfanity } from "@/lib/profanity"
 
 
+export interface ChatMessageData {
     id: string
     text: string
     senderName: string
@@ -160,7 +161,7 @@ export async function getChatUserProfile(userId: string) {
                 createdAt: true // Join Date
             }
         })
-        
+
         if (!user) return null
 
         // Calculate Stats
@@ -181,7 +182,7 @@ export async function getChatUserProfile(userId: string) {
         })
 
         const heartsReceived = await prisma.chatReaction.count({
-             where: {
+            where: {
                 message: {
                     senderId: userId
                 },
@@ -189,7 +190,7 @@ export async function getChatUserProfile(userId: string) {
             }
         })
 
-         return {
+        return {
             ...user,
             stats: {
                 messagesSent,
@@ -242,7 +243,7 @@ export async function addReaction(messageId: string, type: 'likes' | 'dislikes' 
             where: { messageId },
             _count: true
         })
-        
+
         const newReactions = { likes: 0, dislikes: 0, hearts: 0 }
         counts.forEach(c => {
             if (c.type === 'likes') newReactions.likes = c._count
