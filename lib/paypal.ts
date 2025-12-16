@@ -7,9 +7,9 @@ export async function getPayPalAccessToken() {
         where: { name: "paypal" }
     })
 
-    let clientId = process.env.PAYPAL_CLIENT_ID
-    let clientSecret = process.env.PAYPAL_CLIENT_SECRET
-    let apiUrl = PAYPAL_API_URL
+    let clientId = process.env.PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+    let clientSecret = process.env.PAYPAL_CLIENT_SECRET || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_SECRET
+    let apiUrl = process.env.PAYPAL_API_URL || process.env.NEXT_PUBLIC_PAYPAL_API_URL || PAYPAL_API_URL
 
     if (method && method.config) {
         try {
