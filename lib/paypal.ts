@@ -24,33 +24,28 @@ export async function getPayPalAccessToken() {
 
     let useDbConfig = false
 
-    if (method && method.config) {
+    // Check if we have a "Complete" Env set.
+    // If we have ID but no Secret in Env, we cannot use Env.
+    // We must ensure we don't mix Env ID with DB Secret.
+    const isEnvComplete = !!clientId && !!clientSecret
+
+    if (!isEnvComplete && method && method.config) {
         try {
             const config = JSON.parse(method.config)
 
-            // WE ONLY USE DB CONFIG IF ENV VARS ARE MISSING
-            // This allows .env to always override DB for security/local dev
-
-            const envIdMissing = !clientId || clientId === ""
-            const envSecretMissing = !clientSecret || clientSecret === ""
-
-            if (envIdMissing && config.clientId) {
+            // If Env is incomplete, we switch ENTIRELY to DB config if available.
+            // This prevents "Public Env ID" + "DB Secret" mismatch.
+            if (config.clientId && config.clientSecret) {
                 clientId = config.clientId.trim()
-                useDbConfig = true
-            }
-
-            if (envSecretMissing && config.clientSecret) {
                 clientSecret = config.clientSecret.trim()
                 useDbConfig = true
+                console.log("PayPal: Environment credentials incomplete. Switched to Database configuration.")
             }
 
             // Fix: Override URL based on DB mode if URL wasn't explicitly set by Env var (custom URL)
             // We check if the current apiUrl is just the default one.
-            const isDefaultLive = apiUrl === PAYPAL_API_URL
-            const isDefaultSandbox = apiUrl === "https://api-m.sandbox.paypal.com"
-
-            // If the user didn't set a custom PAYPAL_API_URL in .env, we respect the DB mode
-            if (!process.env.PAYPAL_API_URL && !process.env.NEXT_PUBLIC_PAYPAL_API_URL) {
+            // If we are using DB config, we should respect DB mode
+            if (useDbConfig && !process.env.PAYPAL_API_URL && !process.env.NEXT_PUBLIC_PAYPAL_API_URL) {
                 if (config.mode === "sandbox") {
                     apiUrl = "https://api-m.sandbox.paypal.com"
                 } else {
