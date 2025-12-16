@@ -23,7 +23,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { uploadChatMedia } from "@/actions/upload"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
-import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
 import { showTerminalToast } from "@/components/global/terminal-toast"
 import { filterProfanity } from "@/lib/profanity"
 import { toast } from "sonner"
