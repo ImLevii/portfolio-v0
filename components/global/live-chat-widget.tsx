@@ -33,7 +33,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
     const [hasUnread, setHasUnread] = useState(false)
-    const [view, setView] = useState<'home' | 'tickets' | 'chat'>('home')
+    const [view, setView] = useState<'chat' | 'support'>('chat')
 
     const [messages, setMessages] = useState<ChatMessage[]>(() => {
         if (initialMessages && initialMessages.length > 0) {
