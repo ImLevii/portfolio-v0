@@ -1,4 +1,3 @@
-```
 "use client"
 
 import { useState } from "react"
@@ -45,32 +44,32 @@ export function UsersTable({ initialUsers, availableRoles }: { initialUsers: Use
     const [roleFilter, setRoleFilter] = useState("ALL")
 
     const filteredUsers = initialUsers.filter(user => {
-        const matchesSearch = (user.name?.toLowerCase() || "").includes(search.toLowerCase()) || 
-                              (user.email?.toLowerCase() || "").includes(search.toLowerCase())
+        const matchesSearch = (user.name?.toLowerCase() || "").includes(search.toLowerCase()) ||
+            (user.email?.toLowerCase() || "").includes(search.toLowerCase())
         // Match against role key or role name if needed, but role stored in DB is likely the KEY (e.g. "ADMIN")
         const matchesRole = roleFilter === "ALL" || user.role === roleFilter
-        
+
         return matchesSearch && matchesRole
     })
 
     const getRoleBadge = (userRoleKey: string) => {
         // Find the custom definition for this role
-        const roleDef = availableRoles.find(r => r.key === userRoleKey) || 
-                       availableRoles.find(r => r.key === "CUSTOMER") // Fallback
-        
+        const roleDef = availableRoles.find(r => r.key === userRoleKey) ||
+            availableRoles.find(r => r.key === "CUSTOMER") // Fallback
+
         if (!roleDef) return null
 
         return (
-            <div 
+            <div
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border shadow-[0_0_10px_rgba(0,0,0,0.2)] transition-all hover:scale-105 cursor-default"
                 style={{
-                    backgroundColor: `${ roleDef.color } 15`,
-                    borderColor: `${ roleDef.color } 30`,
+                    backgroundColor: `${roleDef.color}15`,
+                    borderColor: `${roleDef.color}30`,
                     color: roleDef.color,
-                    boxShadow: `0 0 10px ${ roleDef.color } 10`
+                    boxShadow: `0 0 10px ${roleDef.color}10`
                 }}
             >
-                <Shield className="h-3 w-3" style={{ fill: `${ roleDef.color } 20` }} />
+                <Shield className="h-3 w-3" style={{ fill: `${roleDef.color}20` }} />
                 <span>{roleDef.name.toUpperCase()}</span>
             </div>
         )
@@ -97,8 +96,8 @@ export function UsersTable({ initialUsers, availableRoles }: { initialUsers: Use
                     <SelectContent className="bg-black/90 border-cyan-500/20 text-white backdrop-blur-xl">
                         <SelectItem value="ALL" className="focus:bg-cyan-500/20 focus:text-cyan-400">All Roles</SelectItem>
                         {availableRoles.map(role => (
-                            <SelectItem 
-                                key={role.key} 
+                            <SelectItem
+                                key={role.key}
                                 value={role.key}
                                 className="focus:bg-white/10"
                                 style={{ color: role.color }}
@@ -163,7 +162,7 @@ export function UsersTable({ initialUsers, availableRoles }: { initialUsers: Use
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="bg-black/90 border-cyan-500/20 text-gray-300 backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.1)]">
                                                 <DropdownMenuItem asChild className="hover:bg-cyan-500/10 hover:text-cyan-400 cursor-pointer focus:bg-cyan-500/10 focus:text-cyan-400">
-                                                    <Link href={`/ admin / customers / ${ user.id } `}>
+                                                    <Link href={`/admin/customers/${user.id}`}>
                                                         View Details
                                                     </Link>
                                                 </DropdownMenuItem>
@@ -181,7 +180,7 @@ export function UsersTable({ initialUsers, availableRoles }: { initialUsers: Use
                     </TableBody>
                 </Table>
             </div>
-            
+
             <div className="flex items-center justify-end gap-2 text-xs text-cyan-500/50 font-mono">
                 <span>TOTAL USERS:</span>
                 <span className="text-cyan-400 font-bold">{filteredUsers.length}</span>
@@ -189,4 +188,3 @@ export function UsersTable({ initialUsers, availableRoles }: { initialUsers: Use
         </div>
     )
 }
-```
