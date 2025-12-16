@@ -30,13 +30,14 @@ export async function getPayPalAccessToken() {
         }
     }
 
-    // Fallback if DB lookup failed or was empty, to the hardcoded ones (or env vars)
-    // NOTE: Ideally remove hardcoded credentials in production!
-    if (!clientId) clientId = "Aah3diQKlZaEyXnKZRGlcUOqwOqIpOGKfqLWC39j8Gdwhz1KdPp3Jjn06xyK01DYXfMg_XO7Fj5yMgfh"
-    if (!clientSecret) clientSecret = "EEgnavQEtWZPpKWumZS-DMCJHyEHplJcraTtm26M5hSMtR-sWuyODxNXltv7QZz81Vxpx0U9e4hJWGcU"
+    // Logging to debug source of truth without leaking secrets
+    const source = (method && method.config) ? "DB (may be overridden by Env)" : "Env"
+    const isSandbox = apiUrl.includes("sandbox")
+
+    console.log(`PayPal Config: Source=[${source}], Mode=[${isSandbox ? "SANDBOX" : "LIVE"}], ClientIDPresent=[${!!clientId}]`)
 
     if (!clientId || !clientSecret) {
-        throw new Error("Missing PayPal credentials")
+        throw new Error("Missing PayPal credentials. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in .env.local or Admin Dashboard.")
     }
 
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64")
@@ -52,6 +53,7 @@ export async function getPayPalAccessToken() {
 
     if (!response.ok) {
         const error = await response.text()
+        console.error("PayPal Token Error Response:", error)
         throw new Error(`PayPal auth failed: ${error}`)
     }
 
