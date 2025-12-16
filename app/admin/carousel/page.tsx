@@ -7,7 +7,7 @@ export default async function CarouselAdminPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold font-orbitron text-white">Carousel Management</h1>
+                <h1 className="text-3xl font-bold font-orbitron text-white neon-text-glow">Carousel Management</h1>
             </div>
             <CarouselManager initialItems={items} />
         </div>

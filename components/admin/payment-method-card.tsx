@@ -4,7 +4,7 @@ import { useState } from "react"
 import { PaymentMethod } from "@prisma/client"
 import { updatePaymentMethod } from "@/app/admin/settings/payments/actions"
 import { Switch } from "@/components/ui/switch"
-import { TechButton } from "@/components/ui/tech-button"
+import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { Loader2, Save } from "lucide-react"
@@ -62,7 +62,7 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
     }
 
     return (
-        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4">
+        <div className="p-6 rounded-2xl glass-panel border border-gray-800/60 bg-black/40 space-y-6 hover:border-gray-700/60 transition-colors">
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-xl font-bold text-white">{method.displayName}</h3>
@@ -84,7 +84,7 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                         checked={isEnabled}
                         onCheckedChange={handleToggle}
                         disabled={loading}
-                        className="data-[state=checked]:bg-green-500"
+                        className="data-[state=checked]:bg-emerald-500"
                     />
                 </div>
             </div>
@@ -135,7 +135,7 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                                             const newConfig = { ...currentConfig, clientId: e.target.value }
                                             setConfig(JSON.stringify(newConfig, null, 2))
                                         }}
-                                        className="w-full bg-black/50 border border-white/10 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors font-mono"
+                                        className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
                                         placeholder="Enter PayPal Client ID"
                                     />
                                 </div>
@@ -149,7 +149,7 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                                             const newConfig = { ...currentConfig, clientSecret: e.target.value }
                                             setConfig(JSON.stringify(newConfig, null, 2))
                                         }}
-                                        className="w-full bg-black/50 border border-white/10 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors font-mono"
+                                        className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
                                         placeholder="Enter PayPal Client Secret"
                                     />
                                 </div>
@@ -173,16 +173,16 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                         </>
                     )}
 
-                    <div className="flex justify-end">
-                        <TechButton
+                    <div className="flex justify-end pt-2">
+                        <Button
                             onClick={handleSaveConfig}
                             disabled={loading}
                             size="sm"
-                            glowColor="emerald"
+                            className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] border-0"
                         >
-                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                             Save Config
-                        </TechButton>
+                        </Button>
                     </div>
                 </div>
             )}

@@ -91,52 +91,52 @@ export function SupportCategoryManager({ initialCategories }: SupportCategoryMan
     }
 
     return (
-        <Card className="border-cyan-500/20 bg-black/40 backdrop-blur-xl">
-            <CardHeader className="flex flex-row items-center justify-between">
+        <div className="glass-panel p-6 rounded-2xl border border-gray-800/60 bg-black/40">
+            <div className="flex flex-row items-center justify-between mb-6">
                 <div>
-                    <CardTitle className="text-cyan-100">Support Categories</CardTitle>
-                    <CardDescription>Manage the options available in the Support Hub</CardDescription>
+                    <h3 className="text-xl font-bold font-orbitron text-cyan-400">Support Categories</h3>
+                    <p className="text-sm text-gray-400 mt-1">Manage the options available in the Support Hub</p>
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+                        <Button variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-950/30 hover:text-cyan-300">
                             <Plus className="h-4 w-4 mr-2" />
                             Add Category
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-zinc-900 border-zinc-800">
+                    <DialogContent className="glass-panel border-gray-800/60 bg-black/90 backdrop-blur-xl">
                         <DialogHeader>
-                            <DialogTitle>Add New Category</DialogTitle>
-                            <DialogDescription>Create a new option requiring support.</DialogDescription>
+                            <DialogTitle className="font-orbitron text-white text-xl">Add New Category</DialogTitle>
+                            <DialogDescription className="text-gray-400">Create a new option requiring support.</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Title</label>
+                                <label className="text-sm font-medium text-gray-300">Title</label>
                                 <Input
                                     value={newTitle}
                                     onChange={(e) => setNewTitle(e.target.value)}
                                     placeholder="e.g. Payments"
-                                    className="bg-black/20 border-zinc-700"
+                                    className="bg-white/5 border-gray-700 text-white placeholder:text-gray-600 focus:border-cyan-500/50"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Subtitle</label>
+                                <label className="text-sm font-medium text-gray-300">Subtitle</label>
                                 <Input
                                     value={newSubtitle}
                                     onChange={(e) => setNewSubtitle(e.target.value)}
                                     placeholder="Short description..."
-                                    className="bg-black/20 border-zinc-700"
+                                    className="bg-white/5 border-gray-700 text-white placeholder:text-gray-600 focus:border-cyan-500/50"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Icon</label>
+                                <label className="text-sm font-medium text-gray-300">Icon</label>
                                 <Select value={newIcon} onValueChange={setNewIcon}>
-                                    <SelectTrigger className="bg-black/20 border-zinc-700">
+                                    <SelectTrigger className="bg-white/5 border-gray-700 text-white">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="bg-zinc-900 border-gray-800">
                                         {ALLOWED_ICONS.map(icon => (
-                                            <SelectItem key={icon} value={icon}>
+                                            <SelectItem key={icon} value={icon} className="focus:bg-cyan-500/20 focus:text-cyan-400">
                                                 <div className="flex items-center gap-2">
                                                     {iconMap[icon]}
                                                     <span className="capitalize">{icon.replace('-', ' ')}</span>
@@ -148,43 +148,43 @@ export function SupportCategoryManager({ initialCategories }: SupportCategoryMan
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                            <Button onClick={handleCreate} disabled={isPending} className="bg-cyan-600 hover:bg-cyan-500">
+                            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-gray-400 hover:text-white">Cancel</Button>
+                            <Button onClick={handleCreate} disabled={isPending} className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)] border-0">
                                 {isPending ? "Creating..." : "Create Category"}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-            </CardHeader>
-            <CardContent className="space-y-2">
+            </div>
+            <div className="space-y-3">
                 {initialCategories.length === 0 ? (
-                    <div className="text-center py-8 text-zinc-500 border border-dashed border-zinc-800 rounded-lg">
+                    <div className="text-center py-8 text-gray-500 border border-dashed border-gray-800/60 rounded-xl bg-white/5">
                         No categories found. Create one to get started.
                     </div>
                 ) : (
                     initialCategories.map((cat: { id: string, title: string, subtitle: string | null, icon: string }) => (
-                        <div key={cat.id} className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 group">
-                            <GripVertical className="h-4 w-4 text-zinc-600 cursor-move" />
-                            <div className="p-2 rounded-full bg-cyan-500/10 text-cyan-500">
-                                {iconMap[cat.icon] || <MessageSquare className="h-4 w-4" />}
+                        <div key={cat.id} className="flex items-center gap-4 p-4 rounded-xl border border-gray-800/60 bg-gray-900/40 hover:bg-gray-800/60 group transition-all">
+                            <GripVertical className="h-5 w-5 text-gray-600 cursor-move hover:text-gray-400 transition-colors" />
+                            <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                                {iconMap[cat.icon] || <MessageSquare className="h-5 w-5" />}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm text-zinc-200">{cat.title}</p>
-                                <p className="text-xs text-zinc-500 truncate">{cat.subtitle}</p>
+                                <p className="font-bold text-white font-orbitron text-base">{cat.title}</p>
+                                <p className="text-sm text-gray-400 truncate">{cat.subtitle}</p>
                             </div>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => handleDelete(cat.id)}
                                 disabled={isPending}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                                className="opacity-0 group-hover:opacity-100 transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>
                     ))
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     )
 }

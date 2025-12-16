@@ -62,17 +62,17 @@ export function SponsoredMessageList({ initialMessages }: SponsoredMessageListPr
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-6 glass-panel rounded-2xl border border-gray-800/60 bg-black/40">
                 <div>
-                    <h2 className="text-2xl font-bold font-orbitron text-emerald-500 flex items-center gap-2">
-                        <Megaphone className="h-6 w-6" />
+                    <h2 className="text-2xl font-bold font-orbitron text-white flex items-center gap-2">
+                        <Megaphone className="h-6 w-6 text-emerald-500" />
                         Sponsored Messages
                     </h2>
                     <p className="text-zinc-400 text-sm mt-1">Manage automated announcements in the live chat.</p>
                 </div>
                 <Button
                     onClick={handleCreate}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all active:scale-[0.98] font-bold"
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     New Message
@@ -81,47 +81,46 @@ export function SponsoredMessageList({ initialMessages }: SponsoredMessageListPr
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {messages.map((msg) => (
-                    <Card key={msg.id} className="bg-zinc-900/50 border-zinc-800 hover:border-emerald-500/30 transition-all overflow-hidden group relative">
+                    <div key={msg.id} className="glass-panel rounded-2xl border border-gray-800/60 bg-gray-900/30 overflow-hidden hover:border-emerald-500/50 transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] group relative flex flex-col h-full">
                         {/* Preview "Live" Badge */}
-                        <div className="absolute top-2 right-2">
-                            <Badge variant={msg.isActive ? "default" : "secondary"} className={msg.isActive ? "bg-emerald-500 text-white" : "bg-zinc-800 text-zinc-500"}>
+                        <div className="absolute top-3 right-3 z-10">
+                            <Badge variant={msg.isActive ? "default" : "secondary"} className={`${msg.isActive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)]" : "bg-zinc-800 text-zinc-500"} backdrop-blur-sm border`}>
                                 {msg.isActive ? "Active" : "Inactive"}
                             </Badge>
                         </div>
 
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-lg font-bold text-zinc-100 flex items-center gap-2 pr-12">
+                        <div className="p-5 pb-0 flex-1">
+                            <h3 className="text-lg font-bold text-white font-orbitron pr-16 mb-3 line-clamp-1">
                                 {msg.title}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <p className="text-sm text-zinc-400 line-clamp-3 min-h-[60px]">
+                            </h3>
+
+                            <p className="text-sm text-gray-400 line-clamp-3 min-h-[60px] leading-relaxed">
                                 {msg.description}
                             </p>
 
                             {/* Preview specific fields */}
-                            <div className="flex flex-col gap-2 mt-2">
-                                <div className="text-xs space-y-1 text-zinc-500">
+                            <div className="flex flex-col gap-3 mt-4 p-3 rounded-xl bg-black/40 border border-white/5">
+                                <div className="text-xs space-y-2 text-zinc-400">
                                     <div className="flex items-center gap-2 truncate">
-                                        <ExternalLink className="h-3 w-3" />
-                                        {msg.linkUrl ? <span className="text-blue-400">{msg.linkUrl}</span> : "No link"}
+                                        <ExternalLink className="h-3 w-3 text-emerald-500" />
+                                        {msg.linkUrl ? <span className="text-blue-400 hover:underline">{msg.linkUrl}</span> : <span className="text-zinc-600">No link</span>}
                                     </div>
                                     <div className="flex items-center gap-2 truncate">
-                                        <RefreshCw className="h-3 w-3" />
-                                        <span className="text-emerald-500 font-mono">Run Frequency: Every {msg.frequency}m</span>
+                                        <RefreshCw className="h-3 w-3 text-emerald-500" />
+                                        <span className="text-emerald-400 font-mono">Run Frequency: Every {msg.frequency}m</span>
                                     </div>
                                 </div>
                                 {/* Live Timer Badge */}
-                                <div className="mt-2">
+                                <div className="">
                                     <LiveTimer frequency={msg.frequency} />
                                 </div>
                             </div>
-                        </CardContent>
-                        <CardFooter className="pt-0 flex justify-end gap-2">
+                        </div>
+                        <div className="p-4 pt-4 flex justify-end gap-2 border-t border-white/5 mt-4 bg-black/20">
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 text-zinc-400 hover:text-white"
+                                className="h-8 w-8 p-0 text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
                                 onClick={() => handleEdit(msg)}
                             >
                                 <Edit className="h-4 w-4" />
@@ -129,14 +128,14 @@ export function SponsoredMessageList({ initialMessages }: SponsoredMessageListPr
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                                className="h-8 w-8 p-0 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                 onClick={() => handleDelete(msg.id)}
                                 disabled={isDeleting === msg.id}
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
-                        </CardFooter>
-                    </Card>
+                        </div>
+                    </div>
                 ))}
             </div>
 

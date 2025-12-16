@@ -86,65 +86,85 @@ export function CarouselManager({ initialItems }: { initialItems: CarouselItem[]
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center gap-2">
-                <Button onClick={() => { setEditingItem(null); setIsDialogOpen(true) }} className="bg-green-600 hover:bg-green-700">
-                    <Plus className="mr-2 h-4 w-4" /> Add New Slide
-                </Button>
-                {items.length === 0 && (
-                    <Button
-                        onClick={async () => {
-                            setLoading(true)
-                            try {
-                                const { seedCarouselItems } = await import("@/app/admin/carousel/actions")
-                                await seedCarouselItems()
-                                toast.success("Default slides loaded")
-                                window.location.reload()
-                            } catch (error) {
-                                toast.error("Failed to load defaults")
-                            } finally {
-                                setLoading(false)
-                            }
-                        }}
-                        variant="outline"
-                        className="border-green-600 text-green-500 hover:bg-green-900/20"
-                        disabled={loading}
-                    >
-                        Load Default Slides
-                    </Button>
-                )}
-            </div>
+        <div className="space-y-6">
+            <div className="glass-panel p-6 rounded-2xl border border-gray-800/60 bg-black/40">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 className="text-xl font-bold text-white font-orbitron">Carousel Slides</h2>
+                        <p className="text-sm text-gray-400">Manage your homepage carousel content</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {items.length === 0 && (
+                            <Button
+                                onClick={async () => {
+                                    setLoading(true)
+                                    try {
+                                        const { seedCarouselItems } = await import("@/app/admin/carousel/actions")
+                                        await seedCarouselItems()
+                                        toast.success("Default slides loaded")
+                                        window.location.reload()
+                                    } catch (error) {
+                                        toast.error("Failed to load defaults")
+                                    } finally {
+                                        setLoading(false)
+                                    }
+                                }}
+                                variant="outline"
+                                className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30"
+                                disabled={loading}
+                            >
+                                Load Defaults
+                            </Button>
+                        )}
+                        <Button
+                            onClick={() => { setEditingItem(null); setIsDialogOpen(true) }}
+                            className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all active:scale-[0.98]"
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> Add Slide
+                        </Button>
+                    </div>
+                </div>
 
-            <div className="grid gap-4">
-                {items.map((item) => (
-                    <Card key={item.id} className="bg-gray-900 border-gray-800">
-                        <CardContent className="flex items-center justify-between p-4">
-                            <div className="flex items-center gap-4">
-                                <GripVertical className="text-gray-500 cursor-move" />
-                                <div>
-                                    <h3 className="font-bold text-white font-orbitron">{item.title}</h3>
-                                    <p className="text-sm text-gray-400">{item.subtitle}</p>
+                <div className="grid gap-4">
+                    {items.map((item) => (
+                        <div key={item.id} className="group relative overflow-hidden rounded-xl border border-gray-800/60 bg-gray-900/40 hover:bg-gray-800/60 transition-all hover:shadow-xl hover:shadow-emerald-900/10">
+                            <div className="flex items-center justify-between p-5">
+                                <div className="flex items-center gap-5">
+                                    <div className="p-2 rounded-lg bg-white/5 text-gray-500 group-hover:text-emerald-400 group-hover:bg-emerald-500/10 transition-colors cursor-move">
+                                        <GripVertical className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-white font-orbitron text-lg flex items-center gap-2">
+                                            {item.title}
+                                            {item.isActive && <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>}
+                                        </h3>
+                                        <p className="text-sm text-gray-400 font-light mt-1">{item.subtitle}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-3 bg-black/40 px-3 py-1.5 rounded-full border border-white/5">
+                                        <Label htmlFor={`active-${item.id}`} className="text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer">Active</Label>
+                                        <Switch
+                                            id={`active-${item.id}`}
+                                            checked={item.isActive}
+                                            onCheckedChange={(checked) => handleToggleActive(item.id, checked)}
+                                            className="data-[state=checked]:bg-emerald-500"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button variant="ghost" size="icon" onClick={() => { setEditingItem(item); setIsDialogOpen(true) }} className="hover:bg-blue-500/10 hover:text-blue-400 transition-colors">
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} className="hover:bg-red-500/10 hover:text-red-400 transition-colors">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    <Label htmlFor={`active-${item.id}`} className="text-sm text-gray-400">Active</Label>
-                                    <Switch
-                                        id={`active-${item.id}`}
-                                        checked={item.isActive}
-                                        onCheckedChange={(checked) => handleToggleActive(item.id, checked)}
-                                    />
-                                </div>
-                                <Button variant="ghost" size="icon" onClick={() => { setEditingItem(item); setIsDialogOpen(true) }}>
-                                    <Pencil className="h-4 w-4 text-blue-400" />
-                                </Button>
-                                <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                                    <Trash2 className="h-4 w-4 text-red-400" />
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    ))}
                 ))}
+                </div>
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

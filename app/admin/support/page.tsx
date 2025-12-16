@@ -13,12 +13,12 @@ export default async function SupportDashboard() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4 border-b border-zinc-800 pb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500">
+            <div className="flex items-center gap-4 border-b border-gray-800/60 pb-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
                     <HeadphonesIcon className="h-6 w-6" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight font-orbitron text-white">Support Hub</h1>
+                    <h1 className="text-3xl font-bold tracking-tight font-orbitron text-white neon-text-glow">Support Hub</h1>
                     <p className="text-zinc-400">Manage support tickets and user inquiries.</p>
                 </div>
             </div>
@@ -32,15 +32,16 @@ export default async function SupportDashboard() {
 
             <div className="grid gap-4">
                 {tickets.length === 0 ? (
-                    <div className="text-center py-20 bg-zinc-900/50 rounded-2xl border border-white/5">
+                    <div className="text-center py-20 glass-panel rounded-2xl border border-gray-800/60 bg-black/40">
                         <HeadphonesIcon className="h-12 w-12 mx-auto text-zinc-600 mb-4" />
-                        <h3 className="text-lg font-bold text-white mb-1">No Active Tickets</h3>
+                        <h3 className="text-lg font-bold text-white mb-1 font-orbitron">No Active Tickets</h3>
                         <p className="text-zinc-500">All caught up! There are no open support requests.</p>
                     </div>
                 ) : (
                     tickets.map((ticket) => (
-                        <div key={ticket.id} className="group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/50 backdrop-blur-sm p-4 hover:border-emerald-500/50 hover:bg-zinc-900/80 transition-all">
-                            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                        <div key={ticket.id} className="group relative overflow-hidden rounded-xl border border-gray-800/60 bg-black/40 hover:bg-zinc-900/60 hover:border-emerald-500/30 transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] p-5">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-emerald-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
+                            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between pl-2">
                                 <div className="flex items-start gap-4">
                                     <div className={cn("p-3 rounded-full mt-1",
                                         ticket.category === 'Deposits' ? "bg-emerald-500/10 text-emerald-500" :
@@ -52,8 +53,8 @@ export default async function SupportDashboard() {
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-bold text-white text-lg">{ticket.category}</span>
-                                            <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider",
-                                                ticket.status === 'OPEN' ? "bg-green-500/20 text-green-400" : "bg-zinc-500/20 text-zinc-400"
+                                            <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border",
+                                                ticket.status === 'OPEN' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
                                             )}>
                                                 {ticket.status}
                                             </span>

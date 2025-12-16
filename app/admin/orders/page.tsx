@@ -21,26 +21,31 @@ export default async function AdminOrdersPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold font-orbitron text-white neon-text-glow">Orders Management</h1>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Orders Management</h1>
+                    <p className="text-gray-400 mt-2">View and manage customer orders</p>
+                </div>
+            </div>
 
-            <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl overflow-hidden shadow-xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="bg-black/40 border-b border-gray-800">
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Order ID</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Customer</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Items</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Total</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Status</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Date</th>
-                                <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Actions</th>
+            <div className="glass-panel p-6 rounded-2xl border border-gray-800/60">
+                <div className="rounded-xl border border-gray-800/60 overflow-hidden">
+                    <table className="w-full text-left text-sm">
+                        <thead className="bg-black/40 text-gray-400 font-orbitron text-xs uppercase tracking-wider">
+                            <tr className="border-b border-gray-800/60">
+                                <th className="px-6 py-4 font-medium">Order ID</th>
+                                <th className="px-6 py-4 font-medium">Customer</th>
+                                <th className="px-6 py-4 font-medium">Items</th>
+                                <th className="px-6 py-4 font-medium">Total</th>
+                                <th className="px-6 py-4 font-medium">Status</th>
+                                <th className="px-6 py-4 font-medium">Date</th>
+                                <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-800">
+                        <tbody className="divide-y divide-gray-800/60">
                             {orders.map((order) => (
-                                <tr key={order.id} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-400">
+                                <tr key={order.id} className="hover:bg-white/5 transition-colors group">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-400 group-hover:text-emerald-400 transition-colors">
                                         #{order.id.slice(-6)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -61,13 +66,13 @@ export default async function AdminOrdersPage() {
                                             ))}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-mono">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-mono font-bold">
                                         ${(order.amount / 100).toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 text-xs font-bold rounded-full border ${order.status === 'completed'
-                                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                                                : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${order.status === 'completed'
+                                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                            : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
                                             }`}>
                                             {order.status.toUpperCase()}
                                         </span>
@@ -82,7 +87,7 @@ export default async function AdminOrdersPage() {
                                         }}>
                                             <button
                                                 type="submit"
-                                                className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 p-2 rounded-lg border border-red-500/20 hover:bg-red-500/20"
+                                                className="p-2 hover:bg-red-500/10 text-red-400 rounded-lg transition-all hover:shadow-[0_0_10px_rgba(239,68,68,0.2)] opacity-0 group-hover:opacity-100"
                                                 title="Delete Order"
                                             >
                                                 <Trash2 className="h-4 w-4" />

@@ -17,7 +17,7 @@ export default async function SponsoredMessagesPage() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold font-orbitron text-white">
+                <h1 className="text-3xl font-bold font-orbitron text-white neon-text-glow">
                     Live Chat <span className="text-emerald-500">Inventory</span>
                 </h1>
                 <p className="text-zinc-400">
