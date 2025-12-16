@@ -42,8 +42,8 @@ export default async function UsersPage() {
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="users" className="glass-panel p-6 rounded-2xl border border-gray-800/60 transition-all duration-300">
-                    <UsersTable initialUsers={users} />
+                <TabsContent value="users" className="border-none mt-0">
+                    <UsersTable initialUsers={users} availableRoles={roles} />
                 </TabsContent>
 
                 <TabsContent value="roles" className="glass-panel p-6 rounded-2xl border border-gray-800/60 transition-all duration-300">

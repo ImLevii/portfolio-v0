@@ -71,96 +71,108 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
                     <h2 className="text-xl font-orbitron text-white">Role Configuration</h2>
                     <p className="text-sm text-gray-400">Customize role prefixes, colors, and permissions.</p>
                 </div>
-                <Button onClick={handleSave} disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white neon-glow">
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Roles
-                </Button>
             </div>
 
             <div className="grid gap-6">
                 {roles.map((role, index) => (
-                    <Card key={role.key} className="bg-black/40 border-white/10 backdrop-blur-md">
-                        <CardHeader className="pb-3">
+                    <Card key={role.key} className="border-cyan-500/20 bg-black/40 backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
+                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        <CardHeader className="pb-3 relative z-10">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div
-                                        className="h-8 w-8 rounded-lg flex items-center justify-center border border-white/10"
-                                        style={{ backgroundColor: `${role.color}20`, color: role.color }}
+                                        className="h-10 w-10 rounded-xl flex items-center justify-center border shadow-lg transition-transform group-hover:scale-105"
+                                        style={{
+                                            backgroundColor: `${role.color}10`,
+                                            borderColor: `${role.color}30`,
+                                            color: role.color,
+                                            boxShadow: `0 0 15px ${role.color}15`
+                                        }}
                                     >
-                                        <Shield className="h-4 w-4" />
+                                        <Shield className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-base font-orbitron">{role.name}</CardTitle>
-                                        <CardDescription className="text-xs">Key: {role.key}</CardDescription>
+                                        <CardTitle className="text-lg font-orbitron tracking-wide text-white">{role.name}</CardTitle>
+                                        <CardDescription className="text-xs font-mono opacity-70">Key: {role.key}</CardDescription>
                                     </div>
                                 </div>
                                 {role.key !== "ADMIN" && role.key !== "CUSTOMER" && (
-                                    // Prevent deleting core roles for safety for now
-                                    <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                                    <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 )}
                             </div>
                         </CardHeader>
-                        <CardContent className="grid gap-6">
+                        <CardContent className="grid gap-6 relative z-10">
                             {/* Visual Settings */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-xs text-gray-400">Display Name</Label>
+                                    <Label className="text-xs text-gray-400 uppercase tracking-wider">Display Name</Label>
                                     <Input
                                         value={role.name}
                                         onChange={(e) => updateRole(index, "name", e.target.value)}
-                                        className="bg-black/50 border-white/10 h-8 text-sm"
+                                        className="bg-black/50 border-white/10 h-9 text-sm focus:border-cyan-500/50 transition-colors"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-xs text-gray-400">Chat Prefix</Label>
+                                    <Label className="text-xs text-gray-400 uppercase tracking-wider">Chat Prefix</Label>
                                     <Input
                                         value={role.prefix}
                                         onChange={(e) => updateRole(index, "prefix", e.target.value)}
-                                        className="bg-black/50 border-white/10 h-8 text-sm"
+                                        className="bg-black/50 border-white/10 h-9 text-sm focus:border-cyan-500/50 transition-colors"
                                         placeholder="e.g. [Mod]"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-xs text-gray-400">Badge Color (Hex)</Label>
+                                    <Label className="text-xs text-gray-400 uppercase tracking-wider">Badge Color (Hex)</Label>
                                     <div className="flex gap-2">
                                         <Input
                                             value={role.color}
                                             onChange={(e) => updateRole(index, "color", e.target.value)}
-                                            className="bg-black/50 border-white/10 h-8 text-sm font-mono"
+                                            className="bg-black/50 border-white/10 h-9 text-sm font-mono focus:border-cyan-500/50 transition-colors"
                                         />
                                         <div
-                                            className="h-8 w-8 rounded border border-white/10 shrink-0"
-                                            style={{ backgroundColor: role.color }}
+                                            className="h-9 w-9 rounded border border-white/10 shrink-0 shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+                                            style={{ backgroundColor: role.color, borderColor: role.color }}
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Permissions */}
-                            <div className="space-y-2">
-                                <Label className="text-xs text-gray-400">Permissions</Label>
+                            <div className="space-y-3 pt-2 border-t border-white/5">
+                                <Label className="text-xs text-gray-400 uppercase tracking-wider">Permissions</Label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {AVAILABLE_PERMISSIONS.map((perm) => (
-                                        <div key={perm.key} className="flex items-center space-x-2 bg-white/5 p-2 rounded border border-white/5">
+                                        <div
+                                            key={perm.key}
+                                            className={`flex items-center space-x-2 p-2 rounded border transition-all duration-300 ${role.permissions.includes(perm.key) || role.permissions.includes("all")
+                                                    ? "bg-cyan-500/10 border-cyan-500/30"
+                                                    : "bg-white/5 border-white/5"
+                                                }`}
+                                        >
                                             <Checkbox
                                                 id={`${role.key}-${perm.key}`}
                                                 checked={role.permissions.includes(perm.key) || role.permissions.includes("all")}
                                                 disabled={role.permissions.includes("all") && perm.key !== "all"}
                                                 onCheckedChange={() => togglePermission(index, perm.key)}
-                                                className="border-white/20 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                                className="border-white/20 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
                                             />
                                             <label
                                                 htmlFor={`${role.key}-${perm.key}`}
-                                                className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-300"
+                                                className={`text-xs font-medium leading-none cursor-pointer ${role.permissions.includes(perm.key) || role.permissions.includes("all")
+                                                        ? "text-cyan-100"
+                                                        : "text-gray-400"
+                                                    }`}
                                             >
                                                 {perm.label}
                                             </label>
                                         </div>
                                     ))}
-                                    <div className="flex items-center space-x-2 bg-red-500/10 p-2 rounded border border-red-500/20">
+                                    <div className={`flex items-center space-x-2 p-2 rounded border transition-all duration-300 ${role.permissions.includes("all")
+                                            ? "bg-red-500/10 border-red-500/30"
+                                            : "bg-red-500/5 border-red-500/10"
+                                        }`}>
                                         <Checkbox
                                             id={`${role.key}-all`}
                                             checked={role.permissions.includes("all")}
@@ -169,7 +181,7 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
                                         />
                                         <label
                                             htmlFor={`${role.key}-all`}
-                                            className="text-xs font-bold leading-none text-red-400"
+                                            className="text-xs font-bold leading-none text-red-400 cursor-pointer"
                                         >
                                             Full Administrator
                                         </label>
@@ -181,22 +193,45 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
                 ))}
             </div>
 
-            <Button
-                variant="outline"
-                className="w-full border-dashed border-white/10 hover:bg-white/5 hover:border-emerald-500/50 text-gray-400 hover:text-emerald-400"
-                onClick={() => {
-                    setRoles([...roles, {
-                        key: `ROLE_${roles.length + 1}`,
-                        name: "New Role",
-                        prefix: "[New]",
-                        color: "#9ca3af",
-                        permissions: []
-                    }])
-                }}
-            >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Custom Role
-            </Button>
+            <div className="flex gap-4 pt-4 border-t border-white/5">
+                <Button
+                    variant="outline"
+                    className="flex-1 border-dashed border-white/10 hover:bg-white/5 hover:border-cyan-500/50 text-gray-400 hover:text-cyan-400 h-12"
+                    onClick={() => {
+                        setRoles([...roles, {
+                            key: `ROLE_${roles.length + 1}`,
+                            name: "New Role",
+                            prefix: "[New]",
+                            color: "#9ca3af",
+                            permissions: []
+                        }])
+                    }}
+                >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Custom Role
+                </Button>
+
+                <Button
+                    onClick={handleSave}
+                    disabled={isLoading}
+                    className="flex-1 h-12 bg-[#0a0a0a] border border-white/10 hover:bg-neutral-900 text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] rounded-xl group relative overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin text-cyan-500" />
+                            <span className="font-orbitron font-bold tracking-wider text-cyan-500">SAVING...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Save className="mr-2 h-5 w-5 text-cyan-500 group-hover:text-cyan-400 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
+                            <span className="font-orbitron font-bold tracking-wider text-cyan-500 group-hover:text-cyan-400 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] transition-all">
+                                SAVE CONFIGURATION
+                            </span>
+                        </>
+                    )}
+                </Button>
+            </div>
         </div>
     )
 }
