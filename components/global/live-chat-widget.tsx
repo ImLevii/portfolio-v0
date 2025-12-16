@@ -622,26 +622,19 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                     >
                                         <ArrowLeft className="h-4 w-4" />
                                     </button>
-                                ) : !activeTicket && isAdmin ? (
-                                    <button
-                                        onClick={handleClearChat}
-                                        className="p-1.5 hover:bg-red-500/20 rounded-md transition-colors text-zinc-400 hover:text-red-400 group"
-                                        title="Clear All Chat History"
-                                    >
-                                        <Trash2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                                    </button>
                                 ) : !activeTicket ? (
-                                    /* LIVE USER COUNT PILL (Only in Global Chat to save space in Ticket view) */
-                                    <div className="flex items-center gap-2 bg-zinc-800/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/5 shadow-inner">
-                                        <div className="relative">
-                                            <Users className="h-3.5 w-3.5 text-zinc-400" />
-                                            {onlineCount > 1 && <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>}
+                                    /* LIVE USER COUNT PILL (Only in Global Chat) */
+                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.1)] group">
+                                        <div className="relative flex h-3 w-3 items-center justify-center">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 duration-1000"></span>
+                                            {/* Custom Person SVG */}
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 w-3 h-3 text-emerald-500">
+                                                <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor" className="animate-pulse" />
+                                                <path d="M12 13C8.13401 13 5 16.134 5 20V21H19V20C19 16.134 15.866 13 12 13Z" fill="currentColor" className="animate-pulse" />
+                                            </svg>
                                         </div>
-                                        <span className="text-[11px] font-bold text-zinc-300 tabular-nums leading-none pt-0.5">
-                                            {onlineCount}
+                                        <span className="text-[10px] font-black text-emerald-400 tabular-nums leading-none tracking-wider shadow-emerald-500/20 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]">
+                                            {onlineCount} <span className="text-emerald-500/50 ml-0.5">ONLINE</span>
                                         </span>
                                     </div>
                                 ) : null}
