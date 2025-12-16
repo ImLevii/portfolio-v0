@@ -306,6 +306,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
 
     const [inputText, setInputText] = useState("")
     const scrollRef = useRef<HTMLDivElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         if (isOpen && scrollRef.current) {
@@ -1008,8 +1009,8 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                     {/* Media Upload Button */}
                                                     <div className="relative">
                                                         <input
+                                                            ref={fileInputRef}
                                                             type="file"
-                                                            id="chat-media-upload"
                                                             className="hidden"
                                                             accept="image/*,video/mp4,video/webm"
                                                             disabled={isPending || activeTicket?.status === 'CLOSED'}
@@ -1048,7 +1049,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                         />
                                                         <button
                                                             type="button"
-                                                            onClick={() => document.getElementById('chat-media-upload')?.click()}
+                                                            onClick={() => fileInputRef.current?.click()}
                                                             disabled={isPending || activeTicket?.status === 'CLOSED'}
                                                             className="p-2 rounded-xl bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
                                                             title="Upload Image or Video"
