@@ -129,42 +129,5 @@ export function CouponManager({ coupons }: { coupons: Coupon[] }) {
                 </div>
             )}
         </div>
-                                                const res = await createCoupon(null, formData)
-    if (res.success) {
-        toast.success("Coupon created")
-        setIsCreating(false)
-    } else {
-        toast.error(res.error || "Failed")
-    }
-}} className = "space-y-4" >
-                                                <div className="space-y-2">
-                                                    <label className="text-sm text-gray-400">Code</label>
-                                                    <Input name="code" placeholder="SUMMER2025" required className="bg-gray-800 border-gray-700 text-white" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm text-gray-400">Discount Percentage (%)</label>
-                                                    <Input name="percent" type="number" min="1" max="100" required className="bg-gray-800 border-gray-700 text-white" />
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <label className="text-sm text-gray-400">Max Uses (Optional)</label>
-                                                        <Input name="maxUses" type="number" className="bg-gray-800 border-gray-700 text-white" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-sm text-gray-400">Expires At (Optional)</label>
-                                                        <Input name="expiresAt" type="date" className="bg-gray-800 border-gray-700 text-white" />
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-end gap-2 mt-4">
-                                                    <Button type="button" variant="ghost" onClick={() => setIsCreating(false)} className="hover:bg-white/10 hover:text-white">Cancel</Button>
-                                                    <Button type="submit" className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]">Create Coupon</Button>
-                                                </div>
-                                            </form >
-                                        </div >
-                                    </div >
-                                </div >
-                                )
-            }
-                            </div >
-                            )
+    )
 }
