@@ -164,6 +164,8 @@ model SiteSettings {
 model Presence {
   id        String   @id @default(cuid())
   lastSeen  DateTime @default(now())
+  isTyping  Boolean  @default(false)
+  username  String?
 }
 
 
