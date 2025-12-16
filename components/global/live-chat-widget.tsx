@@ -503,15 +503,16 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     }
 
     return (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end print:hidden">
+        <motion.div
+            drag
+            dragListener={false}
+            dragControls={dragControls}
+            dragMomentum={false}
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end print:hidden"
+        >
             <AnimatePresence>
                 {isOpen && !isMinimized && (
                     <motion.div
-                        drag
-                        dragListener={false}
-                        dragControls={dragControls}
-                        dragMomentum={false}
-                        dragElastic={0}
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -921,6 +922,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         setIsOpen(!isOpen)
                     }
                 }}
+                onPointerDown={(e) => dragControls.start(e)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
             >
@@ -945,6 +947,6 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                     Chat minimized
                 </div>
             )}
-        </div>
+        </motion.div>
     )
 }
