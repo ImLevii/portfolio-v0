@@ -18,16 +18,27 @@ interface Product {
 
 interface ShopContentProps {
     products: Product[]
+    title?: string
+    description?: string
+    showCarousel?: boolean
+    showCategoryFilter?: boolean
+    headerContent?: React.ReactNode
+    categoryImage?: string | null
 }
 
-export function ShopContent({ products }: ShopContentProps) {
-    // Parse features from JSON string if needed, but ProductCard might expect string[]
-    // The DB returns string for features. ProductCard expects string[].
-    // I need to map the products to parse features.
-
+export function ShopContent({
+    products,
+    title = "Digital Shop",
+    description = "Premium tools, assets, and configurations to accelerate your development workflow.",
+    showCarousel = true,
+    showCategoryFilter = true,
+    headerContent,
+    categoryImage
+}: ShopContentProps) {
+    // Parse features from JSON string if needed
     const parsedProducts = products.map(p => ({
         ...p,
-        features: JSON.parse(p.features) as string[]
+        features: (typeof p.features === 'string' ? JSON.parse(p.features) : p.features) as string[]
     }))
 
     const categories = Array.from(new Set(parsedProducts.map(p => p.category)))
@@ -47,8 +58,6 @@ export function ShopContent({ products }: ShopContentProps) {
             case "price-desc": return b.price - a.price
             case "name-asc": return a.name.localeCompare(b.name)
             case "newest": default:
-                // Assuming newer products have higher IDs or we rely on default DB order (desc createdAt) 
-                // But since we can't easily parse ID as timestamp, we'll assume the array 'products' came sorted by Date Desc from server
                 return 0
         }
     })
@@ -58,24 +67,35 @@ export function ShopContent({ products }: ShopContentProps) {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-transparent to-transparent pointer-events-none" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent pointer-events-none" />
 
+            {/* Category Image Background for Category Pages */}
+            {categoryImage && (
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-black/80 z-10" />
+                    <img src={categoryImage} alt="Background" className="w-full h-[50vh] object-cover opacity-50 mask-image-gradient" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/80 to-gray-950" />
+                </div>
+            )}
+
             <div className="container relative z-10 mx-auto px-4 py-6 md:py-8">
                 <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-5xl font-bold font-orbitron bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                            Digital Shop
+                            {title}
                         </h1>
                         <p className="mt-2 md:mt-4 text-base md:text-lg text-gray-400 max-w-xl">
-                            Premium tools, assets, and configurations to accelerate your development workflow.
+                            {description}
                         </p>
                     </div>
                 </div>
 
-                <ShopCarousel />
+                {showCarousel && <ShopCarousel />}
+
+                {headerContent}
 
                 <ShopToolbar
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
-                    categories={categories}
+                    categories={showCategoryFilter ? categories : []}
                     activeCategory={activeCategory}
                     onCategoryChange={setActiveCategory}
                     sortOption={sortOption}

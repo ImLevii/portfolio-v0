@@ -19,12 +19,16 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         notFound()
     }
 
+    const categories = await db.category.findMany({
+        orderBy: { order: 'asc' }
+    })
+
     const updateAction = updateProduct.bind(null, id)
 
     return (
         <div className="space-y-8">
             <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Edit Product</h1>
-            <ProductForm initialData={product} action={updateAction} />
+            <ProductForm initialData={product} categories={categories} action={updateAction} />
         </div>
     )
 }

@@ -21,10 +21,11 @@ interface ProductFormProps {
         isSale?: boolean
         filePath?: string | null
     }
+    categories: { id: string, name: string }[]
     action: (formData: FormData) => Promise<void>
 }
 
-export function ProductForm({ initialData, action }: ProductFormProps) {
+export function ProductForm({ initialData, categories, action }: ProductFormProps) {
     const [loading, setLoading] = useState(false)
     const [imageUrl, setImageUrl] = useState(initialData?.image || "")
     const router = useRouter()
@@ -79,13 +80,19 @@ export function ProductForm({ initialData, action }: ProductFormProps) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Category</label>
-                                    <input
+                                    <select
                                         name="category"
-                                        defaultValue={initialData?.category}
+                                        defaultValue={initialData?.category || ""}
                                         required
-                                        placeholder="e.g. Electronics"
-                                        className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700"
-                                    />
+                                        className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700 appearance-none"
+                                    >
+                                        <option value="" disabled>Select a category</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.name}>
+                                                {cat.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
