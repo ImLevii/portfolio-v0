@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
 import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react"
-import { deleteProduct, toggleProductListing } from "@/app/admin/actions"
+import { deleteProduct, toggleProductListing } from "@/app/admin/products/actions"
 
 export default async function AdminProductsPage() {
     const products = await db.product.findMany({

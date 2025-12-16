@@ -129,54 +129,14 @@ export function CouponManager({ coupons }: { coupons: Coupon[] }) {
                 </div>
             )}
         </div>
-        isCreating && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div className="w-full max-w-md glass-panel border border-gray-800/60 rounded-2xl overflow-hidden shadow-2xl">
-                <div className="p-6 border-b border-gray-800/60">
-                    <h2 className="text-xl font-bold text-white font-orbitron neon-text-glow">Create Coupon</h2>
-                </div>
-                <div className="p-6">
-                    <form action={async (formData) => {
-                        const res = await createCoupon(null, formData)
-                        if (res.success) {
-                            toast.success("Coupon created")
-                            setIsCreating(false)
-                        } else {
-                            toast.error(res.error || "Failed")
-                        }
-                    }} className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm text-gray-400">Code</label>
-                            <Input name="code" placeholder="SUMMER2025" required className="bg-gray-800 border-gray-700 text-white" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm text-gray-400">Discount Percentage (%)</label>
-                            <Input name="percent" type="number" min="1" max="100" required className="bg-gray-800 border-gray-700 text-white" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm text-gray-400">Max Uses (Optional)</label>
-                                <Input name="maxUses" type="number" className="bg-gray-800 border-gray-700 text-white" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm text-gray-400">Expires At (Optional)</label>
-                                <Input name="expiresAt" type="date" className="bg-gray-800 border-gray-700 text-white" />
-                                isCreating && (
-                                <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-                                    <div className="w-full max-w-md glass-panel border border-gray-800/60 rounded-2xl overflow-hidden shadow-2xl">
-                                        <div className="p-6 border-b border-gray-800/60">
-                                            <h2 className="text-xl font-bold text-white font-orbitron neon-text-glow">Create Coupon</h2>
-                                        </div>
-                                        <div className="p-6">
-                                            <form action={async (formData) => {
                                                 const res = await createCoupon(null, formData)
-                                                if (res.success) {
-                                                    toast.success("Coupon created")
-                                                    setIsCreating(false)
-                                                } else {
-                                                    toast.error(res.error || "Failed")
-                                                }
-                                            }} className="space-y-4">
+    if (res.success) {
+        toast.success("Coupon created")
+        setIsCreating(false)
+    } else {
+        toast.error(res.error || "Failed")
+    }
+}} className = "space-y-4" >
                                                 <div className="space-y-2">
                                                     <label className="text-sm text-gray-400">Code</label>
                                                     <Input name="code" placeholder="SUMMER2025" required className="bg-gray-800 border-gray-700 text-white" />
@@ -199,12 +159,12 @@ export function CouponManager({ coupons }: { coupons: Coupon[] }) {
                                                     <Button type="button" variant="ghost" onClick={() => setIsCreating(false)} className="hover:bg-white/10 hover:text-white">Cancel</Button>
                                                     <Button type="submit" className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]">Create Coupon</Button>
                                                 </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                            </form >
+                                        </div >
+                                    </div >
+                                </div >
                                 )
             }
-                            </div>
+                            </div >
                             )
 }

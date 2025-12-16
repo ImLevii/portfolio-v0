@@ -163,7 +163,7 @@ export function CarouselManager({ initialItems }: { initialItems: CarouselItem[]
                             </div>
                         </div>
                     ))}
-                ))}
+
                 </div>
             </div>
 

@@ -4,6 +4,8 @@ import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
+import { writeFile, mkdir } from "fs/promises"
+import { join } from "path"
 
 async function checkAdmin() {
     const session = await auth()
@@ -12,9 +14,6 @@ async function checkAdmin() {
         throw new Error("Unauthorized")
     }
 }
-
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
 
 async function saveFile(file: File): Promise<string> {
     const bytes = await file.arrayBuffer()
@@ -122,6 +121,18 @@ export async function deleteProduct(id: string) {
 
     await db.product.delete({
         where: { id },
+    })
+
+    revalidatePath("/admin/products")
+    revalidatePath("/shop")
+}
+
+export async function toggleProductListing(id: string, isListed: boolean) {
+    await checkAdmin()
+
+    await db.product.update({
+        where: { id },
+        data: { isListed }
     })
 
     revalidatePath("/admin/products")
