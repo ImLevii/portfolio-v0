@@ -21,6 +21,7 @@ import { playMessageSound, unlockAudioContext, playSendSound, playTypingSound } 
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
+import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
 
 
 const MAX_CHARS = 500

@@ -170,14 +170,21 @@ export async function getChatUserProfile(userId: string) {
         })
 
         // Total likes received on their messages
-        // Since we store JSON in ChatMessage, we have to aggregate carefully or rely on ChatRelation inverse
-        // But simpler: Count ChatReaction where message.senderId = userId
         const likesReceived = await prisma.chatReaction.count({
             where: {
                 message: {
                     senderId: userId
                 },
                 type: 'likes'
+            }
+        })
+
+        const dislikesReceived = await prisma.chatReaction.count({
+            where: {
+                message: {
+                    senderId: userId
+                },
+                type: 'dislikes'
             }
         })
 
@@ -195,6 +202,7 @@ export async function getChatUserProfile(userId: string) {
             stats: {
                 messagesSent,
                 likesReceived,
+                dislikesReceived,
                 heartsReceived
             }
         }
@@ -209,6 +217,18 @@ export async function addReaction(messageId: string, type: 'likes' | 'dislikes' 
         const session = await auth()
         if (!session?.user?.id) return { success: false, error: "Must be logged in" }
         const userId = session.user.id
+
+        // 0. Check Message & Prevent Self-Reaction
+        const message = await prisma.chatMessage.findUnique({
+            where: { id: messageId },
+            select: { senderId: true }
+        })
+
+        if (!message) return { success: false, error: "Message not found" }
+
+        if (message.senderId === userId) {
+            return { success: false, error: "Cannot react to own message" }
+        }
 
         // 1. Check if reaction exists (Toggle Logic)
         const existing = await prisma.chatReaction.findUnique({
