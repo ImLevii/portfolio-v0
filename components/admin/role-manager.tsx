@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { RoleDefinition, saveRoles, AVAILABLE_PERMISSIONS } from "@/actions/roles"
+import { saveRoles } from "@/actions/roles"
+import { RoleDefinition, AVAILABLE_PERMISSIONS } from "@/lib/roles"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
