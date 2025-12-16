@@ -74,34 +74,19 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     const [localSystemMessages, setLocalSystemMessages] = useState<ChatMessage[]>([])
 
     // Guest State
+    // Guest State
     const [guestNickname, setGuestNickname] = useState<string>("")
+    const [guestId, setGuestId] = useState<string>("")
     const [isGuestLoggedIn, setIsGuestLoggedIn] = useState(false)
 
-    useEffect(() => {
-        // Restore guest session
-        const storedName = sessionStorage.getItem("chat_guest_name")
-        const storedId = sessionStorage.getItem("chat_guest_id")
-        if (storedName && storedId) {
-            setGuestNickname(storedName)
-            setIsGuestLoggedIn(true)
-        }
-    }, [])
+    // NOTE: Removed sessionStorage restoration effect to satisfy "reset every refresh" request.
 
     const handleGuestLogin = (item: React.FormEvent) => {
         item.preventDefault()
         if (!guestNickname.trim()) return
 
-        const guestId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-        sessionStorage.setItem("chat_guest_name", guestNickname)
-        sessionStorage.setItem("chat_guest_id", guestId) // New ID if just joining
-        // If we want to persist ID across renames we should check if one exists first, 
-        // but for "Join" distinct action implies new session or setting it up.
-        // Actually best to keep ID if it exists? 
-        // Let's simple check:
-        if (!sessionStorage.getItem("chat_guest_id")) {
-            sessionStorage.setItem("chat_guest_id", guestId)
-        }
-
+        const newGuestId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        setGuestId(newGuestId)
         setIsGuestLoggedIn(true)
     }
 
@@ -109,21 +94,21 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     useEffect(() => {
         if (!isOpen) return
         const interval = setInterval(async () => {
-            // Use guest ID for typing check exclusion
-            const myId = user?.id || sessionStorage.getItem("chat_guest_id") || 'guest'
+            // Use state guest ID for typing check exclusion
+            const myId = user?.id || guestId || 'guest'
             const users = await getTypingUsers(myId)
             setTypingUsers(users)
         }, 2000)
         return () => clearInterval(interval)
-    }, [isOpen, user?.id])
+    }, [isOpen, user?.id, guestId])
 
     const handleTyping = () => {
         playTypingSound()
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
-        else setTypingStatus(user?.id || sessionStorage.getItem("chat_guest_id") || 'guest', true, user?.name || guestNickname || 'Guest')
+        else setTypingStatus(user?.id || guestId || 'guest', true, user?.name || guestNickname || 'Guest')
 
         typingTimeoutRef.current = setTimeout(() => {
-            setTypingStatus(user?.id || sessionStorage.getItem("chat_guest_id") || 'guest', false)
+            setTypingStatus(user?.id || guestId || 'guest', false)
             typingTimeoutRef.current = null
         }, 3000)
     }
