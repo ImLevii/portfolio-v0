@@ -28,7 +28,7 @@ interface ChatMessage extends ChatMessageData {
 
 const MAX_CHARS = 500
 
-export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: any, config?: ChatSettingsConfig, initialMessages?: ChatMessageData[] }) {
+export function LiveChatWidget({ user, config, initialMessages = [], initialTickets = [] }: { user?: any, config?: ChatSettingsConfig, initialMessages?: ChatMessageData[], initialTickets?: any[] }) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
@@ -44,7 +44,7 @@ export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: 
                 senderAvatar: m.senderAvatar,
                 senderRole: m.senderRole,
                 createdAt: m.createdAt,
-                reactions: m.reactions, // it's already an object in ChatMessageData from getRecentMessages? Check actions/chat.ts
+                reactions: m.reactions,
                 type: 'user'
             })) as ChatMessage[]
         }
@@ -54,7 +54,7 @@ export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: 
     const [announcement, setAnnouncement] = useState<AnnouncementConfig | null>(null)
     const [hasUnread, setHasUnread] = useState(false)
     const [activeTicket, setActiveTicket] = useState<{ id: string; category: string; status: string } | null>(null)
-    const [userTickets, setUserTickets] = useState<any[]>([])
+    const [userTickets, setUserTickets] = useState<any[]>(initialTickets)
     const [view, setView] = useState<'chat' | 'support'>('chat')
     const [products, setProducts] = useState<{ id: string, name: string }[]>([])
     const [localSystemMessages, setLocalSystemMessages] = useState<ChatMessage[]>([])
@@ -553,7 +553,7 @@ export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: 
                         {/* Header */}
                         <div
                             onPointerDown={(e) => dragControls.start(e)}
-                            onTouchStart={(e) => dragControls.start(e)}
+                            onTouchStart={(e) => dragControls.start(e as any)}
                             className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md cursor-move touch-none"
                         >
                             <div className="flex items-center gap-3">
@@ -643,7 +643,9 @@ export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: 
                                         {/* My Tickets Section */}
                                         {userTickets.length > 0 && (
                                             <div className="mb-4">
-                                                <h4 className="px-4 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">Your Tickets</h4>
+                                                <h4 className="px-4 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                                    {(user as any)?.role === "ADMIN" || (user as any)?.role === "Admin" ? "Support Queue (Admin)" : "Your Tickets"}
+                                                </h4>
                                                 {userTickets.map((ticket) => (
                                                     <button
                                                         key={ticket.id}
@@ -706,21 +708,7 @@ export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: 
                                     </div>
                                 </ScrollArea>
 
-                                {/* FAQs Search Placeholder */}
-                                <div className="p-4 border-t border-white/5 bg-black/20">
-                                    <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                                        <Input
-                                            placeholder="Search FAQs..."
-                                            className="pl-9 bg-white/5 border-white/10 text-sm focus-visible:ring-emerald-500/50"
-                                        />
-                                    </div>
-                                    <div className="mt-3 flex justify-center">
-                                        <span className="flex items-center gap-1 text-[10px] text-zinc-600 font-medium">
-                                            Powered by <span className="text-emerald-500/80">Levik.dev</span>
-                                        </span>
-                                    </div>
-                                </div>
+
                             </div>
                         ) : (
                             /* CHAT VIEW */
