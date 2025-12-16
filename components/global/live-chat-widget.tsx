@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 
 import { type ChatSettingsConfig } from "@/actions/chat-settings"
 import { updatePresence, getOnlineCount, setTypingStatus, getTypingUsers } from "@/actions/presence"
-import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData, getChatProducts } from "@/actions/chat"
+import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { createTicket, getTicket, getUserTickets, closeTicket } from "@/actions/tickets"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 import { getActiveSponsoredMessage, type SponsoredMessageData } from "@/actions/sponsored"
@@ -384,11 +384,16 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     }
 
     const handleDeleteMessage = async (msgId: string) => {
-        if (!confirm("Delete this message?")) return
-
+        // No confirmation needed for admins/support as per request "easily delete messages without confirmation"
         // Optimistic UI
         setMessages(prev => prev.filter(m => m.id !== msgId))
         await deleteMessage(msgId)
+    }
+
+    const handleClearChat = async () => {
+        if (!confirm("Are you sure you want to clear ALL chat history? This cannot be undone.")) return
+        setMessages([]) // Optimistic clear
+        await clearChat()
     }
 
     const handleEmojiSelect = (emoji: string) => {
@@ -435,6 +440,8 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
         const licenseRegex = /(\b[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b)/g
         // Mentions: @Name
         const mentionRegex = /(@[a-zA-Z0-9_]+)/g
+        // URLs for media
+        const urlRegex = /(https?:\/\/[^\s]+)/g
 
         // 1. Split by Bold
         const parts = text.split(/(\*\*.*?\*\*)/g)
@@ -444,59 +451,91 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                 return <span key={`bold-${i}`} className="font-bold text-white">{part.slice(2, -2)}</span>
             }
 
-            // 2. Split by License Key
-            const subParts = part.split(licenseRegex)
-            return subParts.map((subPart, j) => {
-                if (/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(subPart)) {
+            // 2. Split by URLs (Media Embedding)
+            const urlParts = part.split(urlRegex)
+            return urlParts.map((subPart, j) => {
+                if (urlRegex.test(subPart)) {
+                    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(subPart)
+                    const isVideo = /\.(mp4|webm|ogg)$/i.test(subPart)
+
+                    if (isImage) {
+                        return (
+                            <div key={`media-${i}-${j}`} className="my-2 relative group overflow-hidden rounded-lg border border-white/10">
+                                <img
+                                    src={subPart}
+                                    alt="User Upload"
+                                    className="max-h-48 w-auto object-cover rounded-lg transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                                    onClick={() => window.open(subPart, '_blank')}
+                                />
+                            </div>
+                        )
+                    }
+                    if (isVideo) {
+                        return (
+                            <div key={`media-${i}-${j}`} className="my-2 rounded-lg overflow-hidden border border-white/10">
+                                <video
+                                    src={subPart}
+                                    controls
+                                    className="max-h-48 w-auto rounded-lg"
+                                />
+                            </div>
+                        )
+                    }
+
+                    // Regular Link
                     return (
-                        <span
-                            key={`license-${i}-${j}`}
-                            className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 select-all cursor-pointer hover:bg-emerald-500/20 transition-colors"
-                            title="License Key"
-                            onClick={() => {
-                                navigator.clipboard.writeText(subPart)
-                                // Optional: Toast feedback could go here
-                            }}
+                        <a
+                            key={`link-${i}-${j}`}
+                            href={subPart}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline break-all"
                         >
-                            <ShieldCheck className="h-3 w-3" />
                             {subPart}
-                        </span>
+                        </a>
                     )
                 }
 
-                // 3. Split by Mentions
-                const subSubParts = subPart.split(mentionRegex)
-                return subSubParts.map((subSubPart, k) => {
-                    if (subSubPart.startsWith('@')) {
-                        // Check if it matches a known product (fuzzy: ignore spaces)
-                        const mentionHandle = subSubPart.slice(1).toLowerCase()
-                        const product = products.find(p => p.name.replace(/\s+/g, '').toLowerCase() === mentionHandle)
-
-                        if (product) {
-                            return (
-                                <Link
-                                    key={`mention-${i}-${j}-${k}`}
-                                    href={`/shop/${product.id}`}
-                                    target="_blank"
-                                    className="font-bold text-blue-400 hover:text-blue-300 hover:underline cursor-pointer transition-colors"
-                                    title={`View ${product.name}`}
-                                >
-                                    {subSubPart}
-                                </Link>
-                            )
-                        }
-
-                        // Default highlight
+                // 3. Split by License Key
+                const licenseParts = subPart.split(licenseRegex)
+                return licenseParts.map((licPart, k) => {
+                    if (/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(licPart)) {
                         return (
                             <span
-                                key={`mention-${i}-${j}-${k}`}
-                                className="font-bold text-blue-400 hover:text-blue-300 hover:underline cursor-pointer transition-colors"
+                                key={`license-${i}-${j}-${k}`}
+                                className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 select-all cursor-pointer hover:bg-emerald-500/20 transition-colors"
+                                title="License Key"
+                                onClick={() => navigator.clipboard.writeText(licPart)}
                             >
-                                {subSubPart}
+                                <ShieldCheck className="h-3 w-3" />
+                                {licPart}
                             </span>
                         )
                     }
-                    return subSubPart
+
+                    // 4. Split by Mentions
+                    const mentionParts = licPart.split(mentionRegex)
+                    return mentionParts.map((menPart, l) => {
+                        if (menPart.startsWith('@')) {
+                            const mentionHandle = menPart.slice(1).toLowerCase()
+                            const product = products.find(p => p.name.replace(/\s+/g, '').toLowerCase() === mentionHandle)
+
+                            if (product) {
+                                return (
+                                    <Link
+                                        key={`mention-${i}-${j}-${k}-${l}`}
+                                        href={`/shop/${product.id}`}
+                                        target="_blank"
+                                        className="font-bold text-blue-400 hover:text-blue-300 hover:underline cursor-pointer transition-colors"
+                                    >
+                                        {menPart}
+                                    </Link>
+                                )
+                            }
+                            return <span key={`mention-${i}-${j}-${k}-${l}`} className="font-bold text-blue-400">{menPart}</span>
+                        }
+                        return menPart
+                    })
                 })
             })
         })
@@ -583,6 +622,14 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                         className="mr-1 p-1 hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-white"
                                     >
                                         <ArrowLeft className="h-4 w-4" />
+                                    </button>
+                                ) : !activeTicket && isAdmin ? (
+                                    <button
+                                        onClick={handleClearChat}
+                                        className="p-1.5 hover:bg-red-500/20 rounded-md transition-colors text-zinc-400 hover:text-red-400 group"
+                                        title="Clear All Chat History"
+                                    >
+                                        <Trash2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
                                     </button>
                                 ) : !activeTicket ? (
                                     /* LIVE USER COUNT PILL (Only in Global Chat to save space in Ticket view) */

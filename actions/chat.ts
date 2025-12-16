@@ -103,7 +103,8 @@ export async function deleteMessage(messageId: string) {
     }
 }
 
-export async function clearGlobalChat() {
+
+export async function clearChat() {
     try {
         const session = await auth()
         const role = (session?.user as any)?.role
@@ -112,12 +113,8 @@ export async function clearGlobalChat() {
             return { success: false, error: "Unauthorized" }
         }
 
-        // Delete all messages that are NOT associated with a ticket
-        await prisma.chatMessage.deleteMany({
-            where: {
-                ticketId: null
-            }
-        })
+        // Delete ALL messages
+        await prisma.chatMessage.deleteMany()
 
         revalidatePath("/")
         return { success: true }
