@@ -23,7 +23,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { uploadChatMedia } from "@/actions/upload"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
+import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
 import { showTerminalToast } from "@/components/global/terminal-toast"
+import { filterProfanity } from "@/lib/profanity"
 import { toast } from "sonner"
 
 interface ChatMessage {
@@ -83,11 +85,34 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
 
     const handleGuestLogin = (item: React.FormEvent) => {
         item.preventDefault()
-        if (!guestNickname.trim()) return
+        const nick = guestNickname.trim()
+        if (!nick) return
+
+        // 1. Length Check
+        if (nick.length > 15) {
+            showTerminalToast.error("INVALID NAME", "Nickname must be 15 characters or less.")
+            return
+        }
+
+        // 2. Link Check
+        // refined regex to catch domains like .com, .net, etc without protocol
+        const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9-]+\.(com|net|org|io|gg|xyz|co|us|uk|info|biz)\b)/i
+        if (urlRegex.test(nick)) {
+            showTerminalToast.error("INVALID NAME", "Links and domain names are not allowed as nicknames.")
+            return
+        }
+
+        // 3. Profanity Check
+        const cleanNick = filterProfanity(nick)
+        if (cleanNick !== nick) {
+            showTerminalToast.error("INVALID NAME", "Please choose a different nickname.")
+            return
+        }
 
         const newGuestId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
         setGuestId(newGuestId)
         setIsGuestLoggedIn(true)
+        setGuestNickname(nick) // Ensure trimmed version is set
     }
 
     // Poll for typing users
@@ -1110,7 +1135,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                         onChange={(e) => setGuestNickname(e.target.value)}
                                                         placeholder="Enter a temporary nickname..."
                                                         className="h-10 rounded-xl border-white/5 bg-white/5 text-sm placeholder:text-zinc-500 text-zinc-200 focus-visible:border-emerald-500/50 focus-visible:ring-0 transition-all pr-10"
-                                                        maxLength={20}
+                                                        maxLength={15}
                                                         autoFocus
                                                     />
                                                     <Users className="absolute right-3 top-3 h-4 w-4 text-zinc-500" />
