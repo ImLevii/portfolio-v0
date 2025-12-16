@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils"
 
 import { type ChatSettingsConfig } from "@/actions/chat-settings"
 import { updatePresence, getOnlineCount, setTypingStatus, getTypingUsers } from "@/actions/presence"
-import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { createTicket, getTicket, getUserTickets, closeTicket } from "@/actions/tickets"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
 import { getActiveSponsoredMessage, type SponsoredMessageData } from "@/actions/sponsored"
