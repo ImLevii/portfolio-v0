@@ -23,6 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, getChatUserProfile, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { uploadChatMedia } from "@/actions/upload"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { toast } from "sonner"
 
 interface ChatMessage {
@@ -1021,26 +1022,23 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                                 const formData = new FormData()
                                                                 formData.append('file', file)
 
-                                                                const loadingToast = toast.loading("Uploading media...")
+                                                                const loadingToast = showTerminalToast.loading("UPLOADING", "Processing media file...")
 
                                                                 try {
                                                                     // Use top-level import
                                                                     const result = await uploadChatMedia(formData)
 
-                                                                    toast.dismiss(loadingToast)
-
                                                                     if (result.success && result.url) {
                                                                         const prefix = result.type === 'video' ? '[video]' : '![image]'
                                                                         const markdown = ` ${prefix}(${result.url}) `
                                                                         setInputText(prev => prev + markdown)
-                                                                        toast.success("Upload successful")
+                                                                        showTerminalToast.success("UPLOAD COMPLETE", "Media attached successfully.", loadingToast)
                                                                     } else {
-                                                                        toast.error(result.error || "Upload failed")
+                                                                        showTerminalToast.error("UPLOAD FAILED", result.error || "Unknown error occurred.", loadingToast)
                                                                     }
                                                                 } catch (err) {
                                                                     console.error(err)
-                                                                    toast.dismiss(loadingToast)
-                                                                    toast.error("Upload failed")
+                                                                    showTerminalToast.error("SYSTEM ERROR", "Connection interrupted.", loadingToast)
                                                                 }
 
                                                                 // Reset input

@@ -28,6 +28,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { updateChatSettings, type ChatSettingsConfig } from "@/actions/chat-settings"
 import { clearChat } from "@/actions/chat"
 import { AlertCircle } from "lucide-react"
@@ -56,13 +57,13 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
             try {
                 const result = await updateChatSettings(values as ChatSettingsConfig)
                 if (result.success) {
-                    toast.success("Chat settings updated successfully")
+                    showTerminalToast.success("SETTINGS SAVED", "Chat configuration updated.")
                     router.refresh()
                 } else {
-                    toast.error("Failed to update settings")
+                    showTerminalToast.error("SAVE FAILED", "Could not update settings.")
                 }
             } catch (error) {
-                toast.error("Something went wrong")
+                showTerminalToast.error("SYSTEM ERROR", "Something went wrong.")
             }
         })
     }
@@ -70,17 +71,19 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
     const handleClearChat = async () => {
         if (!confirm("Are you sure you want to clear all chat history? This cannot be undone.")) return
 
+        const loadingToast = showTerminalToast.loading("CLEARING CHAT", "Deleting message history...")
+
         startTransition(async () => {
             try {
                 const result = await clearChat()
                 if (result.success) {
-                    toast.success("Chat history cleared")
+                    showTerminalToast.success("CHAT CLEARED", "All messages have been deleted.", loadingToast)
                     router.refresh()
                 } else {
-                    toast.error("Failed to clear chat")
+                    showTerminalToast.error("CLEAR FAILED", "Could not delete messages.", loadingToast)
                 }
             } catch (error) {
-                toast.error("Something went wrong")
+                showTerminalToast.error("SYSTEM ERROR", "Something went wrong.", loadingToast)
             }
         })
     }
