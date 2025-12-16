@@ -30,6 +30,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
     const dragControls = useDragControls()
+    const isDraggingRef = useRef(false)
 
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [onlineCount, setOnlineCount] = useState(1)
@@ -508,6 +509,8 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             dragListener={false}
             dragControls={dragControls}
             dragMomentum={false}
+            onDragStart={() => { isDraggingRef.current = true }}
+            onDragEnd={() => { setTimeout(() => isDraggingRef.current = false, 100) }}
             className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end print:hidden"
         >
             <AnimatePresence>
@@ -911,6 +914,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                     hasUnread && !isOpen && "animate-pulse shadow-[0_0_30px_rgba(16,185,129,0.6)] border-emerald-500"
                 )}
                 onClick={() => {
+                    if (isDraggingRef.current) return
                     if (isOpen && isMinimized) {
                         setIsMinimized(false)
                     } else {
