@@ -17,7 +17,7 @@ export function AdminSidebar() {
         { href: "/admin/chat", label: "Live Chat", icon: MessageSquare },
         { href: "/admin/sponsored", label: "Sponsored", icon: Megaphone },
         { href: "/admin/orders", label: "Orders", icon: Package },
-        { href: "/admin/customers", label: "Customers", icon: Users },
+        { href: "/admin/customers", label: "Users & Roles", icon: Users },
         { href: "/admin/support", label: "Support Hub", icon: HeadphonesIcon },
         { href: "/admin/carousel", label: "Carousel", icon: LayoutDashboard }, // Added Carousel link
         { href: "/admin/coupons", label: "Coupons", icon: Package },

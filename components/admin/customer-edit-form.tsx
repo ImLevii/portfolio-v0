@@ -94,7 +94,9 @@ export function CustomerEditForm({ customer }: CustomerEditFormProps) {
                             </SelectTrigger>
                             <SelectContent className="bg-black border-gray-800 text-white">
                                 <SelectItem value="CUSTOMER">Customer</SelectItem>
-                                <SelectItem value="ADMIN">Admin</SelectItem>
+                                <SelectItem value="SUPPORT">Support Agent</SelectItem>
+                                <SelectItem value="MODERATOR">Moderator</SelectItem>
+                                <SelectItem value="ADMIN">Administrator</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
