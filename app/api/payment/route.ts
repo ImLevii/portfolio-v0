@@ -68,33 +68,56 @@ export async function POST(req: Request) {
                 user = await db.user.create({ data: { email, name } })
             }
 
-            // Create Order
-            // Note: We need product IDs here. Currently they are not passed in PaymentData.
-            // We should update the client to pass productIds or store them in the PayPal order context if possible.
-            // For now, assuming single product or we need to fetch from cart context on client side and pass it here.
-            // Let's assume the client passes `productIds` in the body.
+            // Extract metadata from custom_id using the same logic as creation
+            let productIds: string[] = []
+            let couponId: string | undefined = undefined
 
-            // TODO: Update PaymentData interface and client call to include productIds
+            const customId = capture?.custom_id
+            if (customId) {
+                try {
+                    const payload = JSON.parse(customId)
+                    // Check if it's the full payload or the shortened one
+                    if (payload.p && Array.isArray(payload.p)) {
+                        productIds = payload.p
+                    } else if (payload.p_count) {
+                        // Fallback logic if we had to truncat (shouldn't happen often for small cart)
+                        // If we truncated, we might have lost the IDs. 
+                        // However, let's also check if client passed them in body as backup
+                        console.warn("PayPal metadata was truncated, checking fallback body data")
+                    }
 
-            // Temporary: If productIds are missing, we can't link products. 
-            // BUT, for this task, we must implement it. 
-            // I will add `productIds` to the request body handling.
+                    if (payload.c) {
+                        couponId = payload.c
+                    }
+                } catch (e) {
+                    console.error("Failed to parse PayPal custom_id metadata", e)
+                }
+            }
 
-            const productIds = (data as any).productIds || []
+            // Fallback to body data if metadata missing
+            if (productIds.length === 0 && (data as any).productIds) {
+                productIds = (data as any).productIds
+            }
+
+            // Fallback to couponID from body if not found in custom_id
+            if (!couponId && (data as any).couponId) {
+                couponId = (data as any).couponId
+            }
 
             if (productIds.length > 0) {
                 const order = await db.order.create({
                     data: {
                         userId: user.id,
                         stripeSessionId: `PAYPAL_${data.orderID}`, // Use PayPal ID as session ID
-                        amount: Number(data.amount) * 100, // Convert to cents if needed, or keep as is depending on schema
+                        amount: Number(data.amount) * 100, // Convert to cents
                         currency: "USD",
                         status: "completed",
                         paymentMethod: "paypal",
+                        couponCode: couponId ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
                         items: {
                             create: productIds.map((id: string) => ({
                                 productId: id,
-                                price: 0 // Ideally fetch price
+                                price: 0 // Ideally fetch price or calculate based on total/count
                             }))
                         }
                     }
@@ -110,6 +133,16 @@ export async function POST(req: Request) {
                             status: "ACTIVE"
                         }
                     })
+                }
+
+                // Increment Coupon Usage
+                if (couponId) {
+                    await db.coupon.update({
+                        where: { id: couponId },
+                        data: {
+                            uses: { increment: 1 }
+                        }
+                    }).catch(err => console.error("Failed to increment coupon usage:", err))
                 }
             }
         }

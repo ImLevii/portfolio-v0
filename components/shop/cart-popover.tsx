@@ -269,7 +269,6 @@ export function CartPopover({ user }: { user?: any }) {
                         </div>
 
                         {isPayPalSelected ? (
-                            paypalClientId ? (
                                 <div className="relative group">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 blur-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                     {paypalError && (
@@ -289,11 +288,6 @@ export function CartPopover({ user }: { user?: any }) {
                                         />
                                     </button>
                                 </div>
-                            ) : (
-                                <div className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-200">
-                                    PayPal client ID missing.
-                                </div>
-                            )
                         ) : (
                             <Button
                                 onClick={onCheckout}
