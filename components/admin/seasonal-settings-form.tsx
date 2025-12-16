@@ -192,7 +192,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                 <Button
                     onClick={handleSave}
                     disabled={isPending}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white border-0 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all active:scale-[0.98]"
                 >
                     {isPending ? (
                         <>

@@ -207,7 +207,7 @@ export function ProductForm({ initialData, action }: ProductFormProps) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold font-orbitron py-4 rounded-xl transition-all shadow-lg hover:shadow-green-900/20 flex items-center justify-center gap-2 tracking-wider"
+                        className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold font-orbitron py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 tracking-wider"
                     >
                         {loading && <Loader2 className="h-5 w-5 animate-spin" />}
                         {initialData ? "UPDATE PRODUCT" : "CREATE PRODUCT"}

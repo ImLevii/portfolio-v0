@@ -178,7 +178,7 @@ export function AnnouncementForm() {
                     <Button
                         onClick={handleBroadcast}
                         disabled={isPending}
-                        className="flex-1 bg-purple-600 hover:bg-purple-500"
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-0 shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all active:scale-[0.98]"
                     >
                         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
                         Broadcast Now
@@ -187,7 +187,7 @@ export function AnnouncementForm() {
                         onClick={handleClear}
                         disabled={isPending}
                         variant="outline"
-                        className="border-red-500/20 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                        className="border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/50 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all"
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Clear Active

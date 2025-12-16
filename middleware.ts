@@ -3,6 +3,10 @@ import authConfig from "@/auth.config"
 
 const { auth } = NextAuth(authConfig)
 
+import { NextResponse } from "next/server"
+
+// ... imports
+
 export default auth((req) => {
     const isLoggedIn = !!req.auth
     const isAuthRoute = req.nextUrl.pathname.startsWith("/auth")
@@ -17,7 +21,7 @@ export default auth((req) => {
     if (isAdminRoute) {
         if (!isLoggedIn) {
             console.log("Middleware: Admin route accessed, not logged in. Redirecting to signin.")
-            return Response.redirect(new URL("/api/auth/signin", req.nextUrl))
+            return NextResponse.redirect(new URL("/api/auth/signin", req.nextUrl))
         }
 
         // @ts-ignore
@@ -26,7 +30,7 @@ export default auth((req) => {
 
         if (userRole !== "ADMIN" && userRole !== "Admin") {
             console.log("Middleware: User is not ADMIN. Redirecting to /.")
-            return Response.redirect(new URL("/", req.nextUrl))
+            return NextResponse.redirect(new URL("/", req.nextUrl))
         }
     }
 })

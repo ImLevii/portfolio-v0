@@ -536,7 +536,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
                     >
                         {/* Header */}
-                        <div onPointerDown={(e) => dragControls.start(e)} className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md cursor-move">
+                        <div
+                            onPointerDown={(e) => dragControls.start(e)}
+                            onTouchStart={(e) => dragControls.start(e)}
+                            className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md cursor-move touch-none"
+                        >
                             <div className="flex items-center gap-3">
                                 {view === 'support' ? (
                                     <button
