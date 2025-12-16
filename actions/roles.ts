@@ -6,11 +6,9 @@ import { revalidatePath } from "next/cache"
 
 import { DEFAULT_ROLES } from "@/lib/roles"
 
-// Re-export type for convenience if needed by other server files, 
-// though generally client components should import from lib/roles
-import type { RoleDefinition } from "@/lib/roles"
+// Re-export type behavior is problematic in "use server" files for some bundlers
+// Consumers should import directly from @/lib/roles
 
-export { RoleDefinition } // Re-export type if needed
 
 export async function getRoles() {
     try {
