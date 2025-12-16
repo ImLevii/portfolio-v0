@@ -9,7 +9,13 @@ export async function getPayPalAccessToken() {
 
     let clientId = process.env.PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
     let clientSecret = process.env.PAYPAL_CLIENT_SECRET || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_SECRET
-    let apiUrl = process.env.PAYPAL_API_URL || process.env.NEXT_PUBLIC_PAYPAL_API_URL || PAYPAL_API_URL
+
+    // Valid values: 'sandbox' or 'live'
+    const envMode = process.env.PAYPAL_MODE || (process.env.NODE_ENV === "development" ? "sandbox" : "live")
+
+    // Default to Live unless Env explicitly says Sandbox or provides a Sandbox URL
+    let apiUrl = process.env.PAYPAL_API_URL || process.env.NEXT_PUBLIC_PAYPAL_API_URL ||
+        (envMode === "sandbox" ? "https://api-m.sandbox.paypal.com" : PAYPAL_API_URL)
 
     // Trim Env vars if they exist
     if (clientId) clientId = clientId.trim()
@@ -22,8 +28,9 @@ export async function getPayPalAccessToken() {
         try {
             const config = JSON.parse(method.config)
 
-            // Check if we should use DB config
-            // We use DB config if Env vars are missing OR if they are effectively empty
+            // WE ONLY USE DB CONFIG IF ENV VARS ARE MISSING
+            // This allows .env to always override DB for security/local dev
+
             const envIdMissing = !clientId || clientId === ""
             const envSecretMissing = !clientSecret || clientSecret === ""
 
@@ -37,8 +44,18 @@ export async function getPayPalAccessToken() {
                 useDbConfig = true
             }
 
-            if (config.mode === "sandbox" && (!apiUrl || apiUrl === "")) {
-                apiUrl = "https://api-m.sandbox.paypal.com"
+            // Fix: Override URL based on DB mode if URL wasn't explicitly set by Env var (custom URL)
+            // We check if the current apiUrl is just the default one.
+            const isDefaultLive = apiUrl === PAYPAL_API_URL
+            const isDefaultSandbox = apiUrl === "https://api-m.sandbox.paypal.com"
+
+            // If the user didn't set a custom PAYPAL_API_URL in .env, we respect the DB mode
+            if (!process.env.PAYPAL_API_URL && !process.env.NEXT_PUBLIC_PAYPAL_API_URL) {
+                if (config.mode === "sandbox") {
+                    apiUrl = "https://api-m.sandbox.paypal.com"
+                } else {
+                    apiUrl = PAYPAL_API_URL
+                }
             }
         } catch (e) {
             console.error("Failed to parse PayPal config from DB", e)
