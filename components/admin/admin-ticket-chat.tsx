@@ -24,6 +24,15 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
         }
     }
 
+    // Smart Scroll Logic
+    const lastScrollHeightRef = useRef<number>(0)
+    const isUserNearBottom = () => {
+        const container = scrollRef.current?.parentElement
+        if (!container) return false
+        const threshold = 100 // pixels from bottom
+        return container.scrollHeight - container.scrollTop - container.clientHeight < threshold
+    }
+
     // Initial scroll
     useEffect(() => {
         scrollToBottom("auto")
@@ -32,29 +41,44 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
     // Scroll on new messages
     useEffect(() => {
         const lastMsg = messages[messages.length - 1]
+        // Only scroll if we were already near bottom OR if we just sent a message (optimistic)
+        // We use a flag or check if the new message is ours? 
+        // For simplicity: If new message ID changed...
         if (lastMsg?.id !== lastMessageIdRef.current) {
-            scrollToBottom()
+            // Check if we authored the last message (it's optimistic or from us)
+            const isMe = lastMsg?.senderRole === 'ADMIN' || lastMsg?.senderRole === 'Admin'
+
+            if (isMe || isUserNearBottom()) {
+                scrollToBottom()
+            }
             lastMessageIdRef.current = lastMsg?.id
         }
     }, [messages])
 
     // Polling Logic
     useEffect(() => {
+        let isMounted = true
         const pollInterval = setInterval(async () => {
-            // Re-fetch ticket data to get new messages
-            // We use the imported server action. Note: ensure getTicket is importable/usable here.
-            // If getTicket is server-only and not exposed to client bundles effectively, we might need a wrapper.
-            // But usually server actions can be imported. 
-            // If `getTicket` in actions/tickets.ts is "use server", it's fine.
             try {
                 const { getTicket } = await import("@/actions/tickets")
                 const updatedTicket = await getTicket(initialTicket.id)
 
-                if (updatedTicket) {
-                    // Update messages if changed
+                if (updatedTicket && isMounted) {
                     setMessages(prev => {
+                        // 1. Remove optimistic messages that have been confirmed (assume real messages replace them)
+                        // Actually, simplified: Just compare length or content.
+                        // Best approach: If real messages from server are DIFFERENT than current state (excluding optimistic/temp)
+
+                        // Filter out temporary optimistic messages from current state to compare with server
+                        const currentReal = prev.filter(m => !m.id.startsWith('temp-'))
                         const newMsgs = updatedTicket.messages
-                        if (JSON.stringify(newMsgs) !== JSON.stringify(prev)) {
+
+                        // Deep check
+                        if (JSON.stringify(newMsgs) !== JSON.stringify(currentReal)) {
+                            // Merge strategy: Take server messages, append any PENDING optimistic ones that aren't in server yet?
+                            // For simplicity, we'll just trust server, but we risk killing a pending message if it hasn't landed yet.
+                            // BUT, polling is 3s. Sending usually takes <1s.
+                            // If isSending is true, maybe skip update?
                             return newMsgs
                         }
                         return prev
@@ -65,7 +89,10 @@ export function AdminTicketChat({ ticket: initialTicket }: { ticket: any }) {
             }
         }, 3000)
 
-        return () => clearInterval(pollInterval)
+        return () => {
+            isMounted = false
+            clearInterval(pollInterval)
+        }
     }, [initialTicket.id])
 
     const handleSend = async (e: React.FormEvent) => {

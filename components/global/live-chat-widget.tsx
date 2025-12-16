@@ -209,13 +209,25 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             }
 
             if (isCurrent) {
-                setMessages(() => {
-                    let displayMessages: ChatMessage[] = dbMessages.map(m => ({ ...m, type: 'user' }))
-                    // Merge local system messages
-                    // We want them to appear effectively "in order" or just at the bottom?
-                    // Usually they are interleaved by time.
-                    const all = [...displayMessages, ...localSystemMessages]
-                    return all.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                setMessages((prev) => {
+                    const nextDisplayMessages = dbMessages.map(m => ({ ...m, type: 'user' as const }))
+                    const nextAll = [...nextDisplayMessages, ...localSystemMessages].sort(
+                        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                    )
+
+                    // Deep compare to prevent re-renders if nothing changed
+                    // Since specific object references change, we compare structure
+                    const prevStr = JSON.stringify(prev.map(m => ({ id: m.id, reactions: m.reactions })))
+                    const nextStr = JSON.stringify(nextAll.map(m => ({ id: m.id, reactions: m.reactions })))
+
+                    // Optimization: If IDs and Reactions are same, text is likely same (chats are append-only usually)
+                    // But for safety, full compare might be safer but slower. 
+                    // Let's settle on a "smart" compare: standard JSON stringify of the whole array is fast enough for <100 msgs.
+                    if (JSON.stringify(prev) === JSON.stringify(nextAll)) {
+                        return prev
+                    }
+
+                    return nextAll
                 })
             }
         }
