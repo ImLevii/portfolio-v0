@@ -25,6 +25,9 @@ interface ChatMessage extends ChatMessageData {
     sponsoredData?: SponsoredMessageData
 }
 
+
+const MAX_CHARS = 500
+
 export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSettingsConfig }) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
@@ -79,7 +82,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
         lastMessageIdRef.current = null
 
         const pollData = async () => {
-            // ... (Presence & Count logic same)
+            // ... (Presence & Count logic same)A
             if (presenceId) await updatePresence(presenceId)
             if (!isCurrent) return
 
@@ -262,6 +265,16 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const handleSendMessage = (e?: React.FormEvent) => {
         e?.preventDefault()
         if (!inputText.trim()) return
+
+        if (inputText.length > MAX_CHARS) {
+            alert(`Message too long. Max ${MAX_CHARS} characters.`)
+            return
+        }
+
+        if (inputText.includes('```')) {
+            alert("Code blocks are not allowed in chat.")
+            return
+        }
 
         // Optimistic UI update could go here, but with 3s poll it might flicker.
         // Let's just send and wait for poll or manually trigger fetch.
@@ -857,24 +870,35 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                 {/* Input Area */}
                                 <div className="border-t border-white/5 bg-black/40 p-3 backdrop-blur-md">
                                     {user ? (
-                                        <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
-                                            <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending || activeTicket?.status === 'CLOSED'} />
-                                            <Input
-                                                value={inputText}
-                                                onChange={(e) => setInputText(e.target.value)}
-                                                placeholder={activeTicket?.status === 'CLOSED' ? "This ticket is closed." : "Send a message..."}
-                                                disabled={isPending || activeTicket?.status === 'CLOSED'}
-                                                className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                            />
-                                            <Button
-                                                type="submit"
-                                                size="icon"
-                                                disabled={isPending || activeTicket?.status === 'CLOSED'}
-                                                className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                <Send className="h-4 w-4" />
-                                            </Button>
-                                        </form>
+                                        <div className="flex flex-col gap-1 w-full">
+                                            {inputText.length > 0 && (
+                                                <div className={cn(
+                                                    "text-[10px] text-right font-medium transition-colors",
+                                                    inputText.length > MAX_CHARS ? "text-red-500" : "text-zinc-500"
+                                                )}>
+                                                    {inputText.length}/{MAX_CHARS}
+                                                </div>
+                                            )}
+                                            <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
+                                                <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending || activeTicket?.status === 'CLOSED'} />
+                                                <Input
+                                                    value={inputText}
+                                                    onChange={(e) => setInputText(e.target.value)}
+                                                    placeholder={activeTicket?.status === 'CLOSED' ? "This ticket is closed." : "Send a message..."}
+                                                    disabled={isPending || activeTicket?.status === 'CLOSED'}
+                                                    maxLength={MAX_CHARS}
+                                                    className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                />
+                                                <Button
+                                                    type="submit"
+                                                    size="icon"
+                                                    disabled={isPending || activeTicket?.status === 'CLOSED' || inputText.length > MAX_CHARS}
+                                                    className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <Send className="h-4 w-4" />
+                                                </Button>
+                                            </form>
+                                        </div>
                                     ) : (
                                         <div className="flex flex-col gap-2">
                                             <div className="relative">
