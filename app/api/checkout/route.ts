@@ -30,9 +30,16 @@ export async function POST(req: Request) {
     const host = req.headers.get("host")
     const protocol = process.env.NODE_ENV === "development" ? "http" : "https"
 
-    const baseUrl = origin || `${protocol}://${host}` || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    // Prioritize NEXT_PUBLIC_APP_URL for production stability, fall back to request origin for previews/dev
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || origin || `${protocol}://${host}` || "http://localhost:3000"
 
-    console.log("Checkout request:", { productIds, paymentMethodId, baseUrl })
+    console.log("Checkout init:", {
+        productIds,
+        paymentMethodId,
+        resolvedBaseUrl: baseUrl,
+        envAppUrl: process.env.NEXT_PUBLIC_APP_URL,
+        origin
+    })
 
     if (!productIds || productIds.length === 0) {
         console.log("Checkout error: Product IDs are required")
