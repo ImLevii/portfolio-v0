@@ -26,6 +26,7 @@ import { getRecentMessages, sendMessage, addReaction, deleteMessage, clearChat, 
 const MAX_CHARS = 500
 
 export function LiveChatWidget({ user, config, initialMessages = [], initialTickets = [] }: { user?: any, config?: ChatSettingsConfig, initialMessages?: ChatMessageData[], initialTickets?: any[] }) {
+    const isAdmin = user?.role === "ADMIN" || user?.role === "Admin"
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
