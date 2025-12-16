@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useTransition } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence, useDragControls } from "framer-motion"
-import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare, Megaphone } from "lucide-react"
+import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare, Megaphone, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -928,6 +928,18 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                             </p>
                                         </div>
                                     )}
+                                    {/* Powered By Footer */}
+                                    <div className="mt-3 flex justify-center">
+                                        <a
+                                            href="https://levik.dev"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-600 transition-all duration-300 hover:text-emerald-500 hover:drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"
+                                        >
+                                            <Zap className="h-3 w-3 text-zinc-700 transition-all duration-300 group-hover:fill-emerald-500 group-hover:text-emerald-500 group-hover:rotate-12" />
+                                            <span>Powered by <span className="text-zinc-500 group-hover:text-emerald-400 transition-colors">levik.dev</span></span>
+                                        </a>
+                                    </div>
                                 </div>
                             </>
                         )}
