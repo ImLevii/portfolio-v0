@@ -176,7 +176,10 @@ export async function POST(req: Request) {
     if (paymentMethodId === "paypal") {
         try {
             const formattedTotal = (totalAmount / 100).toFixed(2)
-            const order = await createPayPalOrder(formattedTotal, baseUrl)
+            const order = await createPayPalOrder(formattedTotal, baseUrl, {
+                productIds: productIds,
+                couponId: couponId || undefined // Explicitly undefined if falsey/empty to avoid clutter
+            })
 
             const approveLink = order.links.find((link: any) => link.rel === "approve")
 
@@ -235,7 +238,7 @@ export async function POST(req: Request) {
             cancel_url: `${baseUrl}/shop?canceled=1`,
             metadata: {
                 productIds: JSON.stringify(productIds),
-                couponId: couponId || null
+                couponId: couponId || ""
             },
             customer_email: session?.user?.email || undefined, // Prefill email if logged in
         })

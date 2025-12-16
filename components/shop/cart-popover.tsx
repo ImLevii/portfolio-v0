@@ -127,6 +127,7 @@ export function CartPopover({ user }: { user?: any }) {
             if (data.url) {
                 window.location.href = data.url
             } else {
+                console.error("Checkout failed:", data)
                 const errorMessage = data.details
                     ? `${data.error}: ${data.details}`
                     : data.error || "Something went wrong."

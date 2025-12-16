@@ -59,13 +59,35 @@ export async function getPayPalAccessToken() {
     return { accessToken: data.access_token as string, apiUrl }
 }
 
-export async function createPayPalOrder(amount: string, baseUrl: string) {
+export async function createPayPalOrder(amount: string, baseUrl: string, metadata?: { productIds: string[], couponId?: string }) {
     const { accessToken, apiUrl } = await getPayPalAccessToken()
 
     const returnUrl = `${baseUrl}/shop/success?method=paypal`
     const cancelUrl = `${baseUrl}/shop?canceled=1`
 
-    console.log("Creating PayPal Order:", { amount, returnUrl, cancelUrl })
+    console.log("Creating PayPal Order:", { amount, returnUrl, cancelUrl, metadata })
+
+    // Serialize metadata for custom_id (PayPal limit 127 chars)
+    // We prioritize couponId as it's small, and list product IDs if space permits
+    let customId = ""
+    if (metadata) {
+        try {
+            const payload = {
+                c: metadata.couponId,
+                p: metadata.productIds
+            }
+            customId = JSON.stringify(payload)
+            if (customId.length > 127) {
+                // If too long, just send coupon and count of products
+                customId = JSON.stringify({
+                    c: metadata.couponId,
+                    p_count: metadata.productIds.length
+                })
+            }
+        } catch (e) {
+            console.error("Failed to serialize PayPal metadata", e)
+        }
+    }
 
     const response = await fetch(`${apiUrl}/v2/checkout/orders`, {
         method: "POST",
@@ -81,6 +103,7 @@ export async function createPayPalOrder(amount: string, baseUrl: string) {
                         currency_code: "USD",
                         value: amount,
                     },
+                    custom_id: customId || undefined
                 },
             ],
             application_context: {
