@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useTransition } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence, useDragControls } from "framer-motion"
-import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare, Megaphone, Zap } from "lucide-react"
+import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare, Megaphone, Zap, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -633,7 +633,10 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                     /* LIVE USER COUNT - Simplified */
                                     <div className="flex items-center gap-2 bg-emerald-500/5 px-2.5 py-1 rounded-full border border-emerald-500/10">
                                         <div className="relative flex h-3 w-3 items-center justify-center">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-50 duration-1000"></span>
+                                            <span
+                                                className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-50 animate-ping"
+                                                style={{ animationDuration: '3s' }}
+                                            ></span>
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 w-3 h-3 text-emerald-500">
                                                 <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor" />
                                                 <path d="M12 13C8.13401 13 5 16.134 5 20V21H19V20C19 16.134 15.866 13 12 13Z" fill="currentColor" />
@@ -997,7 +1000,60 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                 </div>
                                             )}
                                             <form onSubmit={handleSendMessage} className="relative flex items-center gap-2">
-                                                <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending || activeTicket?.status === 'CLOSED'} />
+                                                <div className="flex items-center gap-2">
+                                                    <SimpleEmojiPicker onSelect={handleEmojiSelect} disabled={isPending || activeTicket?.status === 'CLOSED'} />
+
+                                                    {/* Media Upload Button */}
+                                                    <div className="relative">
+                                                        <input
+                                                            type="file"
+                                                            id="chat-media-upload"
+                                                            className="hidden"
+                                                            accept="image/*,video/mp4,video/webm"
+                                                            disabled={isPending || activeTicket?.status === 'CLOSED'}
+                                                            onChange={async (e) => {
+                                                                const file = e.target.files?.[0]
+                                                                if (!file) return
+
+                                                                // Optimistic loading state or toast could go here
+                                                                const formData = new FormData()
+                                                                formData.append('file', file)
+
+                                                                // Import dynamically or at top. Using dynamic for now to keep diff clean if possible, but cleaner to add import at top.
+                                                                // Retrying with top-level import is better. I will assume I need to add import.
+                                                                try {
+                                                                    // Show some loading indicator if we had one, for now just append text on completion
+                                                                    const { uploadChatMedia } = await import("@/actions/upload")
+                                                                    const result = await uploadChatMedia(formData)
+
+                                                                    if (result.success && result.url) {
+                                                                        const prefix = result.type === 'video' ? '[video]' : '![image]'
+                                                                        const markdown = ` ${prefix}(${result.url}) `
+                                                                        setInputText(prev => prev + markdown)
+                                                                    } else {
+                                                                        alert(result.error || "Upload failed")
+                                                                    }
+                                                                } catch (err) {
+                                                                    console.error(err)
+                                                                    alert("Upload failed")
+                                                                }
+
+                                                                // Reset input
+                                                                e.target.value = ''
+                                                            }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => document.getElementById('chat-media-upload')?.click()}
+                                                            disabled={isPending || activeTicket?.status === 'CLOSED'}
+                                                            className="p-2 rounded-xl bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+                                                            title="Upload Image or Video"
+                                                        >
+                                                            <ImageIcon className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
                                                 <Input
                                                     value={inputText}
                                                     onChange={(e) => setInputText(e.target.value)}
@@ -1005,7 +1061,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                     disabled={isPending || activeTicket?.status === 'CLOSED'}
                                                     maxLength={MAX_CHARS}
                                                     onKeyDown={handleTyping}
-                                                    className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-1"
                                                 />
                                                 <Button
                                                     type="submit"
