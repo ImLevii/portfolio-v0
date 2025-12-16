@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
 import { type ChatSettingsConfig } from "@/actions/chat-settings"
-import { updatePresence, getOnlineCount } from "@/actions/presence"
+import { updatePresence, getOnlineCount, setTypingStatus, getTypingUsers } from "@/actions/presence"
 import { getRecentMessages, sendMessage, addReaction, deleteMessage, type ChatMessageData, getChatProducts } from "@/actions/chat"
 import { createTicket, getTicket, getUserTickets, closeTicket } from "@/actions/tickets"
 import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcements"
@@ -32,32 +32,52 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
-    const dragControls = useDragControls()
-    const isDraggingRef = useRef(false)
+    const [hasUnread, setHasUnread] = useState(false)
+    const [view, setView] = useState<'home' | 'tickets' | 'chat'>('home')
 
     const [messages, setMessages] = useState<ChatMessage[]>(() => {
         if (initialMessages && initialMessages.length > 0) {
             return initialMessages.map(m => ({
-                id: m.id,
-                text: m.text,
-                senderName: m.senderName,
-                senderAvatar: m.senderAvatar,
-                senderRole: m.senderRole,
-                createdAt: m.createdAt,
-                reactions: m.reactions,
+                ...m,
                 type: 'user'
             })) as ChatMessage[]
         }
         return []
     })
+
+    const [typingUsers, setTypingUsers] = useState<string[]>([])
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
     const [onlineCount, setOnlineCount] = useState(1)
     const [announcement, setAnnouncement] = useState<AnnouncementConfig | null>(null)
-    const [hasUnread, setHasUnread] = useState(false)
     const [activeTicket, setActiveTicket] = useState<{ id: string; category: string; status: string } | null>(null)
     const [userTickets, setUserTickets] = useState<any[]>(initialTickets)
-    const [view, setView] = useState<'chat' | 'support'>('chat')
     const [products, setProducts] = useState<{ id: string, name: string }[]>([])
     const [localSystemMessages, setLocalSystemMessages] = useState<ChatMessage[]>([])
+
+    // Poll for typing users
+    useEffect(() => {
+        if (!isOpen) return
+        const interval = setInterval(async () => {
+            const users = await getTypingUsers(user?.id || 'guest')
+            setTypingUsers(users)
+        }, 2000)
+        return () => clearInterval(interval)
+    }, [isOpen, user?.id])
+
+    const handleTyping = () => {
+        playTypingSound()
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        else setTypingStatus(user?.id || 'guest', true, user?.name || 'Guest')
+
+        typingTimeoutRef.current = setTimeout(() => {
+            setTypingStatus(user?.id || 'guest', false)
+            typingTimeoutRef.current = null
+        }, 3000)
+    }
+
+    const dragControls = useDragControls()
+    const isDraggingRef = useRef(false)
 
     // Clear local messages when context changes to prevent leaks (e.g. global ads in private tickets)
     useEffect(() => {
@@ -875,7 +895,28 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                 </ScrollArea>
 
                                 {/* Input Area */}
-                                <div className="border-t border-white/5 bg-black/40 p-3 backdrop-blur-md">
+                                <div className="border-t border-white/5 bg-black/40 p-3 backdrop-blur-md relative">
+                                    <AnimatePresence>
+                                        {typingUsers.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                className="absolute -top-6 left-4 text-[10px] text-zinc-500 flex items-center gap-1.5 font-mono"
+                                            >
+                                                <span className="relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                                </span>
+                                                <span className="text-emerald-500 font-bold">
+                                                    {typingUsers.length > 2
+                                                        ? `${typingUsers.length} people are typing...`
+                                                        : `${typingUsers.join(', ')} is typing...`
+                                                    }
+                                                </span>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                     {user ? (
                                         <div className="flex flex-col gap-1 w-full">
                                             {inputText.length > 0 && (
@@ -894,7 +935,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                     placeholder={activeTicket?.status === 'CLOSED' ? "This ticket is closed." : "Send a message..."}
                                                     disabled={isPending || activeTicket?.status === 'CLOSED'}
                                                     maxLength={MAX_CHARS}
-                                                    onKeyDown={() => playTypingSound()}
+                                                    onKeyDown={handleTyping}
                                                     className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                 />
                                                 <Button

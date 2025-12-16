@@ -41,7 +41,51 @@ export async function getOnlineCount() {
         if (!isPlanLimit) {
             console.error("Failed to get online count:", error)
         }
-        // Return 1 as fallback so it doesn't look empty
         return { count: 1 }
+    }
+}
+
+export async function setTypingStatus(id: string, isTyping: boolean, username?: string) {
+    try {
+        await prisma.presence.upsert({
+            where: { id },
+            update: {
+                isTyping,
+                lastSeen: new Date(),
+                ...(username ? { username } : {})
+            },
+            create: {
+                id,
+                lastSeen: new Date(),
+                isTyping,
+                username: username || "Anonymous"
+            }
+        })
+        return { success: true }
+    } catch (error) {
+        // Silently fail for typing status to avoid log spam
+        return { success: false }
+    }
+}
+
+export async function getTypingUsers(currentUserId: string) {
+    try {
+        // defined as typing AND seen in last 5 seconds
+        const cutoff = new Date(Date.now() - 5 * 1000)
+
+        const typingUsers = await prisma.presence.findMany({
+            where: {
+                isTyping: true,
+                lastSeen: { gt: cutoff },
+                id: { not: currentUserId } // Don't show "You are typing"
+            },
+            select: {
+                username: true
+            }
+        })
+
+        return typingUsers.map(u => u.username).filter(Boolean) as string[]
+    } catch (error) {
+        return []
     }
 }
