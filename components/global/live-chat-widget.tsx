@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useTransition } from "react"
 import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useDragControls } from "framer-motion"
 import { MessageCircle, X, Send, Minus, Users, ThumbsUp, ThumbsDown, Heart, Reply, Trash2, HeadphonesIcon, CreditCard, Gamepad2, ShieldCheck, DollarSign, Gauge, ArrowLeft, Search, MessageSquare, Megaphone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,6 +29,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
+    const dragControls = useDragControls()
 
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [onlineCount, setOnlineCount] = useState(1)
@@ -506,6 +507,11 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             <AnimatePresence>
                 {isOpen && !isMinimized && (
                     <motion.div
+                        drag
+                        dragListener={false}
+                        dragControls={dragControls}
+                        dragMomentum={false}
+                        dragElastic={0}
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -513,7 +519,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                         className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md">
+                        <div onPointerDown={(e) => dragControls.start(e)} className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md cursor-move">
                             <div className="flex items-center gap-3">
                                 {view === 'support' ? (
                                     <button
