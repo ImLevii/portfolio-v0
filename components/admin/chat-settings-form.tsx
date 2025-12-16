@@ -67,6 +67,24 @@ export function ChatSettingsForm({ initialConfig }: ChatSettingsFormProps) {
         })
     }
 
+    const handleClearChat = async () => {
+        if (!confirm("Are you sure you want to clear all chat history? This cannot be undone.")) return
+
+        startTransition(async () => {
+            try {
+                const result = await clearChat()
+                if (result.success) {
+                    toast.success("Chat history cleared")
+                    router.refresh()
+                } else {
+                    toast.error("Failed to clear chat")
+                }
+            } catch (error) {
+                toast.error("Something went wrong")
+            }
+        })
+    }
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-5xl mx-auto">
