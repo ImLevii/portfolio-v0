@@ -18,7 +18,7 @@ import { getAnnouncement, type AnnouncementConfig } from "@/actions/announcement
 import { getActiveSponsoredMessage, type SponsoredMessageData } from "@/actions/sponsored"
 import { SponsoredMessageCard } from "@/components/global/sponsored-message-card"
 import { SimpleEmojiPicker } from "@/components/global/simple-emoji-picker"
-import { playMessageSound, unlockAudioContext } from "@/lib/audio"
+import { playMessageSound, unlockAudioContext, playSendSound, playTypingSound } from "@/lib/audio"
 
 interface ChatMessage extends ChatMessageData {
     type?: 'system' | 'user' | 'announcement' | 'sponsored' // 'user' is default for DB messages
@@ -28,14 +28,28 @@ interface ChatMessage extends ChatMessageData {
 
 const MAX_CHARS = 500
 
-export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSettingsConfig }) {
+export function LiveChatWidget({ user, config, initialMessages = [] }: { user?: any, config?: ChatSettingsConfig, initialMessages?: ChatMessageData[] }) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
     const [isPending, startTransition] = useTransition()
     const dragControls = useDragControls()
     const isDraggingRef = useRef(false)
 
-    const [messages, setMessages] = useState<ChatMessage[]>([])
+    const [messages, setMessages] = useState<ChatMessage[]>(() => {
+        if (initialMessages && initialMessages.length > 0) {
+            return initialMessages.map(m => ({
+                id: m.id,
+                text: m.text,
+                senderName: m.senderName,
+                senderAvatar: m.senderAvatar,
+                senderRole: m.senderRole,
+                createdAt: m.createdAt,
+                reactions: m.reactions, // it's already an object in ChatMessageData from getRecentMessages? Check actions/chat.ts
+                type: 'user'
+            })) as ChatMessage[]
+        }
+        return []
+    })
     const [onlineCount, setOnlineCount] = useState(1)
     const [announcement, setAnnouncement] = useState<AnnouncementConfig | null>(null)
     const [hasUnread, setHasUnread] = useState(false)
@@ -292,6 +306,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 }
             } else {
                 setInputText("")
+                playSendSound()
                 // Re-fetch immediately for responsiveness
             }
         })
@@ -891,6 +906,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                                                     placeholder={activeTicket?.status === 'CLOSED' ? "This ticket is closed." : "Send a message..."}
                                                     disabled={isPending || activeTicket?.status === 'CLOSED'}
                                                     maxLength={MAX_CHARS}
+                                                    onKeyDown={() => playTypingSound()}
                                                     className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                 />
                                                 <Button
@@ -934,7 +950,7 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
             {/* Floating Toggle */}
             <motion.button
                 className={cn(
-                    "group relative flex h-14 w-14 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500",
+                    "group relative flex h-20 w-20 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500",
                     "border-emerald-500/30",
                     "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
                     "hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:border-emerald-500/50 hover:scale-105 active:scale-95",
@@ -966,9 +982,9 @@ export function LiveChatWidget({ user, config }: { user?: any, config?: ChatSett
                 )}
 
                 {isOpen && !isMinimized ? (
-                    <X className="h-6 w-6 text-emerald-500/80 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)] group-hover:text-emerald-400" />
+                    <X className="h-8 w-8 text-emerald-500/80 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)] group-hover:text-emerald-400" />
                 ) : (
-                    <MessageCircle className="h-6 w-6 text-emerald-500/80 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)] group-hover:text-emerald-400" />
+                    <MessageCircle className="h-8 w-8 text-emerald-500/80 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)] group-hover:text-emerald-400" />
                 )}
             </motion.button>
 

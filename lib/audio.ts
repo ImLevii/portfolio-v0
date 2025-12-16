@@ -123,3 +123,55 @@ export const playErrorSound = () => {
         console.error("Audio playback failed", e);
     }
 }
+
+export const playSendSound = () => {
+    try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        // "Swoosh" / Ascending pitch
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.1);
+    } catch (e) {
+        // ignore
+    }
+}
+
+export const playTypingSound = () => {
+    try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+
+        // Very short click/noise
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        // Noise buffer or just a short high pitch tick?
+        // Let's use a short sine tick
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.02, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.03);
+    } catch (e) {
+        // ignore
+    }
+}

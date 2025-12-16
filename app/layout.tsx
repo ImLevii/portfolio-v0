@@ -40,6 +40,10 @@ export default async function RootLayout({
 
   const chatSettings = await getChatSettings()
 
+  /* Fetch initial data for chat to appear loaded instantly */
+  const { getRecentMessages } = await import("@/actions/chat")
+  const initialMessages = await getRecentMessages()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
@@ -47,7 +51,11 @@ export default async function RootLayout({
           <ScrollToTop />
           <Navbar user={session?.user} />
           <SeasonalEffects config={seasonalSettings} />
-          <LiveChatWidget user={session?.user} config={chatSettings} />
+          <LiveChatWidget
+            user={session?.user}
+            config={chatSettings}
+            initialMessages={initialMessages}
+          />
 
           {children}
         </ThemeProvider>
