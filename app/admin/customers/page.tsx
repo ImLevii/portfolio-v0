@@ -17,6 +17,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { DeleteCustomerButton } from "@/components/admin/delete-customer-button"
 
 export default async function CustomersPage() {
     const customers = await db.user.findMany({
@@ -73,8 +74,8 @@ export default async function CustomersPage() {
                                     </TableCell>
                                     <TableCell>
                                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${customer.role === 'ADMIN'
-                                                ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                            ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                             }`}>
                                             {customer.role === 'ADMIN' && <Shield className="h-3 w-3" />}
                                             {customer.role}
@@ -99,6 +100,11 @@ export default async function CustomersPage() {
                                                         View Details
                                                     </Link>
                                                 </DropdownMenuItem>
+                                                <DeleteCustomerButton
+                                                    customerId={customer.id}
+                                                    customerName={customer.name || customer.email || "Unknown"}
+                                                    variant="icon"
+                                                />
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

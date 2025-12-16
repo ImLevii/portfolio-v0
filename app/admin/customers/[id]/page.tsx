@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { CustomerEditForm } from "@/components/admin/customer-edit-form"
+import { DeleteCustomerButton } from "@/components/admin/delete-customer-button"
 import { AssignProductForm } from "@/components/admin/assign-product-form"
 import { EditLicenseForm } from "@/components/admin/edit-license-form"
 import { StatsCard } from "@/components/admin/stats-card"
@@ -76,6 +77,11 @@ export default async function CustomerDetailsPage({ params }: CustomerDetailsPag
                     <div className="flex items-center gap-4">
                         <h1 className="text-3xl font-bold font-orbitron text-white">{customer.name || "Customer Details"}</h1>
                         <CustomerEditForm customer={customer} />
+                        <DeleteCustomerButton
+                            customerId={customer.id}
+                            customerName={customer.name || customer.email || "Unknown"}
+                            redirectAfter
+                        />
                     </div>
                     <div className="flex items-center gap-2 text-gray-400 mt-1">
                         <Mail className="h-4 w-4" />

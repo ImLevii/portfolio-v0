@@ -131,3 +131,22 @@ export async function updateLicense(formData: FormData) {
 
     revalidatePath(`/admin/customers/${customerId}`)
 }
+
+export async function deleteCustomer(id: string) {
+    const session = await auth()
+
+    // @ts-ignore
+    if (session?.user?.role !== "ADMIN") {
+        throw new Error("Unauthorized")
+    }
+
+    if (!id) {
+        throw new Error("Missing required fields")
+    }
+
+    await db.user.delete({
+        where: { id }
+    })
+
+    revalidatePath("/admin/customers")
+}
