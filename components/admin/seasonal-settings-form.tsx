@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Save, Snowflake, Leaf, Music, Volume2, Clock, Activity } from "lucide-react"
+import { Loader2, Save, Snowflake, Leaf, Music, Volume2, Clock, Activity, Wand2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { updateSeasonalSettings, SeasonalSettingsConfig, SeasonalMode } from "@/actions/seasonal-settings"
+import { cn } from "@/lib/utils"
 
 interface SeasonalSettingsFormProps {
     settings: SeasonalSettingsConfig
@@ -36,173 +37,218 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
     }
 
     return (
-        <div className="space-y-6">
-            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Snowflake className="h-5 w-5 text-blue-400" />
-                        Seasonal Configuration
-                    </CardTitle>
-                    <CardDescription>
-                        Control the seasonal effects displayed across the site.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <Label>Effect Mode</Label>
-                            <Select
-                                value={settings.mode}
-                                onValueChange={(val: SeasonalMode) => handleChange("mode", val)}
-                            >
-                                <SelectTrigger className="w-[180px] bg-white/5 border-white/10">
-                                    <SelectValue placeholder="Select mode" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="auto">Auto (Date-based)</SelectItem>
-                                    <SelectItem value="winter">Winter (Snow)</SelectItem>
-                                    <SelectItem value="autumn">Autumn (Leaves)</SelectItem>
-                                    <SelectItem value="none">None</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <Label>Enable Effects</Label>
-                            <Switch
-                                checked={settings.enabled}
-                                onCheckedChange={(val) => handleChange("enabled", val)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-4 pt-4 border-t border-white/10">
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <Label className="flex items-center gap-2">
-                                    <Snowflake className="h-4 w-4 text-blue-400" />
-                                    Snow Density
-                                </Label>
-                                <span className="text-sm text-muted-foreground">{settings.snowDensity}%</span>
+        <div className="space-y-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Visual Configuration */}
+                <Card className="bg-black/40 border-white/5 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    <CardHeader className="relative z-10">
+                        <CardTitle className="flex items-center gap-3 text-xl">
+                            <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                                <Snowflake className="h-5 w-5 text-blue-400" />
                             </div>
-                            <Slider
-                                value={[settings.snowDensity || 50]}
-                                min={1}
-                                max={100}
-                                step={1}
-                                onValueChange={(val) => handleChange("snowDensity", val[0])}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <Label className="flex items-center gap-2">
-                                    <Leaf className="h-4 w-4 text-orange-400" />
-                                    Leaves Density
-                                </Label>
-                                <span className="text-sm text-muted-foreground">{settings.leavesDensity}%</span>
+                            <div className="flex flex-col">
+                                <span className="text-blue-100 font-orbitron tracking-wide">Seasonal Effects</span>
+                                <span className="text-xs text-blue-400/50 font-sans font-normal uppercase tracking-wider">Visual Ambience</span>
                             </div>
-                            <Slider
-                                value={[settings.leavesDensity || 30]}
-                                min={1}
-                                max={100}
-                                step={1}
-                                onValueChange={(val) => handleChange("leavesDensity", val[0])}
-                            />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-8 relative z-10">
+                        <div className="space-y-4">
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white-[0.07]">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-1">
+                                        <Label className="text-base text-zinc-200">Effect Mode</Label>
+                                        <p className="text-xs text-zinc-500">Choose the active seasonal theme</p>
+                                    </div>
+                                    <Select
+                                        value={settings.mode}
+                                        onValueChange={(val: SeasonalMode) => handleChange("mode", val)}
+                                    >
+                                        <SelectTrigger className="w-[180px] bg-black/40 border-white/10 text-zinc-300 focus:ring-blue-500/50">
+                                            <SelectValue placeholder="Select mode" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#0a0a0a] border-zinc-800">
+                                            <SelectItem value="auto">
+                                                <div className="flex items-center gap-2">
+                                                    <Sparkles className="h-3 w-3 text-amber-400" />
+                                                    <span>Auto (Date-based)</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="winter">
+                                                <div className="flex items-center gap-2">
+                                                    <Snowflake className="h-3 w-3 text-cyan-400" />
+                                                    <span>Winter (Snow)</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="autumn">
+                                                <div className="flex items-center gap-2">
+                                                    <Leaf className="h-3 w-3 text-orange-400" />
+                                                    <span>Autumn (Leaves)</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="none">None</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Music className="h-5 w-5 text-purple-400" />
-                        Audio Settings
-                    </CardTitle>
-                    <CardDescription>
-                        Configure seasonal background music and sound effects.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <Label>Enable Music</Label>
-                        <Switch
-                            checked={settings.musicEnabled}
-                            onCheckedChange={(val) => handleChange("musicEnabled", val)}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <Label className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-blue-400" />
-                                Duration (seconds)
-                            </Label>
-                            <span className="text-sm text-muted-foreground">{settings.musicDuration}s</span>
-                        </div>
-                        <Slider
-                            value={[settings.musicDuration || 15]}
-                            min={5}
-                            max={300}
-                            step={5}
-                            onValueChange={(val) => handleChange("musicDuration", val[0])}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            How long the music plays before stopping (or fading out).
-                        </p>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <Label className="flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-pink-400" />
-                            Fade Out Effect
-                        </Label>
-                        <Switch
-                            checked={settings.musicFadeOut}
-                            onCheckedChange={(val) => handleChange("musicFadeOut", val)}
-                        />
-                    </div>
-
-                    <div className="space-y-4 pt-4 border-t border-white/10">
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <Label className="flex items-center gap-2">
-                                    <Volume2 className="h-4 w-4" />
-                                    Default Volume Limit
-                                </Label>
-                                <span className="text-sm text-muted-foreground">{settings.audioVolume}%</span>
+                                <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                                    <div className="space-y-1">
+                                        <Label className="text-base text-zinc-200">Enable Overlay</Label>
+                                        <p className="text-xs text-zinc-500">Toggle all visual particle effects</p>
+                                    </div>
+                                    <Switch
+                                        checked={settings.enabled}
+                                        onCheckedChange={(val) => handleChange("enabled", val)}
+                                        className="data-[state=checked]:bg-blue-600"
+                                    />
+                                </div>
                             </div>
-                            <Slider
-                                value={[settings.audioVolume || 20]}
-                                min={0}
-                                max={100}
-                                step={1}
-                                onValueChange={(val) => handleChange("audioVolume", val[0])}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                Limits the maximum volume users experience. Users can still lower it further in their local settings.
-                            </p>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
 
-            <div className="flex justify-end">
+                        <div className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-zinc-300">
+                                        <Snowflake className="h-4 w-4 text-cyan-400" />
+                                        Snow Density
+                                    </Label>
+                                    <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded border border-cyan-500/20">{settings.snowDensity}%</span>
+                                </div>
+                                <Slider
+                                    value={[settings.snowDensity || 50]}
+                                    min={1}
+                                    max={100}
+                                    step={1}
+                                    onValueChange={(val) => handleChange("snowDensity", val[0])}
+                                    className="data-[range=true]:bg-cyan-500"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-zinc-300">
+                                        <Leaf className="h-4 w-4 text-orange-400" />
+                                        Leaves Density
+                                    </Label>
+                                    <span className="font-mono text-xs text-orange-400 bg-orange-500/10 px-2 py-1 rounded border border-orange-500/20">{settings.leavesDensity}%</span>
+                                </div>
+                                <Slider
+                                    value={[settings.leavesDensity || 30]}
+                                    min={1}
+                                    max={100}
+                                    step={1}
+                                    onValueChange={(val) => handleChange("leavesDensity", val[0])}
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+
+                    {/* Decorative blurred blob */}
+                    <div className="absolute -top-20 -right-20 h-40 w-40 bg-blue-500/20 rounded-full blur-[50px] pointer-events-none" />
+                </Card>
+
+                {/* Audio Configuration */}
+                <Card className="bg-black/40 border-white/5 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    <CardHeader className="relative z-10">
+                        <CardTitle className="flex items-center gap-3 text-xl">
+                            <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                                <Music className="h-5 w-5 text-purple-400" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-purple-100 font-orbitron tracking-wide">Audio Immersion</span>
+                                <span className="text-xs text-purple-400/50 font-sans font-normal uppercase tracking-wider">Background Soundscape</span>
+                            </div>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-8 relative z-10">
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white-[0.07]">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <Label className="text-base text-zinc-200">Enable Music</Label>
+                                    <p className="text-xs text-zinc-500">Play thematic background audio on entry</p>
+                                </div>
+                                <Switch
+                                    checked={settings.musicEnabled}
+                                    onCheckedChange={(val) => handleChange("musicEnabled", val)}
+                                    className="data-[state=checked]:bg-purple-600"
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                                <Label className="flex items-center gap-2 text-zinc-300">
+                                    <Activity className="h-4 w-4 text-pink-400" />
+                                    Smart Fade Out
+                                </Label>
+                                <Switch
+                                    checked={settings.musicFadeOut}
+                                    onCheckedChange={(val) => handleChange("musicFadeOut", val)}
+                                    className="data-[state=checked]:bg-pink-600"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-zinc-300">
+                                        <Clock className="h-4 w-4 text-purple-400" />
+                                        Duration
+                                    </Label>
+                                    <span className="font-mono text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded border border-purple-500/20">{settings.musicDuration}s</span>
+                                </div>
+                                <Slider
+                                    value={[settings.musicDuration || 15]}
+                                    min={5}
+                                    max={300}
+                                    step={5}
+                                    onValueChange={(val) => handleChange("musicDuration", val[0])}
+                                />
+                                <p className="text-[10px] text-zinc-500 text-right">
+                                    Music will auto-stop after this time
+                                </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-zinc-300">
+                                        <Volume2 className="h-4 w-4 text-emerald-400" />
+                                        Max Volume Limit
+                                    </Label>
+                                    <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">{settings.audioVolume}%</span>
+                                </div>
+                                <Slider
+                                    value={[settings.audioVolume || 20]}
+                                    min={0}
+                                    max={100}
+                                    step={1}
+                                    onValueChange={(val) => handleChange("audioVolume", val[0])}
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+
+                    {/* Decorative blurred blob */}
+                    <div className="absolute -bottom-20 -left-20 h-40 w-40 bg-purple-500/20 rounded-full blur-[50px] pointer-events-none" />
+                </Card>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-white/5">
                 <Button
                     onClick={handleSave}
                     disabled={isPending}
-                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white border-0 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all active:scale-[0.98]"
+                    className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white border-0 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-all hover:scale-105 active:scale-95 rounded-xl font-bold tracking-wide"
                 >
                     {isPending ? (
                         <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Saving Changes...
                         </>
                     ) : (
                         <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Changes
+                            <Save className="mr-2 h-5 w-5" />
+                            Save Configuration
                         </>
                     )}
                 </Button>

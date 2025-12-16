@@ -75,119 +75,129 @@ export function AnnouncementForm() {
     }
 
     return (
-        <Card className="border-cyan-500/20 bg-black/40 backdrop-blur-xl mt-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-cyan-100">
-                    <Megaphone className="h-5 w-5 text-purple-500" />
-                    Global Announcement
+        <Card className="border-purple-500/20 bg-black/40 backdrop-blur-xl mt-8 shadow-[0_0_30px_rgba(168,85,247,0.05)] relative overflow-hidden group max-w-5xl mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            <CardHeader className="relative z-10 pb-2">
+                <CardTitle className="flex items-center gap-3 text-xl">
+                    <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                        <Megaphone className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-purple-100 font-orbitron tracking-wide">Global Broadcast</span>
+                        <span className="text-xs text-purple-400/50 font-sans font-normal uppercase tracking-wider">Live System Alerts</span>
+                    </div>
                 </CardTitle>
-                <CardDescription>Send a live pop-up message to all active users</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-6 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label className="text-zinc-200 font-medium ml-1">Title (Optional)</Label>
+                            <Input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="e.g. MAINTENANCE ALERT"
+                                className="bg-white/5 border-white/10 text-white font-bold h-11 focus-visible:border-purple-500/50 focus-visible:ring-0 rounded-xl transition-all"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-200 font-medium ml-1">Duration</Label>
+                            <Select value={duration} onValueChange={setDuration}>
+                                <SelectTrigger className="bg-white/5 border-white/10 text-white h-11 rounded-xl focus:ring-purple-500/50">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
+                                    <SelectItem value="5">5 Seconds</SelectItem>
+                                    <SelectItem value="10">10 Seconds (Default)</SelectItem>
+                                    <SelectItem value="30">30 Seconds</SelectItem>
+                                    <SelectItem value="60">1 Minute</SelectItem>
+                                    <SelectItem value="0" className="text-pink-400 font-bold">Permanent (Until Cleared)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
-                        <Label className="text-zinc-200">Title (Optional)</Label>
-                        <Input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="e.g. MAINTENANCE ALERT"
-                            className="bg-zinc-900/50 border-zinc-800 text-white font-bold"
+                        <Label className="text-zinc-200 font-medium ml-1">Message Content</Label>
+                        <Textarea
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            placeholder="Type something exciting..."
+                            className="bg-white/5 border-white/10 min-h-[116px] text-white resize-none rounded-xl focus-visible:border-purple-500/50 focus-visible:ring-0 transition-all text-base"
                         />
                     </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-zinc-200">Duration</Label>
-                        <Select value={duration} onValueChange={setDuration}>
-                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
-                                <SelectItem value="5">5 Seconds</SelectItem>
-                                <SelectItem value="10">10 Seconds (Default)</SelectItem>
-                                <SelectItem value="30">30 Seconds</SelectItem>
-                                <SelectItem value="60">1 Minute</SelectItem>
-                                <SelectItem value="0" className="text-red-400 font-bold">Permanent (Until Cleared)</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label className="text-zinc-200">Message</Label>
-                    <Textarea
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder="Types something exciting..."
-                        className="bg-zinc-900/50 border-zinc-800 min-h-[80px] text-white"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label className="text-zinc-200">Link URL (Optional)</Label>
-                    <Input
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                        placeholder="https://example.com/promo"
-                        className="bg-zinc-900/50 border-zinc-800 text-white text-sm font-mono"
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-zinc-200">Image URL (Optional)</Label>
+                        <Label className="text-zinc-300 font-medium text-xs uppercase tracking-wider ml-1">Action Link (Optional)</Label>
                         <Input
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
-                            placeholder="https://..."
-                            className="bg-zinc-900/50 border-zinc-800 text-white"
+                            value={linkUrl}
+                            onChange={(e) => setLinkUrl(e.target.value)}
+                            placeholder="https://example.com/promo"
+                            className="bg-black/20 border-white/10 text-blue-300 text-sm font-mono h-10 rounded-lg focus-visible:border-blue-500/50 focus-visible:ring-0"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-zinc-200">Sound Effect</Label>
-                        <Select value={sound} onValueChange={(v: any) => setSound(v)}>
-                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
-                                <SelectItem value="notification">Notification (Ding)</SelectItem>
-                                <SelectItem value="alert">Alert (Siren)</SelectItem>
-                                <SelectItem value="none">Silent</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-zinc-200">Theme Color</Label>
-                        <Select value={color} onValueChange={(v: any) => setColor(v)}>
-                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
-                                <SelectItem value="green" className="text-green-500 font-bold">Neon Green</SelectItem>
-                                <SelectItem value="blue" className="text-cyan-500 font-bold">Cyber Blue</SelectItem>
-                                <SelectItem value="purple" className="text-purple-500 font-bold">Royal Purple</SelectItem>
-                                <SelectItem value="red" className="text-red-500 font-bold">Alert Red</SelectItem>
-                                <SelectItem value="orange" className="text-orange-500 font-bold">Warning Orange</SelectItem>
-                                <SelectItem value="pink" className="text-pink-500 font-bold">Hot Pink</SelectItem>
-                                <SelectItem value="yellow" className="text-yellow-500 font-bold">Electric Yellow</SelectItem>
-                                <SelectItem value="teal" className="text-teal-500 font-bold">Aqua Teal</SelectItem>
-                            </SelectContent>
-                        </Select>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-zinc-300 font-medium text-xs uppercase tracking-wider ml-1">Icon / Image URL</Label>
+                            <Input
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                                placeholder="https://..."
+                                className="bg-black/20 border-white/10 text-zinc-400 text-xs h-10 rounded-lg focus-visible:border-purple-500/50 focus-visible:ring-0"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-300 font-medium text-xs uppercase tracking-wider ml-1">Sound Effect</Label>
+                            <Select value={sound} onValueChange={(v: any) => setSound(v)}>
+                                <SelectTrigger className="bg-black/20 border-white/10 text-zinc-300 h-10 rounded-lg focus:ring-purple-500/50">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
+                                    <SelectItem value="notification">Notification (Ding)</SelectItem>
+                                    <SelectItem value="alert">Alert (Siren)</SelectItem>
+                                    <SelectItem value="none">Silent</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-300 font-medium text-xs uppercase tracking-wider ml-1">Theme Style</Label>
+                            <Select value={color} onValueChange={(v: any) => setColor(v)}>
+                                <SelectTrigger className="bg-black/20 border-white/10 text-zinc-300 h-10 rounded-lg focus:ring-purple-500/50">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-zinc-950 border-zinc-800 text-white max-h-[200px]">
+                                    <SelectItem value="green" className="text-green-500 font-bold">Neon Green</SelectItem>
+                                    <SelectItem value="blue" className="text-cyan-500 font-bold">Cyber Blue</SelectItem>
+                                    <SelectItem value="purple" className="text-purple-500 font-bold">Royal Purple</SelectItem>
+                                    <SelectItem value="red" className="text-red-500 font-bold">Alert Red</SelectItem>
+                                    <SelectItem value="orange" className="text-orange-500 font-bold">Warning Orange</SelectItem>
+                                    <SelectItem value="pink" className="text-pink-500 font-bold">Hot Pink</SelectItem>
+                                    <SelectItem value="yellow" className="text-yellow-500 font-bold">Electric Yellow</SelectItem>
+                                    <SelectItem value="teal" className="text-teal-500 font-bold">Aqua Teal</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 
-                <div className="pt-4 flex gap-3">
+                <div className="pt-4 flex gap-4 border-t border-white/5">
                     <Button
                         onClick={handleBroadcast}
                         disabled={isPending}
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-0 shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all active:scale-[0.98]"
+                        className="flex-1 h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-0 shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all active:scale-[0.98] rounded-xl font-bold tracking-wide text-base"
                     >
-                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                        Broadcast Now
+                        {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Send className="mr-2 h-5 w-5" />}
+                        Broadcast Announcement
                     </Button>
                     <Button
                         onClick={handleClear}
                         disabled={isPending}
                         variant="outline"
-                        className="border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/50 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all"
+                        className="h-12 px-6 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/50 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all rounded-xl font-medium"
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Clear Active
