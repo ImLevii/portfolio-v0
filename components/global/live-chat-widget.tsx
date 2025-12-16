@@ -620,86 +620,81 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                         transition={{ duration: 0.2 }}
                         className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
                     >
-                        {/* Header */}
-                        <div
-                            onPointerDown={(e) => dragControls.start(e)}
-                            onTouchStart={(e) => dragControls.start(e as any)}
-                            className="flex items-center justify-between border-b border-white/5 bg-white/5 p-4 backdrop-blur-md cursor-move touch-none"
-                        >
-                            <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-black/40 backdrop-blur-md cursor-move touch-none select-none">
+                            <div className="flex items-center gap-4">
                                 {view === 'support' ? (
                                     <button
                                         onClick={() => setView('chat')}
-                                        className="mr-1 p-1 hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-white"
+                                        className="p-1.5 hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-white"
                                     >
                                         <ArrowLeft className="h-4 w-4" />
                                     </button>
-                                ) : !activeTicket ? (
-                                    /* LIVE USER COUNT PILL (Only in Global Chat) */
-                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.1)] group">
+                                ) : !activeTicket && (
+                                    /* LIVE USER COUNT - Simplified */
+                                    <div className="flex items-center gap-2 bg-emerald-500/5 px-2.5 py-1 rounded-full border border-emerald-500/10">
                                         <div className="relative flex h-3 w-3 items-center justify-center">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 duration-1000"></span>
-                                            {/* Custom Person SVG */}
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-50 duration-1000"></span>
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 w-3 h-3 text-emerald-500">
-                                                <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor" className="animate-pulse" />
-                                                <path d="M12 13C8.13401 13 5 16.134 5 20V21H19V20C19 16.134 15.866 13 12 13Z" fill="currentColor" className="animate-pulse" />
+                                                <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor" />
+                                                <path d="M12 13C8.13401 13 5 16.134 5 20V21H19V20C19 16.134 15.866 13 12 13Z" fill="currentColor" />
                                             </svg>
                                         </div>
-                                        <span className="text-[10px] font-black text-emerald-400 tabular-nums leading-none tracking-wider shadow-emerald-500/20 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]">
-                                            {onlineCount} <span className="text-emerald-500/50 ml-0.5">ONLINE</span>
+                                        <span className="text-[11px] font-bold text-emerald-500/90 tabular-nums leading-none">
+                                            {onlineCount}
                                         </span>
                                     </div>
-                                ) : null}
-                                <div>
-                                    <h3 className="text-sm font-black text-emerald-500 tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">
-                                        {view === 'support' ? 'SUPPORT HUB' : (activeTicket ? activeTicket.category : 'LIVE CHAT')}
+                                )}
+
+                                <div className="flex flex-col">
+                                    <h3 className="text-sm font-black text-zinc-100 tracking-[0.15em] uppercase">
+                                        {view === 'support' ? 'SUPPORT' : (activeTicket ? activeTicket.category : 'LIVE CHAT')}
                                     </h3>
-                                    <p className="text-[10px] text-emerald-500/60 uppercase tracking-widest font-medium">
-                                        {view === 'support' ? 'Help Center' : (activeTicket ? `Ticket #${activeTicket.id.slice(-4)}` : 'Community')}
-                                    </p>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="h-1 w-1 rounded-full bg-emerald-500"></span>
+                                        <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">
+                                            {view === 'support' ? 'Help Center' : (activeTicket ? `TICKET #${activeTicket.id.slice(-4)}` : 'COMMUNITY')}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
+
+                            <div className="flex items-center gap-2">
                                 {activeTicket && view === 'chat' && (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                         <button
                                             onClick={handleCloseTicket}
-                                            className="group relative flex h-7 w-auto px-3 items-center justify-center gap-1.5 rounded-lg border border-red-500/50 bg-red-500/10 text-[10px] font-bold text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-all hover:bg-red-500/20 hover:text-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]"
-                                            title="Permanently Close Ticket"
+                                            className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                            title="Close Ticket"
                                         >
-                                            <span className="absolute inset-0 rounded-lg bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                            <X className="h-3 w-3 relative z-10" />
-                                            <span className="relative z-10">CLOSE</span>
+                                            <X className="h-3.5 w-3.5" />
                                         </button>
-
                                         <button
                                             onClick={() => {
                                                 setActiveTicket(null)
                                                 setView('support')
                                             }}
-                                            className="group relative flex h-7 w-auto px-3 items-center justify-center gap-1.5 rounded-lg border border-zinc-500/30 bg-zinc-500/10 text-[10px] font-bold text-zinc-400 shadow-[0_0_10px_rgba(113,113,122,0.1)] transition-all hover:bg-zinc-500/20 hover:text-white hover:border-zinc-500/50 hover:shadow-[0_0_15px_rgba(113,113,122,0.3)]"
-                                            title="Exit Chat (Keep Ticket Open)"
+                                            className="p-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                                            title="Exit Ticket"
                                         >
-                                            <ArrowLeft className="h-3 w-3 relative z-10" />
-                                            <span className="relative z-10">EXIT</span>
+                                            <ArrowLeft className="h-3.5 w-3.5" />
                                         </button>
                                     </div>
                                 )}
                                 {view === 'chat' && !activeTicket && (
                                     <button
                                         onClick={() => setView('support')}
-                                        className="group relative flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)] transition-all hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/60 hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
-                                        title="Support Hub"
+                                        className="group relative flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-[10px] font-bold text-zinc-300 transition-all hover:bg-zinc-800 hover:text-white"
                                     >
-                                        <HeadphonesIcon className="h-3 w-3 relative z-10" />
-                                        <span className="relative z-10">SUPPORT</span>
+                                        <HeadphonesIcon className="h-3 w-3 text-zinc-500 group-hover:text-emerald-500 transition-colors" />
+                                        <span>SUPPORT</span>
                                     </button>
                                 )}
-                                <div className="flex items-center gap-1 ml-1">
-                                    <button onClick={() => setIsMinimized(true)} className="text-zinc-400 hover:text-white">
+                                <div className="h-4 w-px bg-white/10 mx-1"></div>
+                                <div className="flex items-center gap-1">
+                                    <button onClick={() => setIsMinimized(true)} className="p-1 text-zinc-500 hover:text-white transition-colors">
                                         <Minus className="h-4 w-4" />
                                     </button>
-                                    <button onClick={() => setIsOpen(false)} className="text-zinc-400 hover:text-white">
+                                    <button onClick={() => setIsOpen(false)} className="p-1 text-zinc-500 hover:text-white transition-colors">
                                         <X className="h-4 w-4" />
                                     </button>
                                 </div>
@@ -715,7 +710,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                         {userTickets.length > 0 && (
                                             <div className="mb-4">
                                                 <h4 className="px-4 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                                    {(user as any)?.role === "ADMIN" || (user as any)?.role === "Admin" ? "Support Queue (Admin)" : "Your Tickets"}
+                                                    {(user as any)?.role === "ADMIN" || (user as any)?.role === "Admin" ? "Support Queue" : "Active Tickets"}
                                                 </h4>
                                                 {userTickets.map((ticket) => (
                                                     <button
@@ -723,6 +718,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                         onClick={() => handleResumeTicket(ticket)}
                                                         className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5 mx-1"
                                                     >
+
                                                         <div className={cn("p-2 rounded-full",
                                                             ticket.status === 'CLOSED' ? "bg-zinc-800 text-zinc-500" : "bg-emerald-500/10 text-emerald-500"
                                                         )}>
