@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake, MessageSquare, HeadphonesIcon, Megaphone } from "lucide-react"
+import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake, MessageSquare, HeadphonesIcon, Megaphone, LayoutGrid } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { handleSignOut } from "@/app/actions"
 
