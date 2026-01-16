@@ -110,19 +110,24 @@ export default function Navbar({ user }: { user?: any }) {
         </nav>
 
         {/* Mobile Menu Actions */}
-        <div className="flex items-center gap-2 md:hidden">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center md:hidden">
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm mr-3">
             <CartPopover user={user} />
             {user ? <UserMenu user={user} /> : <SignIn compact={true} isShop={isShop} />}
           </div>
-          <div className="w-px h-8 bg-white/10 mx-1"></div>
+          <div className="w-px h-8 bg-white/10 mr-3"></div>
           <button
-            className="relative p-2 text-white hover:bg-white/10 rounded-lg transition-colors border border-white/10"
+            className={cn(
+              "relative p-2.5 rounded-2xl border transition-all duration-300 group overflow-hidden",
+              "bg-white/5 hover:bg-white/10 backdrop-blur-md",
+              isOpen ? "border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]" : "border-white/10 hover:border-white/20"
+            )}
             onClick={toggleMenu}
             aria-label="Toggle menu"
             aria-expanded={isOpen}
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {isOpen ? <X className="h-6 w-6 relative z-10" /> : <Menu className="h-6 w-6 relative z-10" />}
           </button>
         </div>
       </div>

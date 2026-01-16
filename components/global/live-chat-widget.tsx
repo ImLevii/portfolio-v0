@@ -53,6 +53,16 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
     const [isPending, startTransition] = useTransition()
     const [hasUnread, setHasUnread] = useState(false)
     const [view, setView] = useState<'chat' | 'support'>('chat')
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640)
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
     const [messages, setMessages] = useState<ChatMessage[]>(() => {
         if (initialMessages && initialMessages.length > 0) {
@@ -666,9 +676,12 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="mb-4 flex h-[70vh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
+                        className="mb-4 flex h-[80dvh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
                     >
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-black/40 backdrop-blur-md cursor-move touch-none select-none">
+                        <div
+                            onPointerDown={(e) => !isMobile && dragControls.start(e)}
+                            className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-black/40 backdrop-blur-md cursor-move touch-none select-none"
+                        >
                             <div className="flex items-center gap-4">
                                 {view === 'support' ? (
                                     <button
@@ -1175,7 +1188,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
             {/* Floating Toggle */}
             <motion.button
                 className={cn(
-                    "group relative flex h-20 w-20 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500",
+                    "group relative flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500",
                     "border-emerald-500/30",
                     "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
                     "hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:border-emerald-500/50 hover:scale-105 active:scale-95",
@@ -1195,7 +1208,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                         setIsOpen(!isOpen)
                     }
                 }}
-                onPointerDown={(e) => dragControls.start(e)}
+                onPointerDown={(e) => !isMobile && dragControls.start(e)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
             >
