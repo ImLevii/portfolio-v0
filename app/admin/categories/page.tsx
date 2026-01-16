@@ -13,8 +13,7 @@ export const metadata: Metadata = {
 
 export default async function CategoriesPage() {
     const categories = await db.category.findMany({
-        orderBy: { order: 'asc' },
-        include: { _count: { select: { products: true } } } // If relation exists later, for now just placeholder or error if not in schema
+        orderBy: { order: 'asc' }
     })
 
     // Fallback if products relation isn't strictly defined as `products` in schema yet (it's using string category field)
