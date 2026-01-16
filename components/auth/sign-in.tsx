@@ -11,21 +11,24 @@ export function SignIn({ compact = false, isShop = false }: { compact?: boolean,
         <Link href="/auth/signin">
             <div
                 className={cn(
-                    "flex items-center justify-center rounded-xl transition-all duration-300 group relative border",
-                    "bg-white/5 border-white/10 hover:bg-white/10",
-                    isShop ? "hover:border-green-500/30" : "hover:border-red-500/30",
-                    compact ? "h-10 w-10 p-0" : "px-3 py-1.5 gap-2"
+                    "flex items-center justify-center rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group shadow-lg",
+                    compact ? "gap-0 sm:gap-3 px-2 sm:px-3 py-2" : "gap-3 px-3 py-1.5"
                 )}
+                style={{
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                }}
             >
-                <LogIn className={cn("h-4 w-4 transition-colors",
-                    isShop ? "text-zinc-400 group-hover:text-green-400" : "text-zinc-400 group-hover:text-red-400"
-                )} />
+                <LogIn className={cn(accentColor, compact ? "h-4 w-4" : "h-5 w-5")} />
                 <span
                     className={cn(
-                        "font-orbitron font-bold text-xs tracking-wide transition-colors",
-                        isShop ? "text-zinc-400 group-hover:text-green-300" : "text-zinc-400 group-hover:text-red-300",
-                        compact ? "hidden" : "inline"
+                        "relative z-10 uppercase font-bold tracking-wider font-orbitron",
+                        compact ? "hidden sm:inline text-[10px]" : "text-[10px] sm:text-xs"
                     )}
+                    style={{
+                        color: hexColor,
+                        textShadow: `0 0 8px ${shadowColor}`,
+                        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                    }}
                 >
                     SIGN IN
                 </span>

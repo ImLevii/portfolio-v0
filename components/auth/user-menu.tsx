@@ -17,14 +17,12 @@ export function UserMenu({ user }: { user: any }) {
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-                <button className="relative h-10 w-10 p-0.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group overflow-hidden">
-                    <Avatar className="h-full w-full rounded-lg border-none">
-                        <AvatarImage src={user.image} alt={user.name} className="object-cover" />
-                        <AvatarFallback className="bg-zinc-800 text-zinc-400 font-orbitron font-bold text-xs rounded-lg">
-                            {user.name?.charAt(0)}
-                        </AvatarFallback>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-white/20 transition-all duration-300">
+                    <Avatar className="h-9 w-9 border-2 border-gray-700/50">
+                        <AvatarImage src={user.image} alt={user.name} />
+                        <AvatarFallback className="bg-gray-800 text-white font-orbitron font-bold">{user.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
-                </button>
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
                 className="w-64 border-gray-800/50 bg-black/95 text-white backdrop-blur-xl p-2"

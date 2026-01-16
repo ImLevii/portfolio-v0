@@ -19,7 +19,6 @@ import { getEnabledPaymentMethods, validateCoupon } from "@/app/shop/actions"
 import { PaymentMethod } from "@prisma/client"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
 
 export function CartPopover({ user }: { user?: any }) {
     const cart = useCart()
@@ -144,19 +143,25 @@ export function CartPopover({ user }: { user?: any }) {
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-                <button className={cn(
-                    "relative flex items-center justify-center rounded-xl transition-all duration-300 group",
-                    "bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-500/30",
-                    "h-10 w-10 sm:h-auto sm:w-auto sm:px-3 sm:py-1.5 sm:gap-2"
-                )}
+                <button className="flex items-center justify-center gap-0 sm:gap-3 px-2 sm:px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg min-w-[32px] sm:min-w-0"
+                    style={{
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                    }}
                 >
-                    <ShoppingCart className="h-5 w-5 text-zinc-400 group-hover:text-green-400 transition-colors" />
-                    <span className="hidden sm:inline font-orbitron font-bold text-xs text-zinc-400 group-hover:text-green-300 transition-colors tracking-wide">
-                        CART
+                    <ShoppingCart className="h-5 w-5 text-green-500" />
+                    <span
+                        className="hidden sm:inline relative z-10 uppercase font-bold tracking-wider text-xs font-orbitron"
+                        style={{
+                            color: '#22c55e',
+                            textShadow: '0 0 8px rgba(34,197,94,0.8)',
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                        }}
+                    >
+                        Cart
                     </span>
                     {cart.items.length > 0 && (
-                        <span className="absolute -top-1 -right-1 sm:top-0 sm:-right-1 flex h-4 w-4 sm:h-2 sm:w-2 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-black sm:p-1.5">
-                            <span className="sm:hidden">{cart.items.length}</span>
+                        <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white shadow-lg shadow-green-900/50 animate-pulse">
+                            {cart.items.length}
                         </span>
                     )}
                 </button>
