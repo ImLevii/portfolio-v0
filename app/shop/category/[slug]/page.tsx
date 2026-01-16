@@ -3,14 +3,15 @@ import { ShopContent } from "@/components/shop/shop-content"
 import { notFound } from "next/navigation"
 
 interface CategoryPageProps {
-    params: {
+    params: Promise<{
         slug: string
-    }
+    }>
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
+    const { slug } = await params
     const category = await db.category.findUnique({
-        where: { slug: params.slug }
+        where: { slug }
     })
 
     if (!category) {
