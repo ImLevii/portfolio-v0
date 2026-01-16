@@ -1,42 +1,32 @@
-import { db } from "@/lib/db"
 import { CategoryForm } from "@/components/admin/category-form"
-import { updateCategory, deleteCategory } from "../actions"
-import { notFound, redirect } from "next/navigation"
-import { Trash2 } from "lucide-react"
+import { updateCategory } from "../actions"
+import { db } from "@/lib/db"
+import { notFound } from "next/navigation"
+import { LayoutGrid } from "lucide-react"
 
-interface PageProps {
-    params: {
-        id: string
-    }
-}
-
-export default async function EditCategoryPage({ params }: PageProps) {
+export default async function EditCategoryPage({ params }: { params: { id: string } }) {
     const category = await db.category.findUnique({
         where: { id: params.id }
     })
 
-    if (!category) return notFound()
-
-    const updateAction = updateCategory.bind(null, category.id)
-    const deleteAction = async () => {
-        "use server"
-        await deleteCategory(category.id)
-        redirect("/admin/categories")
-    }
+    if (!category) notFound()
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-end">
-                <form action={deleteAction}>
-                    <button
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all font-orbitron text-sm font-bold uppercase tracking-wider"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                        Delete Category
-                    </button>
-                </form>
+        <div className="space-y-8 p-4 md:p-8">
+            <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                    <LayoutGrid className="h-6 w-6" />
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight font-orbitron text-white">Edit Category</h1>
+                    <p className="text-zinc-400">Update category details</p>
+                </div>
             </div>
-            <CategoryForm initialData={category} action={updateAction} />
+
+            <CategoryForm
+                initialData={category}
+                action={updateCategory.bind(null, category.id)}
+            />
         </div>
     )
 }

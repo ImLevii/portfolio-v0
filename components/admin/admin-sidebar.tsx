@@ -14,6 +14,7 @@ export function AdminSidebar() {
     const links = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/products", label: "Products", icon: ShoppingBag },
+        { href: "/admin/categories", label: "Categories", icon: LayoutGrid },
         { href: "/admin/chat", label: "Live Chat", icon: MessageSquare },
         { href: "/admin/sponsored", label: "Sponsored", icon: Megaphone },
         { href: "/admin/orders", label: "Orders", icon: Package },

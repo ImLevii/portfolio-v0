@@ -2,14 +2,21 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Image as ImageIcon, Box, ListVideo } from "lucide-react"
+import { Loader2, Save, Image as ImageIcon, LayoutGrid, Type } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent } from "@/components/ui/card"
+import { toast } from "sonner"
 
 interface CategoryFormProps {
     initialData?: {
-        id?: string
+        id: string
         name: string
-        description?: string | null
-        image?: string | null
+        slug: string
+        description: string | null
+        image: string | null
         order: number
     }
     action: (formData: FormData) => Promise<void>
@@ -17,148 +24,116 @@ interface CategoryFormProps {
 
 export function CategoryForm({ initialData, action }: CategoryFormProps) {
     const [loading, setLoading] = useState(false)
-    const [imageUrl, setImageUrl] = useState(initialData?.image || "")
     const router = useRouter()
+    const [name, setName] = useState(initialData?.name || "")
+    const [slug, setSlug] = useState(initialData?.slug || "")
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        setName(value)
+        if (!initialData) {
+            // Auto-generate slug for new categories
+            setSlug(value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''))
+        }
+    }
 
     async function handleSubmit(formData: FormData) {
         setLoading(true)
         try {
             await action(formData)
-            router.refresh()
+            toast.success(initialData ? "Category updated" : "Category created")
             router.push("/admin/categories")
+            router.refresh()
         } catch (error) {
             console.error(error)
-            alert("Something went wrong")
+            toast.error("Something went wrong")
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="flex gap-8 flex-col lg:flex-row">
-            <div className="flex-1 space-y-8">
-                <form action={handleSubmit} className="space-y-8">
-                    {/* Basic Info */}
-                    <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Box className="w-24 h-24 text-green-500 transform rotate-12 translate-x-8 -translate-y-8" />
+        <form action={handleSubmit} className="space-y-8 max-w-4xl mx-auto">
+            <Card className="bg-black/40 border-white/5 backdrop-blur-xl">
+                <CardContent className="p-6 space-y-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-2 text-zinc-300">
+                                <Type className="h-4 w-4 text-blue-400" />
+                                Name
+                            </Label>
+                            <Input
+                                name="name"
+                                value={name}
+                                onChange={handleNameChange}
+                                required
+                                placeholder="e.g. Gaming Gear"
+                                className="bg-white/5 border-white/10 text-zinc-200 focus:ring-blue-500/50"
+                            />
                         </div>
-
-                        <h3 className="text-xl font-bold font-orbitron text-white mb-6 flex items-center gap-2 relative z-10">
-                            <Box className="h-5 w-5 text-green-500" />
-                            Category Details
-                        </h3>
-
-                        <div className="space-y-6 relative z-10">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Category Name</label>
-                                <input
-                                    name="name"
-                                    defaultValue={initialData?.name}
-                                    required
-                                    placeholder="e.g. Accounts"
-                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Description (Optional)</label>
-                                <textarea
-                                    name="description"
-                                    defaultValue={initialData?.description || ""}
-                                    rows={3}
-                                    placeholder="Short description for this category..."
-                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700 resize-y font-mono text-sm leading-relaxed"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Sort Order</label>
-                                <input
-                                    name="order"
-                                    type="number"
-                                    defaultValue={initialData?.order || 0}
-                                    className="w-full bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700"
-                                />
-                                <p className="text-[10px] text-gray-500 font-mono">Higher numbers appear last.</p>
-                            </div>
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-2 text-zinc-300">
+                                <LayoutGrid className="h-4 w-4 text-purple-400" />
+                                Slug
+                            </Label>
+                            <Input
+                                name="slug"
+                                value={slug}
+                                onChange={(e) => setSlug(e.target.value)}
+                                required
+                                placeholder="e.g. gaming-gear"
+                                className="bg-white/5 border-white/10 text-zinc-200 focus:ring-purple-500/50"
+                            />
                         </div>
                     </div>
 
-                    {/* Media */}
-                    <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <ImageIcon className="w-24 h-24 text-purple-500 transform rotate-12 translate-x-8 -translate-y-8" />
+                    <div className="space-y-2">
+                        <Label className="text-zinc-300">Description</Label>
+                        <Textarea
+                            name="description"
+                            defaultValue={initialData?.description || ""}
+                            placeholder="Optional category description..."
+                            className="bg-white/5 border-white/10 text-zinc-200 focus:ring-blue-500/50 min-h-[100px]"
+                        />
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-2 text-zinc-300">
+                                <ImageIcon className="h-4 w-4 text-pink-400" />
+                                Image URL
+                            </Label>
+                            <Input
+                                name="image"
+                                defaultValue={initialData?.image || ""}
+                                placeholder="https://..."
+                                className="bg-white/5 border-white/10 text-zinc-200 focus:ring-pink-500/50"
+                            />
                         </div>
-
-                        <h3 className="text-xl font-bold font-orbitron text-white mb-6 flex items-center gap-2 relative z-10">
-                            <ImageIcon className="h-5 w-5 text-purple-500" />
-                            Category Image
-                        </h3>
-
-                        <div className="space-y-6 relative z-10">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider font-orbitron">Image URL</label>
-                                <div className="flex gap-2">
-                                    <input
-                                        name="image"
-                                        value={imageUrl}
-                                        onChange={(e) => setImageUrl(e.target.value)}
-                                        placeholder="https://..."
-                                        className="flex-1 bg-black/40 border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all placeholder:text-gray-700"
-                                    />
-                                </div>
-                            </div>
+                        <div className="space-y-2">
+                            <Label className="text-zinc-300">Display Order</Label>
+                            <Input
+                                name="order"
+                                type="number"
+                                defaultValue={initialData?.order || 0}
+                                className="bg-white/5 border-white/10 text-zinc-200 focus:ring-blue-500/50"
+                            />
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold font-orbitron py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 tracking-wider uppercase text-sm md:text-base"
-                    >
-                        {loading && <Loader2 className="h-5 w-5 animate-spin" />}
-                        {initialData ? "SAVE CHANGES" : "CREATE CATEGORY"}
-                    </button>
-                </form>
-            </div>
-
-            {/* Preview */}
-            <div className="w-full lg:w-96 space-y-6">
-                <div className="sticky top-24 space-y-6">
-                    <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-6 shadow-xl">
-                        <h3 className="text-sm font-bold font-orbitron text-gray-400 uppercase tracking-wider mb-4 flex items-center justify-between">
-                            <span>Visual Preview</span>
-                            <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/50">Live</span>
-                        </h3>
-
-                        <div className="aspect-[16/9] rounded-xl overflow-hidden bg-black/40 border border-gray-800 relative group shadow-2xl">
-                            {imageUrl ? (
-                                <img
-                                    src={imageUrl}
-                                    alt="Preview"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x300?text=Invalid+URL"
-                                    }}
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-gray-600 flex-col gap-2">
-                                    <ImageIcon className="h-12 w-12 opacity-50" />
-                                    <span className="text-xs font-mono uppercase tracking-widest opacity-50">No Image</span>
-                                </div>
-                            )}
-
-                            {/* Overlay Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60" />
-
-                            <div className="absolute bottom-4 left-4 right-4 z-10">
-                                <h4 className="font-orbitron font-bold text-white text-lg truncate shadow-lg">{initialData?.name || "Category Name"}</h4>
-                            </div>
-                        </div>
+                    <div className="flex justify-end pt-6 border-t border-white/5">
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-orbitron"
+                        >
+                            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            <Save className="mr-2 h-4 w-4" />
+                            {initialData ? "Save Changes" : "Create Category"}
+                        </Button>
                     </div>
-                </div>
-            </div>
-        </div>
+                </CardContent>
+            </Card>
+        </form>
     )
 }

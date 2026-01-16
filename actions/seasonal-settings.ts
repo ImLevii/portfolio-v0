@@ -15,6 +15,8 @@ export interface SeasonalSettingsConfig {
     musicDuration: number // seconds
     musicFadeOut: boolean
     audioVolume: number // 0-100
+    shopSoundEnabled: boolean
+    shopSoundVolume: number // 0-100
 }
 
 const DEFAULT_SETTINGS: SeasonalSettingsConfig = {
@@ -25,7 +27,9 @@ const DEFAULT_SETTINGS: SeasonalSettingsConfig = {
     musicEnabled: true,
     musicDuration: 15,
     musicFadeOut: true,
-    audioVolume: 20
+    audioVolume: 20,
+    shopSoundEnabled: true,
+    shopSoundVolume: 40
 }
 
 export async function getSeasonalSettings(): Promise<SeasonalSettingsConfig> {

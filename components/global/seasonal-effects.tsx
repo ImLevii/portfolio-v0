@@ -45,6 +45,11 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
 
     const settingsEnabled = (currentSeason === "winter" || currentSeason === "autumn") && weatherEffects && soundEffects && (config?.enabled ?? true)
     const musicAllowed = settingsEnabled && (config?.musicEnabled ?? true)
+    const shopSoundAllowed = settingsEnabled && (config?.shopSoundEnabled ?? true)
+
+    // Volume Limits from Config
+    const maxMusicVol = config?.audioVolume ?? 20
+    const maxShopVol = config?.shopSoundVolume ?? 40
 
     // Helper to safely play audio
     const safePlay = (audio: HTMLAudioElement, volume: number) => {
@@ -88,14 +93,16 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
             if (settingsEnabled) {
                 if (pathname === "/shop") {
                     // Play impact
-                    if (impactRef.current) {
+                    if (impactRef.current && shopSoundAllowed) {
                         impactRef.current.currentTime = 0
-                        safePlay(impactRef.current, generalVolume)
+                        const vol = Math.min(generalVolume, maxShopVol)
+                        safePlay(impactRef.current, vol)
                     }
                 } else if (pathname === "/") {
                     // Play melody
                     if (melodyRef.current && musicAllowed) {
-                        safePlay(melodyRef.current, soundtrackVolume)
+                        const vol = Math.min(soundtrackVolume, maxMusicVol)
+                        safePlay(melodyRef.current, vol)
                         // Setup fade out timer
                         startFadeOutTimer()
                     }
@@ -164,11 +171,12 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
             // If we navigate TO shop, play impact (if not already handled by interaction)
             // We need a way to know if we JUST arrived. 
             // The simple "play on render" works fine IF we interacted previously.
-            if (impactRef.current && impactRef.current.paused) {
+            if (impactRef.current && impactRef.current.paused && shopSoundAllowed) {
                 // We allow re-playing impact on route enter?
                 // Simple logic: Play it.
                 impactRef.current.currentTime = 0
-                safePlay(impactRef.current, generalVolume)
+                const vol = Math.min(generalVolume, maxShopVol)
+                safePlay(impactRef.current, vol)
             }
             return
         }
@@ -176,7 +184,8 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
         // --- Home Page ---
         if (pathname === "/") {
             if (melodyRef.current && melodyRef.current.paused && musicAllowed) {
-                safePlay(melodyRef.current, soundtrackVolume)
+                const vol = Math.min(soundtrackVolume, maxMusicVol)
+                safePlay(melodyRef.current, vol)
                 startFadeOutTimer()
             }
         }
@@ -189,12 +198,14 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
     // Sync Volumes live
     useEffect(() => {
         if (melodyRef.current && !fadeIntervalRef.current) {
-            melodyRef.current.volume = Math.max(0, Math.min(1, soundtrackVolume / 100))
+            const vol = Math.min(soundtrackVolume, maxMusicVol)
+            melodyRef.current.volume = Math.max(0, Math.min(1, vol / 100))
         }
         if (impactRef.current) {
-            impactRef.current.volume = Math.max(0, Math.min(1, generalVolume / 100))
+            const vol = Math.min(generalVolume, maxShopVol)
+            impactRef.current.volume = Math.max(0, Math.min(1, vol / 100))
         }
-    }, [soundtrackVolume, generalVolume])
+    }, [soundtrackVolume, generalVolume, maxMusicVol, maxShopVol])
 
     if (!currentSeason || !weatherEffects || (config?.mode === 'none')) return null
 

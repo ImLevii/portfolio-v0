@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { NeonSlider } from "@/components/ui/neon-slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Save, Snowflake, Leaf, Music, Volume2, Clock, Activity, Wand2, Sparkles } from "lucide-react"
+import { Loader2, Save, Snowflake, Leaf, Music, Volume2, Clock, Activity, Wand2, Sparkles, ShoppingBag } from "lucide-react"
 import { toast } from "sonner"
 import { updateSeasonalSettings, SeasonalSettingsConfig, SeasonalMode } from "@/actions/seasonal-settings"
 import { cn } from "@/lib/utils"
@@ -188,6 +188,40 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                     className="data-[state=checked]:bg-pink-600"
                                 />
                             </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white-[0.07]">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <Label className="text-base text-zinc-200">Shop Ambience</Label>
+                                    <p className="text-xs text-zinc-500">Play impact sound when entering the shop</p>
+                                </div>
+                                <Switch
+                                    checked={settings.shopSoundEnabled}
+                                    onCheckedChange={(val) => handleChange("shopSoundEnabled", val)}
+                                    className="data-[state=checked]:bg-amber-600"
+                                />
+                            </div>
+
+                            {settings.shopSoundEnabled && (
+                                <div className="space-y-4 border-t border-white/5 pt-4 animate-in fade-in slide-in-from-top-2">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="flex items-center gap-2 text-zinc-300">
+                                            <ShoppingBag className="h-4 w-4 text-amber-400" />
+                                            Shop Impact Volume
+                                        </Label>
+                                        <span className="font-mono text-xs text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">{settings.shopSoundVolume}%</span>
+                                    </div>
+                                    <NeonSlider
+                                        value={[settings.shopSoundVolume || 40]}
+                                        min={0}
+                                        max={100}
+                                        step={1}
+                                        onValueChange={(val) => handleChange("shopSoundVolume", val[0])}
+                                        className="text-amber-500"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="space-y-6">
