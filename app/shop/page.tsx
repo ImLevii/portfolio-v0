@@ -17,6 +17,7 @@ export default async function ShopPage() {
     return (
         <ShopContent
             products={products}
+            categories={categories}
             headerContent={<CategoryGrid categories={categories} />}
         />
     )
