@@ -77,13 +77,13 @@ export function ShopToolbar({
                     variant="ghost"
                     onClick={() => onCategoryChange("All")}
                     className={cn(
-                        "rounded-full px-6 h-9 font-bold text-xs tracking-wide transition-all border relative overflow-hidden",
+                        "rounded-full px-6 h-9 font-orbitron text-xs tracking-wider transition-all border relative overflow-hidden",
                         activeCategory === "All"
-                            ? "bg-white text-black border-white hover:bg-zinc-200"
-                            : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/20"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                            : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_10px_rgba(255,255,255,0.1)]"
                     )}
                 >
-                    All
+                    ALL
                 </Button>
                 {categories.map((category) => (
                     <Button
@@ -91,13 +91,13 @@ export function ShopToolbar({
                         variant="ghost"
                         onClick={() => onCategoryChange(category.name)}
                         className={cn(
-                            "rounded-full px-6 h-9 font-bold text-xs tracking-wide transition-all border relative overflow-hidden",
+                            "rounded-full px-6 h-9 font-orbitron text-xs tracking-wider transition-all border relative overflow-hidden",
                             activeCategory === category.name
-                                ? "bg-white text-black border-white hover:bg-zinc-200"
-                                : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/20"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                                : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_10px_rgba(255,255,255,0.1)]"
                         )}
                     >
-                        {category.name}
+                        {category.name.toUpperCase()}
                     </Button>
                 ))}
             </div>
