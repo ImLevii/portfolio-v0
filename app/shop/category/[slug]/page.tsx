@@ -17,23 +17,27 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         return notFound()
     }
 
-    // Since products store category as a string due to legacy schema, 
-    // we match by the category name. 
-    // Ideally, we would migrate products to use categoryId in the future.
+    // Fetch ALL products so client-side filtering works for other categories too
     const products = await db.product.findMany({
         where: {
-            isListed: true,
-            category: category.name
+            isListed: true
         },
         orderBy: { createdAt: 'desc' }
+    })
+
+    // Fetch ALL categories for the toolbar
+    const categories = await db.category.findMany({
+        orderBy: { order: 'asc' }
     })
 
     return (
         <ShopContent
             products={products}
+            categories={categories}
             title={category.name}
             description={category.description || `Browse our collection of ${category.name}`}
             categoryImage={category.image}
+            initialCategory={category.name}
         />
     )
 }

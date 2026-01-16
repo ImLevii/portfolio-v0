@@ -32,6 +32,7 @@ interface ShopContentProps {
     showCategoryFilter?: boolean
     headerContent?: React.ReactNode
     categoryImage?: string | null
+    initialCategory?: string
 }
 
 export function ShopContent({
@@ -42,7 +43,8 @@ export function ShopContent({
     showCarousel = true,
     showCategoryFilter = true,
     headerContent,
-    categoryImage
+    categoryImage,
+    initialCategory = "All"
 }: ShopContentProps) {
     // Parse features from JSON string if needed
     const parsedProducts = products.map(p => ({
@@ -50,7 +52,7 @@ export function ShopContent({
         features: (typeof p.features === 'string' ? JSON.parse(p.features) : p.features) as string[]
     }))
 
-    const [activeCategory, setActiveCategory] = useState("All")
+    const [activeCategory, setActiveCategory] = useState(initialCategory)
     const [searchQuery, setSearchQuery] = useState("")
     const [sortOption, setSortOption] = useState("newest")
 
