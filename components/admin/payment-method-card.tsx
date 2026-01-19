@@ -89,9 +89,9 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                 </div>
             </div>
 
-            {(method.name === "bank_transfer" || method.name === "paypal" || method.name === "crypto") && (
+            {(method.name === "bank_transfer" || method.name === "paypal" || method.name === "stripe" || method.name === "crypto") && (
                 <div className="space-y-4 pt-4 border-t border-white/10">
-                    {method.name === "paypal" ? (
+                    {method.name === "paypal" || method.name === "stripe" ? (
                         <>
                             <div className="grid gap-4">
                                 <div className="space-y-2">
@@ -108,7 +108,7 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                                                 : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
                                                 }`}
                                         >
-                                            SANDBOX
+                                            {method.name === "stripe" ? "TEST" : "SANDBOX"}
                                         </button>
                                         <button
                                             onClick={() => {
@@ -126,49 +126,70 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Client ID</label>
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        {method.name === "stripe" ? "Publishable Key" : "Client ID"}
+                                    </label>
                                     <input
                                         type="text"
-                                        value={safeParseConfig(config).clientId || ""}
+                                        value={safeParseConfig(config)[method.name === "stripe" ? "publishableKey" : "clientId"] || ""}
                                         onChange={(e) => {
                                             const currentConfig = safeParseConfig(config)
-                                            const newConfig = { ...currentConfig, clientId: e.target.value }
+                                            const key = method.name === "stripe" ? "publishableKey" : "clientId"
+                                            const newConfig = { ...currentConfig, [key]: e.target.value }
                                             setConfig(JSON.stringify(newConfig, null, 2))
                                         }}
                                         className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
-                                        placeholder="Enter PayPal Client ID"
+                                        placeholder={method.name === "stripe" ? "pk_test_..." : "Enter Client ID"}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Client Secret</label>
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        {method.name === "stripe" ? "Secret Key" : "Client Secret"}
+                                    </label>
                                     <input
                                         type="password"
-                                        value={safeParseConfig(config).clientSecret || ""}
+                                        value={safeParseConfig(config)[method.name === "stripe" ? "secretKey" : "clientSecret"] || ""}
                                         onChange={(e) => {
                                             const currentConfig = safeParseConfig(config)
-                                            const newConfig = { ...currentConfig, clientSecret: e.target.value }
+                                            const key = method.name === "stripe" ? "secretKey" : "clientSecret"
+                                            const newConfig = { ...currentConfig, [key]: e.target.value }
                                             setConfig(JSON.stringify(newConfig, null, 2))
                                         }}
                                         className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
-                                        placeholder="Enter PayPal Client Secret"
+                                        placeholder={method.name === "stripe" ? "sk_test_..." : "Enter Client Secret"}
                                     />
                                 </div>
                             </div>
                         </>
+                    ) : method.name === "crypto" ? (
+                        <div className="grid gap-4">
+                            {["BTC", "ETH", "LTC"].map((crypto) => (
+                                <div key={crypto} className="space-y-2">
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">{crypto} Address</label>
+                                    <input
+                                        type="text"
+                                        value={safeParseConfig(config)[crypto] || ""}
+                                        onChange={(e) => {
+                                            const currentConfig = safeParseConfig(config)
+                                            const newConfig = { ...currentConfig, [crypto]: e.target.value }
+                                            setConfig(JSON.stringify(newConfig, null, 2))
+                                        }}
+                                        className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
+                                        placeholder={`Enter ${crypto} Wallet Address`}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     ) : (
                         <>
                             <label className="text-sm font-medium text-gray-300">
-                                {method.name === "crypto"
-                                    ? "Wallet Addresses (JSON or Text)"
-                                    : "Bank Details & Instructions (JSON)"}
+                                Bank Details & Instructions (JSON)
                             </label>
                             <Textarea
                                 value={config}
                                 onChange={(e) => setConfig(e.target.value)}
                                 className="font-mono text-sm bg-black/50 border-white/10 min-h-[150px]"
-                                placeholder={method.name === "crypto"
-                                    ? '{"BTC": "...", "ETH": "..."}'
-                                    : '{"bankName": "...", "accountNumber": "..."}'}
+                                placeholder={'{"bankName": "...", "accountNumber": "..."}'}
                             />
                         </>
                     )}
