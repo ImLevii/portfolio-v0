@@ -163,7 +163,7 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                         </>
                     ) : method.name === "crypto" ? (
                         <div className="grid gap-4">
-                            {["BTC", "ETH", "LTC"].map((crypto) => (
+                            {["BTC", "ETH", "LTC", "XRP"].map((crypto) => (
                                 <div key={crypto} className="space-y-2">
                                     <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">{crypto} Address</label>
                                     <input

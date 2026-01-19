@@ -63,7 +63,9 @@ export function CartPopover({ user }: { user?: any }) {
                 if (prev && methods.some((method) => method.name === prev)) {
                     return prev
                 }
-                return methods[0].name
+                // Default to PayPal if available, otherwise first available
+                const paypal = methods.find(m => m.name === "paypal")
+                return paypal ? "paypal" : methods[0].name
             })
         })
     }, [])
@@ -243,7 +245,7 @@ export function CartPopover({ user }: { user?: any }) {
                                     const config = method?.config ? JSON.parse(method.config) : {};
 
                                     if (selectedMethod === "crypto") {
-                                        return ["BTC", "ETH", "LTC"].map(coin => config[coin] ? (
+                                        return ["BTC", "ETH", "LTC", "XRP"].map(coin => config[coin] ? (
                                             <div key={coin} className="space-y-1">
                                                 <span className="text-xs font-bold text-green-500">{coin}</span>
                                                 <div
