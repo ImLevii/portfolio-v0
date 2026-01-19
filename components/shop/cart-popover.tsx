@@ -231,80 +231,120 @@ export function CartPopover({ user }: { user?: any }) {
                                     ))}
                                 </RadioGroup>
                             </div>
-                        )}
-
-                        <div className="mb-4 space-y-2">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Coupon Code"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    className="flex-1 bg-gray-900 border border-gray-700 rounded-md px-3 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500/50"
-                                />
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={onApplyCoupon}
-                                    disabled={validatingCoupon || !couponCode || appliedCoupon !== null}
-                                    className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
-                                >
-                                    {validatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}
-                                </Button>
                             </div>
-                            {couponError && (
-                                <p className="text-xs text-red-400">{couponError}</p>
-                            )}
-                            {appliedCoupon && (
-                                <div className="flex justify-between text-xs text-green-400">
-                                    <span>Discount ({appliedCoupon.percent}% off)</span>
-                                    <span>-${(discountAmount / 100).toFixed(2)}</span>
-                                </div>
-                            )}
-                        </div>
+                )}
 
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-medium text-gray-400">Total</span>
-                            <span className="text-xl font-bold font-orbitron text-white">${formattedTotal}</span>
-                        </div>
+                {selectedMethod && ["crypto", "bank_transfer"].includes(selectedMethod) && (
+                    <div className="mb-4 p-3 rounded-md bg-gray-900/80 border border-gray-800 space-y-3">
+                        <Label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                            {selectedMethod === "crypto" ? "Send Payment To:" : "Bank Details:"}
+                        </Label>
+                        {(() => {
+                            const method = paymentMethods.find(m => m.name === selectedMethod);
+                            const config = method?.config ? JSON.parse(method.config) : {};
 
-                        {isPayPalSelected ? (
-                            <div className="relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 blur-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                {paypalError && (
-                                    <div className="mb-2 rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300">
-                                        {paypalError}
+                            if (selectedMethod === "crypto") {
+                                return ["BTC", "ETH", "LTC"].map(coin => config[coin] ? (
+                                    <div key={coin} className="space-y-1">
+                                        <span className="text-xs font-bold text-green-500">{coin}</span>
+                                        <div
+                                            className="text-[10px] font-mono bg-black/50 p-1.5 rounded border border-gray-800 text-gray-300 break-all cursor-pointer hover:bg-gray-800 transition-colors flex items-center justify-between group/copy"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(config[coin]);
+                                                showTerminalToast.success("Copied", `${coin} address copied to clipboard`);
+                                            }}
+                                        >
+                                            {config[coin]}
+                                            <span className="opacity-0 group-hover/copy:opacity-100 text-[9px] text-green-400 uppercase font-bold">Copy</span>
+                                        </div>
                                     </div>
-                                )}
-                                <button
-                                    onClick={onCheckout}
-                                    disabled={loading}
-                                    className="relative w-full h-auto overflow-hidden rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
-                                >
-                                    <img
-                                        src="/paypal-button.png"
-                                        alt="Pay with PayPal"
-                                        className="w-full h-auto object-contain"
-                                    />
-                                </button>
-                            </div>
-                        ) : (
-                            <Button
-                                onClick={onCheckout}
-                                disabled={loading}
-                                className="w-full bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 shadow-lg group h-10"
-                                style={{
-                                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
-                                }}
-                            >
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 font-orbitron tracking-wider text-sm font-bold group-hover:from-green-300 group-hover:to-emerald-500">
-                                    {loading ? "PROCESSING..." : "CHECKOUT"}
-                                </span>
-                            </Button>
-                        )}
+                                ) : null);
+                            } else {
+                                return (
+                                    <div className="text-xs text-gray-300 whitespace-pre-wrap font-mono">
+                                        {JSON.stringify(config, null, 2)}
+                                    </div>
+                                );
+                            }
+                        })()}
+                        <div className="mt-2 text-[10px] text-gray-500 italic">
+                            * Click "Place Order" below after sending payment. Your order will be pending until confirmed.
+                        </div>
                     </div>
                 )}
-            </PopoverContent>
-        </Popover>
+
+                <div className="mb-4 space-y-2">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="Coupon Code"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                            className="flex-1 bg-gray-900 border border-gray-700 rounded-md px-3 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500/50"
+                        />
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onApplyCoupon}
+                            disabled={validatingCoupon || !couponCode || appliedCoupon !== null}
+                            className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+                        >
+                            {validatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}
+                        </Button>
+                    </div>
+                    {couponError && (
+                        <p className="text-xs text-red-400">{couponError}</p>
+                    )}
+                    {appliedCoupon && (
+                        <div className="flex justify-between text-xs text-green-400">
+                            <span>Discount ({appliedCoupon.percent}% off)</span>
+                            <span>-${(discountAmount / 100).toFixed(2)}</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-gray-400">Total</span>
+                    <span className="text-xl font-bold font-orbitron text-white">${formattedTotal}</span>
+                </div>
+
+                {isPayPalSelected ? (
+                    <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 blur-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {paypalError && (
+                            <div className="mb-2 rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300">
+                                {paypalError}
+                            </div>
+                        )}
+                        <button
+                            onClick={onCheckout}
+                            disabled={loading}
+                            className="relative w-full h-auto overflow-hidden rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
+                        >
+                            <img
+                                src="/paypal-button.png"
+                                alt="Pay with PayPal"
+                                className="w-full h-auto object-contain"
+                            />
+                        </button>
+                    </div>
+                ) : (
+                    <Button
+                        onClick={onCheckout}
+                        disabled={loading}
+                        className="w-full bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 shadow-lg group h-10"
+                        style={{
+                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+                        }}
+                    >
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600 font-orbitron tracking-wider text-sm font-bold group-hover:from-green-300 group-hover:to-emerald-500">
+                            {loading ? "PROCESSING..." : (selectedMethod === "crypto" || selectedMethod === "bank_transfer") ? "PLACE ORDER" : "CHECKOUT"}
+                        </span>
+                    </Button>
+                )}
+            </div>
+                )}
+        </PopoverContent>
+        </Popover >
     )
 }

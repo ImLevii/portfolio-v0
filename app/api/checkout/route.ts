@@ -207,6 +207,60 @@ export async function POST(req: Request) {
         }
     }
 
+    if (paymentMethodId === "crypto" || paymentMethodId === "bank_transfer") {
+        try {
+            // Create Pending Order
+            const order = await db.order.create({
+                data: {
+                    userId: session?.user?.id as string,
+                    stripeSessionId: `manual_${Date.now()}_${Math.random().toString(36).substring(7)}`, // Mock ID for constraints
+                    amount: totalAmount,
+                    currency: "usd",
+                    status: "pending",
+                    paymentMethod: paymentMethodId,
+                    couponCode: couponId ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
+                    items: {
+                        create: items.map((item) => {
+                            let price = item.price
+                            if (discountPercent > 0) {
+                                price = Math.round(item.price * (1 - discountPercent / 100))
+                            }
+                            return {
+                                productId: item.id,
+                                price
+                            }
+                        })
+                    }
+                }
+            })
+
+            // Note: We do NOT generate license keys here. 
+            // They should be generated when the admin marks the order as "completed".
+
+            // Increment Coupon Usage
+            if (couponId) {
+                await db.coupon.update({
+                    where: { id: couponId },
+                    data: {
+                        uses: { increment: 1 }
+                    }
+                }).catch(err => console.error("Failed to increment coupon usage:", err))
+            }
+
+            return NextResponse.json(
+                { url: `${baseUrl}/shop/success?manual=true&orderId=${order.id}` },
+                { headers: corsHeaders }
+            )
+
+        } catch (error) {
+            console.error("Manual order creation error:", error)
+            return NextResponse.json(
+                { error: "Failed to process order" },
+                { status: 500, headers: corsHeaders }
+            )
+        }
+    }
+
     // Default to Stripe
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 

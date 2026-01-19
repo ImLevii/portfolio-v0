@@ -54,6 +54,12 @@ function SuccessContent() {
             if (items.length > 0) {
                 removeAll()
             }
+        } else if (searchParams.get("manual")) {
+            // Manual order (Crypto/Bank)
+            if (items.length > 0) {
+                removeAll()
+            }
+            setMessage("Your order has been placed successfully! Please ensure you have completed the payment transfer. Your digital assets will be delivered once the payment is confirmed by an administrator.")
         }
     }, [method, token, searchParams, removeAll, items.length])
 
