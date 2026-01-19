@@ -661,13 +661,16 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
 
     return (
         <motion.div
-            drag
+            drag={!isMobile}
             dragListener={false}
             dragControls={dragControls}
             dragMomentum={false}
             onDragStart={() => { isDraggingRef.current = true }}
             onDragEnd={() => { setTimeout(() => isDraggingRef.current = false, 100) }}
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end print:hidden"
+            className={cn(
+                "fixed z-50 flex flex-col items-end print:hidden",
+                isMobile ? "bottom-0 right-0 w-full pointer-events-none" : "bottom-4 right-4 sm:bottom-6 sm:right-6"
+            )}
         >
             <AnimatePresence>
                 {isOpen && !isMinimized && (
@@ -676,7 +679,12 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="mb-4 flex h-[80dvh] w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl sm:h-[600px] sm:w-[380px]"
+                        className={cn(
+                            "flex flex-col overflow-hidden border border-white/10 bg-black/60 shadow-2xl backdrop-blur-xl pointer-events-auto",
+                            isMobile
+                                ? "w-full h-[85dvh] rounded-t-2xl border-b-0 mb-0"
+                                : "mb-4 h-[80dvh] w-[calc(100vw-32px)] rounded-2xl sm:h-[600px] sm:w-[380px]"
+                        )}
                     >
                         <div
                             onPointerDown={(e) => !isMobile && dragControls.start(e)}
@@ -1188,12 +1196,16 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
             {/* Floating Toggle */}
             <motion.button
                 className={cn(
-                    "group relative flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500",
+                    "group relative flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border bg-[#0a0a0a] transition-all duration-500 pointer-events-auto",
                     "border-emerald-500/30",
                     "shadow-[0_0_15px_rgba(16,185,129,0.2)]",
                     "hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:border-emerald-500/50 hover:scale-105 active:scale-95",
                     // Pulse glow when unread
-                    hasUnread && !isOpen && "animate-pulse shadow-[0_0_30px_rgba(16,185,129,0.6)] border-emerald-500"
+                    hasUnread && !isOpen && "animate-pulse shadow-[0_0_30px_rgba(16,185,129,0.6)] border-emerald-500",
+                    // Hide toggle on mobile when open to avoid obstruction
+                    isMobile && isOpen && "hidden",
+                    // Add margin on mobile to prevent flush-to-edge
+                    isMobile && !isOpen && "m-4"
                 )}
                 onClick={() => {
                     if (isDraggingRef.current) return
