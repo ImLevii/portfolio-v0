@@ -1,8 +1,8 @@
 
+
 import { db } from "@/lib/db"
-import { deleteOrder } from "@/app/admin/actions"
-import { revalidatePath } from "next/cache"
-import { Trash2, Download, Package } from "lucide-react"
+import { Package } from "lucide-react"
+import { OrderActions } from "@/components/admin/order-actions"
 
 export default async function AdminOrdersPage() {
     const orders = await db.order.findMany({
@@ -81,18 +81,7 @@ export default async function AdminOrdersPage() {
                                         {new Date(order.createdAt).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <form action={async () => {
-                                            "use server"
-                                            await deleteOrder(order.id)
-                                        }}>
-                                            <button
-                                                type="submit"
-                                                className="p-2 hover:bg-red-500/10 text-red-400 rounded-lg transition-all hover:shadow-[0_0_10px_rgba(239,68,68,0.2)] opacity-0 group-hover:opacity-100"
-                                                title="Delete Order"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </form>
+                                        <OrderActions order={order} />
                                     </td>
                                 </tr>
                             ))}
