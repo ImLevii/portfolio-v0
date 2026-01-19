@@ -26,6 +26,7 @@ export function CartPopover({ user }: { user?: any }) {
     const [loading, setLoading] = useState(false)
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
     const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
+    const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null)
     const [paypalError, setPaypalError] = useState<string | null>(null)
 
     const [isOpen, setIsOpen] = useState(false)
@@ -238,28 +239,58 @@ export function CartPopover({ user }: { user?: any }) {
                         {selectedMethod && ["crypto", "bank_transfer"].includes(selectedMethod) && (
                             <div className="mb-4 p-3 rounded-md bg-gray-900/80 border border-gray-800 space-y-3">
                                 <Label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                                    {selectedMethod === "crypto" ? "Send Payment To:" : "Bank Details:"}
+                                    {selectedMethod === "crypto" ? "Select Cryptocurrency:" : "Bank Details:"}
                                 </Label>
                                 {(() => {
                                     const method = paymentMethods.find(m => m.name === selectedMethod);
                                     const config = method?.config ? JSON.parse(method.config) : {};
 
                                     if (selectedMethod === "crypto") {
-                                        return ["BTC", "ETH", "LTC", "XRP"].map(coin => config[coin] ? (
-                                            <div key={coin} className="space-y-1">
-                                                <span className="text-xs font-bold text-green-500">{coin}</span>
-                                                <div
-                                                    className="text-[10px] font-mono bg-black/50 p-1.5 rounded border border-gray-800 text-gray-300 break-all cursor-pointer hover:bg-gray-800 transition-colors flex items-center justify-between group/copy"
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(config[coin]);
-                                                        showTerminalToast.success("Copied", `${coin} address copied to clipboard`);
-                                                    }}
-                                                >
-                                                    {config[coin]}
-                                                    <span className="opacity-0 group-hover/copy:opacity-100 text-[9px] text-green-400 uppercase font-bold">Copy</span>
+                                        const coins = ["BTC", "ETH", "LTC", "XRP"].filter(coin => config[coin]);
+
+                                        // Auto-select first coin if none or invalid selected
+                                        if (!selectedCrypto && coins.length > 0) {
+                                            setSelectedCrypto(coins[0]);
+                                        } else if (selectedCrypto && !coins.includes(selectedCrypto) && coins.length > 0) {
+                                            setSelectedCrypto(coins[0]);
+                                        }
+
+                                        return (
+                                            <div className="space-y-3">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {coins.map(coin => (
+                                                        <button
+                                                            key={coin}
+                                                            onClick={() => setSelectedCrypto(coin)}
+                                                            className={`px-3 py-1.5 rounded text-xs font-bold border transition-colors ${selectedCrypto === coin
+                                                                ? "bg-green-500/20 border-green-500 text-green-400"
+                                                                : "bg-black/40 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-300"
+                                                                }`}
+                                                        >
+                                                            {coin}
+                                                        </button>
+                                                    ))}
                                                 </div>
+
+                                                {selectedCrypto && config[selectedCrypto] && (
+                                                    <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <span className="text-xs font-bold text-white flex items-center justify-between">
+                                                            <span>Send {selectedCrypto} To:</span>
+                                                        </span>
+                                                        <div
+                                                            className="text-[10px] font-mono bg-black/50 p-2 rounded border border-gray-800 text-gray-300 break-all cursor-pointer hover:bg-gray-800 transition-colors flex items-center justify-between group/copy"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(config[selectedCrypto!]);
+                                                                showTerminalToast.success("Copied", `${selectedCrypto} address copied to clipboard`);
+                                                            }}
+                                                        >
+                                                            {config[selectedCrypto]}
+                                                            <span className="opacity-0 group-hover/copy:opacity-100 text-[9px] text-green-400 uppercase font-bold pl-2">Copy</span>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        ) : null);
+                                        );
                                     } else {
                                         return (
                                             <div className="text-xs text-gray-300 whitespace-pre-wrap font-mono">
