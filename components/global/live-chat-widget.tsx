@@ -1129,7 +1129,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                     disabled={isPending || activeTicket?.status === 'CLOSED'}
                                                     maxLength={MAX_CHARS}
                                                     onKeyDown={handleTyping}
-                                                    className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+                                                    className="h-10 rounded-xl border-white/5 bg-white/5 pr-10 text-base sm:text-sm text-zinc-200 placeholder:text-zinc-500 focus-visible:border-emerald-500/50 focus-visible:ring-0 focus-visible:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-1"
                                                 />
                                                 <Button
                                                     type="submit"
@@ -1154,7 +1154,7 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                         value={guestNickname}
                                                         onChange={(e) => setGuestNickname(e.target.value)}
                                                         placeholder="Enter a temporary nickname..."
-                                                        className="h-10 rounded-xl border-white/5 bg-white/5 text-sm placeholder:text-zinc-500 text-zinc-200 focus-visible:border-emerald-500/50 focus-visible:ring-0 transition-all pr-10"
+                                                        className="h-10 rounded-xl border-white/5 bg-white/5 text-base sm:text-sm placeholder:text-zinc-500 text-zinc-200 focus-visible:border-emerald-500/50 focus-visible:ring-0 transition-all pr-10"
                                                         maxLength={15}
                                                         autoFocus
                                                     />
