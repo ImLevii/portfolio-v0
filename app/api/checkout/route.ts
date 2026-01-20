@@ -229,7 +229,7 @@ export async function POST(req: Request) {
                     Accept: "application/json",
                     "Content-Type": "application/json",
                     "X-CC-Api-Key": apiKey,
-                    // Reference implementation does NOT include X-CC-Version
+                    "X-CC-Version": "2018-03-22",
                 },
                 body: JSON.stringify({
                     local_price: {
