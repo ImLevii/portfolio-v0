@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/card"
 import { Plus, Pencil, Trash2, GripVertical } from "lucide-react"
 import { createCarouselItem, updateCarouselItem, deleteCarouselItem } from "@/app/admin/carousel/actions"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 export function CarouselManager({ initialItems }: { initialItems: CarouselItem[] }) {
     const [items, setItems] = useState(initialItems)
@@ -47,17 +47,17 @@ export function CarouselManager({ initialItems }: { initialItems: CarouselItem[]
         try {
             if (editingItem) {
                 await updateCarouselItem(editingItem.id, data)
-                toast.success("Item updated successfully")
+                showTerminalToast.success("Item updated successfully")
             } else {
                 await createCarouselItem(data)
-                toast.success("Item created successfully")
+                showTerminalToast.success("Item created successfully")
             }
             setIsDialogOpen(false)
             setEditingItem(null)
             // Refresh items (in a real app, you might want to re-fetch or update local state optimistically)
             window.location.reload()
         } catch (error) {
-            toast.error("Something went wrong")
+            showTerminalToast.error("Something went wrong")
         } finally {
             setLoading(false)
         }
@@ -67,10 +67,10 @@ export function CarouselManager({ initialItems }: { initialItems: CarouselItem[]
         if (confirm("Are you sure you want to delete this item?")) {
             try {
                 await deleteCarouselItem(id)
-                toast.success("Item deleted successfully")
+                showTerminalToast.success("Item deleted successfully")
                 window.location.reload()
             } catch (error) {
-                toast.error("Something went wrong")
+                showTerminalToast.error("Something went wrong")
             }
         }
     }
@@ -78,10 +78,10 @@ export function CarouselManager({ initialItems }: { initialItems: CarouselItem[]
     const handleToggleActive = async (id: string, isActive: boolean) => {
         try {
             await updateCarouselItem(id, { isActive })
-            toast.success("Status updated")
+            showTerminalToast.success("Status updated")
             window.location.reload()
         } catch (error) {
-            toast.error("Something went wrong")
+            showTerminalToast.error("Something went wrong")
         }
     }
 
@@ -101,10 +101,10 @@ export function CarouselManager({ initialItems }: { initialItems: CarouselItem[]
                                     try {
                                         const { seedCarouselItems } = await import("@/app/admin/carousel/actions")
                                         await seedCarouselItems()
-                                        toast.success("Default slides loaded")
+                                        showTerminalToast.success("Default slides loaded")
                                         window.location.reload()
                                     } catch (error) {
-                                        toast.error("Failed to load defaults")
+                                        showTerminalToast.error("Failed to load defaults")
                                     } finally {
                                         setLoading(false)
                                     }

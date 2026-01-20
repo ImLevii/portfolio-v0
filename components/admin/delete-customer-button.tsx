@@ -15,7 +15,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { deleteCustomer } from "@/app/admin/customers/actions"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { useRouter } from "next/navigation"
 
 interface DeleteCustomerButtonProps {
@@ -34,13 +34,13 @@ export function DeleteCustomerButton({ customerId, customerName, variant = "butt
         setIsLoading(true)
         try {
             await deleteCustomer(customerId)
-            toast.success("Customer deleted successfully")
+            showTerminalToast.success("Customer deleted successfully")
             setOpen(false)
             if (redirectAfter) {
                 router.push("/admin/customers")
             }
         } catch (error) {
-            toast.error("Failed to delete customer")
+            showTerminalToast.error("Failed to delete customer")
             console.error(error)
         } finally {
             setIsLoading(false)

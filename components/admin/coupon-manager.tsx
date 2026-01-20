@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Trash2, Plus, Calendar } from "lucide-react"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { createCoupon, deleteCoupon, toggleCoupon } from "@/app/admin/coupons/actions"
 import { format } from "date-fns"
 
@@ -17,14 +17,14 @@ export function CouponManager({ coupons }: { coupons: Coupon[] }) {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure?")) return
         const result = await deleteCoupon(id)
-        if (result.success) toast.success("Coupon deleted")
-        else toast.error("Failed to delete")
+        if (result.success) showTerminalToast.success("Coupon deleted")
+        else showTerminalToast.error("Failed to delete")
     }
 
     const handleToggle = async (id: string, current: boolean) => {
         const result = await toggleCoupon(id, !current)
-        if (result.success) toast.success("Updated coupon status")
-        else toast.error("Failed to update")
+        if (result.success) showTerminalToast.success("Updated coupon status")
+        else showTerminalToast.error("Failed to update")
     }
 
     return (
@@ -95,10 +95,10 @@ export function CouponManager({ coupons }: { coupons: Coupon[] }) {
                             <form action={async (formData) => {
                                 const res = await createCoupon(null, formData)
                                 if (res.success) {
-                                    toast.success("Coupon created")
+                                    showTerminalToast.success("Coupon created")
                                     setIsCreating(false)
                                 } else {
-                                    toast.error(res.error || "Failed")
+                                    showTerminalToast.error(res.error || "Failed")
                                 }
                             }} className="space-y-4">
                                 <div className="space-y-2">

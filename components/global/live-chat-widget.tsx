@@ -25,7 +25,7 @@ import { uploadChatMedia } from "@/actions/upload"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
 import { showTerminalToast } from "@/components/global/terminal-toast"
 import { filterProfanity } from "@/lib/profanity"
-import { toast } from "sonner"
+
 
 interface ChatMessage {
     id: string

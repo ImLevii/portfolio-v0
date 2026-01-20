@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 interface CategoryFormProps {
     initialData?: {
@@ -41,12 +41,12 @@ export function CategoryForm({ initialData, action }: CategoryFormProps) {
         setLoading(true)
         try {
             await action(formData)
-            toast.success(initialData ? "Category updated" : "Category created")
+            showTerminalToast.success(initialData ? "Category updated" : "Category created")
             router.push("/admin/categories")
             router.refresh()
         } catch (error) {
             console.error(error)
-            toast.error("Something went wrong")
+            showTerminalToast.error("Something went wrong")
         } finally {
             setLoading(false)
         }

@@ -21,7 +21,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { broadcastAnnouncement, clearAnnouncement } from "@/actions/announcements"
 
 export function AnnouncementForm() {
@@ -39,7 +39,7 @@ export function AnnouncementForm() {
 
     const handleBroadcast = () => {
         if (!text) {
-            toast.error("Message text is required")
+            showTerminalToast.error("Message text is required")
             return
         }
 
@@ -54,10 +54,10 @@ export function AnnouncementForm() {
                 duration: parseInt(duration) // 0 = permanent
             })
             if (result.success) {
-                toast.success("Announcement broadcasted successfully!")
+                showTerminalToast.success("Announcement broadcasted successfully!")
                 router.refresh()
             } else {
-                toast.error("Failed to broadcast")
+                showTerminalToast.error("Failed to broadcast")
             }
         })
     }
@@ -66,10 +66,10 @@ export function AnnouncementForm() {
         startTransition(async () => {
             const result = await clearAnnouncement()
             if (result.success) {
-                toast.success("Active announcement cleared")
+                showTerminalToast.success("Active announcement cleared")
                 router.refresh()
             } else {
-                toast.error("Failed to clear")
+                showTerminalToast.error("Failed to clear")
             }
         })
     }

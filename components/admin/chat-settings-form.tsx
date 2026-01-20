@@ -27,7 +27,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { toast } from "sonner"
+
 import { showTerminalToast } from "@/components/global/terminal-toast"
 import { updateChatSettings, type ChatSettingsConfig } from "@/actions/chat-settings"
 import { clearChat } from "@/actions/chat"

@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { NeonSlider } from "@/components/ui/neon-slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Save, Snowflake, Leaf, Music, Volume2, Clock, Activity, Wand2, Sparkles, ShoppingBag } from "lucide-react"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { updateSeasonalSettings, SeasonalSettingsConfig, SeasonalMode } from "@/actions/seasonal-settings"
 import { cn } from "@/lib/utils"
 
@@ -25,9 +25,9 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
         startTransition(async () => {
             const result = await updateSeasonalSettings(settings)
             if (result.success) {
-                toast.success("Settings saved successfully")
+                showTerminalToast.success("Settings saved successfully")
             } else {
-                toast.error("Failed to save settings")
+                showTerminalToast.error("Failed to save settings")
             }
         })
     }

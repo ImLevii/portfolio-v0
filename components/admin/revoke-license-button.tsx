@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { revokeLicense } from "@/app/admin/customers/actions"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { Loader2, Ban } from "lucide-react"
 
 interface RevokeLicenseButtonProps {
@@ -26,9 +26,9 @@ export function RevokeLicenseButton({ id, customerId, status }: RevokeLicenseBut
             formData.append("id", id)
             formData.append("customerId", customerId)
             await revokeLicense(formData)
-            toast.success("License revoked")
+            showTerminalToast.success("License revoked")
         } catch (error) {
-            toast.error("Failed to revoke license")
+            showTerminalToast.error("Failed to revoke license")
         } finally {
             setIsLoading(false)
         }

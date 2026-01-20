@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 interface OrderActionsProps {
     order: Order
@@ -28,12 +28,12 @@ export function OrderActions({ order }: OrderActionsProps) {
         try {
             const result = await updateOrderStatus(order.id, status)
             if (result.success) {
-                toast.success(`Order status updated to ${status}`)
+                showTerminalToast.success(`Order status updated to ${status}`)
             } else {
-                toast.error(result.error || "Failed to update status")
+                showTerminalToast.error(result.error || "Failed to update status")
             }
         } catch (error) {
-            toast.error("Something went wrong")
+            showTerminalToast.error("Something went wrong")
         } finally {
             setLoading(false)
         }
@@ -44,9 +44,9 @@ export function OrderActions({ order }: OrderActionsProps) {
         setLoading(true)
         try {
             await deleteOrder(order.id)
-            toast.success("Order deleted")
+            showTerminalToast.success("Order deleted")
         } catch (error) {
-            toast.error("Failed to delete order")
+            showTerminalToast.error("Failed to delete order")
         } finally {
             setLoading(false)
         }

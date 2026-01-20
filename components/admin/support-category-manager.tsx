@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Trash2, Plus, GripVertical, CreditCard, Gamepad2, Headphones, DollarSign, ShieldCheck, MessageSquare, Save } from "lucide-react"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -53,7 +53,7 @@ export function SupportCategoryManager({ initialCategories }: SupportCategoryMan
     const [newIcon, setNewIcon] = useState("message-square")
 
     const handleCreate = async () => {
-        if (!newTitle) return toast.error("Title is required")
+        if (!newTitle) return showTerminalToast.error("Title is required")
 
         startTransition(async () => {
             const res = await createSupportCategory({
@@ -64,14 +64,14 @@ export function SupportCategoryManager({ initialCategories }: SupportCategoryMan
             })
 
             if (res.success) {
-                toast.success("Category created")
+                showTerminalToast.success("Category created")
                 setIsDialogOpen(false)
                 setNewTitle("")
                 setNewSubtitle("")
                 setNewIcon("message-square")
                 router.refresh()
             } else {
-                toast.error("Failed to create category")
+                showTerminalToast.error("Failed to create category")
             }
         })
     }
@@ -82,10 +82,10 @@ export function SupportCategoryManager({ initialCategories }: SupportCategoryMan
         startTransition(async () => {
             const res = await deleteSupportCategory(id)
             if (res.success) {
-                toast.success("Category deleted")
+                showTerminalToast.success("Category deleted")
                 router.refresh()
             } else {
-                toast.error("Failed to delete")
+                showTerminalToast.error("Failed to delete")
             }
         })
     }

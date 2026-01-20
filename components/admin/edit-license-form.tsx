@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select"
 import { Edit, Loader2 } from "lucide-react"
 import { updateLicense } from "@/app/admin/customers/actions"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 interface EditLicenseFormProps {
     id: string
@@ -36,10 +36,10 @@ export function EditLicenseForm({ id, currentStatus, customerId }: EditLicenseFo
         setIsLoading(true)
         try {
             await updateLicense(formData)
-            toast.success("License updated successfully")
+            showTerminalToast.success("License updated successfully")
             setOpen(false)
         } catch (error) {
-            toast.error("Failed to update license")
+            showTerminalToast.error("Failed to update license")
             console.error(error)
         } finally {
             setIsLoading(false)

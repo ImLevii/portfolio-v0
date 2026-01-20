@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select"
 import { Pencil, Loader2 } from "lucide-react"
 import { updateCustomer } from "@/app/admin/customers/actions"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 interface CustomerEditFormProps {
     customer: {
@@ -41,10 +41,10 @@ export function CustomerEditForm({ customer }: CustomerEditFormProps) {
         setIsLoading(true)
         try {
             await updateCustomer(formData)
-            toast.success("Customer updated successfully")
+            showTerminalToast.success("Customer updated successfully")
             setOpen(false)
         } catch (error) {
-            toast.error("Failed to update customer")
+            showTerminalToast.error("Failed to update customer")
             console.error(error)
         } finally {
             setIsLoading(false)

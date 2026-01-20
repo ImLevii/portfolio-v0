@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Loader2 } from "lucide-react"
 import { assignProduct } from "@/app/admin/customers/actions"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 interface Product {
     id: string
@@ -40,10 +40,10 @@ export function AssignProductForm({ customerId, products }: AssignProductFormPro
         setIsLoading(true)
         try {
             await assignProduct(formData)
-            toast.success("Product assigned successfully")
+            showTerminalToast.success("Product assigned successfully")
             setOpen(false)
         } catch (error) {
-            toast.error("Failed to assign product")
+            showTerminalToast.error("Failed to assign product")
             console.error(error)
         } finally {
             setIsLoading(false)

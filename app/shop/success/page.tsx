@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { useEffect, useState, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import useCart from "@/hooks/use-cart"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 
 function SuccessContent() {
     const searchParams = useSearchParams()
@@ -40,7 +40,7 @@ function SuccessContent() {
 
                     setStatus("success")
                     removeAll()
-                    toast.success("Payment successful!")
+                    showTerminalToast.success("Payment successful!")
                 } catch (error) {
                     console.error("Capture error:", error)
                     setStatus("error")

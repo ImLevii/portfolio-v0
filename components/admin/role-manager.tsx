@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { Loader2, Plus, Trash2, Save, Shield } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -24,12 +24,12 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
         try {
             const res = await saveRoles(roles)
             if (res.success) {
-                toast.success("Roles updated successfully")
+                showTerminalToast.success("Roles updated successfully")
             } else {
-                toast.error(res.error || "Failed to update roles")
+                showTerminalToast.error(res.error || "Failed to update roles")
             }
         } catch (error) {
-            toast.error("An error occurred")
+            showTerminalToast.error("An error occurred")
         } finally {
             setIsLoading(false)
         }
@@ -147,8 +147,8 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
                                         <div
                                             key={perm.key}
                                             className={`flex items-center space-x-2 p-2 rounded border transition-all duration-300 ${role.permissions.includes(perm.key) || role.permissions.includes("all")
-                                                    ? "bg-cyan-500/10 border-cyan-500/30"
-                                                    : "bg-white/5 border-white/5"
+                                                ? "bg-cyan-500/10 border-cyan-500/30"
+                                                : "bg-white/5 border-white/5"
                                                 }`}
                                         >
                                             <Checkbox
@@ -161,8 +161,8 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
                                             <label
                                                 htmlFor={`${role.key}-${perm.key}`}
                                                 className={`text-xs font-medium leading-none cursor-pointer ${role.permissions.includes(perm.key) || role.permissions.includes("all")
-                                                        ? "text-cyan-100"
-                                                        : "text-gray-400"
+                                                    ? "text-cyan-100"
+                                                    : "text-gray-400"
                                                     }`}
                                             >
                                                 {perm.label}
@@ -170,8 +170,8 @@ export function RoleManager({ initialRoles }: { initialRoles: RoleDefinition[] }
                                         </div>
                                     ))}
                                     <div className={`flex items-center space-x-2 p-2 rounded border transition-all duration-300 ${role.permissions.includes("all")
-                                            ? "bg-red-500/10 border-red-500/30"
-                                            : "bg-red-500/5 border-red-500/10"
+                                        ? "bg-red-500/10 border-red-500/30"
+                                        : "bg-red-500/5 border-red-500/10"
                                         }`}>
                                         <Checkbox
                                             id={`${role.key}-all`}

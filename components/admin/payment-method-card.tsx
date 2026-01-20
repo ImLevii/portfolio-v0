@@ -6,7 +6,7 @@ import { updatePaymentMethod } from "@/app/admin/settings/payments/actions"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "sonner"
+import { showTerminalToast } from "@/components/global/terminal-toast"
 import { Loader2, Save } from "lucide-react"
 
 interface PaymentMethodCardProps {
@@ -32,14 +32,14 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
         try {
             const result = await updatePaymentMethod(method.id, { isEnabled: checked })
             if (result.success) {
-                toast.success(`${method.displayName} ${checked ? "enabled" : "disabled"}`)
+                showTerminalToast.success(`${method.displayName} ${checked ? "enabled" : "disabled"}`)
             } else {
                 setIsEnabled(!checked) // Revert
-                toast.error("Failed to update status")
+                showTerminalToast.error("Failed to update status")
             }
         } catch (error) {
             setIsEnabled(!checked)
-            toast.error("Something went wrong")
+            showTerminalToast.error("Something went wrong")
         } finally {
             setLoading(false)
         }
@@ -50,12 +50,12 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
         try {
             const result = await updatePaymentMethod(method.id, { config })
             if (result.success) {
-                toast.success("Configuration saved")
+                showTerminalToast.success("Configuration saved")
             } else {
-                toast.error("Failed to save configuration")
+                showTerminalToast.error("Failed to save configuration")
             }
         } catch (error) {
-            toast.error("Something went wrong")
+            showTerminalToast.error("Something went wrong")
         } finally {
             setLoading(false)
         }
