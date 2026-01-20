@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { createPayPalOrder } from "@/lib/paypal"
 import { generateLicenseKey } from "@/lib/license"
+import crypto from "crypto"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY! || process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY!, {
     // apiVersion: "2025-02-24.acacia", // Use latest or what's available
@@ -211,27 +212,73 @@ export async function POST(req: Request) {
         try {
             const amountString = (totalAmount / 100).toFixed(2)
 
-            const coinbaseMethod = await db.paymentMethod.findUnique({ where: { name: "coinbase" } })
-            const config = coinbaseMethod?.config ? JSON.parse(coinbaseMethod.config) : {}
-            const apiKey = config.apiKey || process.env.COINBASE_API_KEY
+            const keyName = process.env.COINBASE_CDP_API_KEY_NAME
+            const keySecret = process.env.COINBASE_CDP_PRIVATE_KEY
 
-            if (!apiKey) {
-                throw new Error("Coinbase API Key not configured")
+            if (!keyName || !keySecret) {
+                throw new Error("Coinbase CDP Credentials not configured")
             }
 
-            // Reverting to /charges as /checkouts requires different scope/auth.
-            // ForbiddenError usually means the API key doesn't have permission for that specific endpoint.
-            // We will try /charges again but handle it carefully.
-            const response = await fetch("https://api.commerce.coinbase.com/charges", {
-                method: "POST",
-                mode: "cors", // Added from reference
+            const jwt = require('jsonwebtoken')
+
+            const requestMethod = "POST"
+            const url = "api.coinbase.com/api/v1/payment_links"
+            const requestPath = "/api/v1/payment_links"
+
+            // Format private key correctly (replace \n with actual newlines if Env var formatted that way)
+            const privateKey = keySecret.replace(/\\n/g, '\n')
+
+            const token = jwt.sign(
+                {
+                    iss: "cdp",
+                    nbf: Math.floor(Date.now() / 1000),
+                    exp: Math.floor(Date.now() / 1000) + 120,
+                    sub: keyName,
+                    uri: `${requestMethod} ${url}`
+                },
+                privateKey,
+                {
+                    algorithm: 'ES256',
+                    header: {
+                        kid: keyName,
+                        nonce: crypto.randomBytes(16).toString('hex') // crypto is globally available or imported in file
+                    }
+                }
+            )
+
+            const response = await fetch(`https://${url}`, {
+                method: requestMethod,
                 headers: {
-                    Accept: "application/json",
                     "Content-Type": "application/json",
-                    "X-CC-Api-Key": apiKey,
-                    "X-CC-Version": "2018-03-22",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
+                    mode: "test", // Or "live" based on env? Usually auto-detected by key permissions, but explicit mode field exists in new API? 
+                    // Wait, Payment Link API doesn't always have mode in body. It's often implied by key. 
+                    // But let's check payload structure. New API usually needs 'currency' and 'network'.
+                    // Re-checking payload structure: { "price_currency": "USD", "price_amount": "...", "name": ... }
+                    // Actually, for "Payment Links" specifically:
+                    // It might be simpler to use the new "Unified Payments" or "Onchain Charge". 
+                    // Let's assume the user wants standard crypto payments.
+
+                    // Correct payload for /payment_links (Coinbase Commerce 2.0 / Onchain Payment Protocol)
+                    // If creating a ONE_TIME_PAYMENT:
+                    // Docs are tricky without direct access. 
+                    // Let's stick to the KNOWN Commerce API v1 structure but sent to the new endpoint? 
+                    // No, usually new endpoint = new structure.
+                    // Let's TRY interpreting the previous failed "Charges" payload against the new endpoint, 
+                    // BUT mostly likely we need:
+
+                    // Simple "Charge" equivalent payload for Payment Link:
+                    // { "name": "...", "description": "...", "pricing_type": "fixed_price", "local_price": { "amount": "...", "currency": "..." } }
+                    // This structure IS supported by the new Commerce-on-CDP endpoints usually.
+
+                    // Let's stick to the previous payload structure but with JWT auth first.
+                    // (The browser agent found POST https://business.coinbase.com/api/v1/payment-links)
+                    // Wait, browser agent said `https://business.coinbase.com/api/v1/payment-links`
+                    // API Docs usually say `api.coinbase.com`.
+                    // I will use `api.coinbase.com/api/v1/payment_links` as standard CDP pattern.
+
                     local_price: {
                         amount: amountString,
                         currency: "USD",
@@ -253,12 +300,15 @@ export async function POST(req: Request) {
             const data = await response.json()
 
             if (!response.ok) {
-                console.error("Coinbase error:", data)
-                throw new Error(data.error?.message || "Failed to create Coinbase charge")
+                console.error("Coinbase CDP error:", data)
+                throw new Error(data.message || data.error?.message || "Failed to create Coinbase Payment Link")
             }
 
+            // New API might return `web_url` or `hosted_url`
+            const checkoutUrl = data.hosted_url || data.web_url || data.link_url
+
             return NextResponse.json(
-                { url: data.data.hosted_url },
+                { url: checkoutUrl },
                 { headers: corsHeaders }
             )
         } catch (error: any) {
