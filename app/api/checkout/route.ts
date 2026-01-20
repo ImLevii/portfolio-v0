@@ -219,8 +219,9 @@ export async function POST(req: Request) {
                 throw new Error("Coinbase API Key not configured")
             }
 
-            // Note: /charges is deprecated. Using /checkouts to create a dynamic checkout.
-            // Checkouts persist, so this creates a new checkout definition for every order.
+            // Reverting to /charges as /checkouts requires different scope/auth.
+            // ForbiddenError usually means the API key doesn't have permission for that specific endpoint.
+            // We will try /charges again but handle it carefully.
             const payload = {
                 name: "Purchase from Portfolio Shop",
                 description: items.map((i) => i.name).join(", "),
@@ -234,20 +235,17 @@ export async function POST(req: Request) {
                     productIds: JSON.stringify(productIds),
                     couponId: couponId || "",
                 },
-                requested_info: ["name", "email"],
-                // redirect_url might not be supported dynamically in /checkouts payload by default,
-                // but we pass it just in case or rely on webhook + manual user navigation.
                 redirect_url: `${baseUrl}/shop/success?coinbase=true`,
                 cancel_url: `${baseUrl}/shop?canceled=1`,
             }
 
-            const response = await fetch("https://api.commerce.coinbase.com/checkouts", {
+            const response = await fetch("https://api.commerce.coinbase.com/charges", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                     "X-CC-Api-Key": apiKey,
-                    "X-CC-Version": "2018-03-22",
+                    // Removing implicit version or setting to a neutral one might help if strict deprecation is enforced by version
                 },
                 body: JSON.stringify(payload),
             })
@@ -256,16 +254,11 @@ export async function POST(req: Request) {
 
             if (!response.ok) {
                 console.error("Coinbase error:", data)
-                throw new Error(data.error?.message || "Failed to create Coinbase checkout")
+                throw new Error(data.error?.message || "Failed to create Coinbase charge")
             }
 
-            // For checkouts, the ID is returned. URL is usually constructed.
-            // Check if hosted_url exists (some versions return it), otherwise construct it.
-            const checkoutId = data.data.id
-            const checkoutUrl = `https://commerce.coinbase.com/checkout/${checkoutId}`
-
             return NextResponse.json(
-                { url: checkoutUrl },
+                { url: data.data.hosted_url },
                 { headers: corsHeaders }
             )
         } catch (error: any) {
