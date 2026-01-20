@@ -210,111 +210,77 @@ export async function POST(req: Request) {
 
     if (paymentMethodId === "coinbase") {
         try {
-            const amountString = (totalAmount / 100).toFixed(2)
-
-            const keyName = process.env.COINBASE_CDP_API_KEY_NAME
-            const keySecret = process.env.COINBASE_CDP_PRIVATE_KEY
-
-            if (!keyName || !keySecret) {
-                throw new Error("Coinbase CDP Credentials not configured")
-            }
-
-            const jwt = require('jsonwebtoken')
-
-            const requestMethod = "POST"
-            const url = "api.coinbase.com/api/v1/payment_links"
-            const requestPath = "/api/v1/payment_links"
-
-            // Format private key correctly
-            let privateKey = keySecret.replace(/\\n/g, '\n')
-
-            if (!privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
-                privateKey = `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----\n`
-            }
-
-            const token = jwt.sign(
-                {
-                    iss: "cdp",
-                    nbf: Math.floor(Date.now() / 1000),
-                    exp: Math.floor(Date.now() / 1000) + 120,
-                    sub: keyName,
-                    uri: `${requestMethod} ${url}`
-                },
-                privateKey,
-                {
-                    algorithm: 'ES256',
-                    header: {
-                        kid: keyName,
-                        nonce: crypto.randomBytes(16).toString('hex') // crypto is globally available or imported in file
+            // 1. Create Pending Order first (needed for webhook and metadata)
+            const order = await db.order.create({
+                data: {
+                    userId: session?.user?.id as string,
+                    stripeSessionId: `coinbase_${Date.now()}_${Math.random().toString(36).substring(7)}`, // Temporary ID
+                    amount: totalAmount,
+                    currency: "usd",
+                    status: "pending",
+                    paymentMethod: "coinbase",
+                    couponCode: couponId ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
+                    items: {
+                        create: items.map((item) => {
+                            let price = item.price
+                            if (discountPercent > 0) {
+                                price = Math.round(item.price * (1 - discountPercent / 100))
+                            }
+                            return {
+                                productId: item.id,
+                                price
+                            }
+                        })
                     }
                 }
-            )
-
-            const response = await fetch(`https://${url}`, {
-                method: requestMethod,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    mode: "test", // Or "live" based on env? Usually auto-detected by key permissions, but explicit mode field exists in new API? 
-                    // Wait, Payment Link API doesn't always have mode in body. It's often implied by key. 
-                    // But let's check payload structure. New API usually needs 'currency' and 'network'.
-                    // Re-checking payload structure: { "price_currency": "USD", "price_amount": "...", "name": ... }
-                    // Actually, for "Payment Links" specifically:
-                    // It might be simpler to use the new "Unified Payments" or "Onchain Charge". 
-                    // Let's assume the user wants standard crypto payments.
-
-                    // Correct payload for /payment_links (Coinbase Commerce 2.0 / Onchain Payment Protocol)
-                    // If creating a ONE_TIME_PAYMENT:
-                    // Docs are tricky without direct access. 
-                    // Let's stick to the KNOWN Commerce API v1 structure but sent to the new endpoint? 
-                    // No, usually new endpoint = new structure.
-                    // Let's TRY interpreting the previous failed "Charges" payload against the new endpoint, 
-                    // BUT mostly likely we need:
-
-                    // Simple "Charge" equivalent payload for Payment Link:
-                    // { "name": "...", "description": "...", "pricing_type": "fixed_price", "local_price": { "amount": "...", "currency": "..." } }
-                    // This structure IS supported by the new Commerce-on-CDP endpoints usually.
-
-                    // Let's stick to the previous payload structure but with JWT auth first.
-                    // (The browser agent found POST https://business.coinbase.com/api/v1/payment-links)
-                    // Wait, browser agent said `https://business.coinbase.com/api/v1/payment-links`
-                    // API Docs usually say `api.coinbase.com`.
-                    // I will use `api.coinbase.com/api/v1/payment_links` as standard CDP pattern.
-
-                    local_price: {
-                        amount: amountString,
-                        currency: "USD",
-                    },
-                    pricing_type: "fixed_price",
-                    name: "Purchase from Portfolio Shop",
-                    description: items.map((i) => i.name).join(", "),
-                    redirect_url: `${baseUrl}/shop/success?coinbase=true`,
-                    cancel_url: `${baseUrl}/shop?canceled=1`,
-                    metadata: {
-                        userId: session?.user?.id,
-                        productIds: JSON.stringify(productIds),
-                        couponId: couponId || "",
-                        email: session?.user?.email || undefined
-                    },
-                }),
             })
 
-            const data = await response.json()
-
-            if (!response.ok) {
-                console.error("Coinbase CDP error:", data)
-                throw new Error(data.message || data.error?.message || "Failed to create Coinbase Payment Link")
+            // 2. Increment Coupon Usage
+            if (couponId) {
+                await db.coupon.update({
+                    where: { id: couponId },
+                    data: {
+                        uses: { increment: 1 }
+                    }
+                }).catch((err) => console.error("Failed to increment coupon usage:", err))
             }
 
-            // New API might return `web_url` or `hosted_url`
-            const checkoutUrl = data.hosted_url || data.web_url || data.link_url
+            // 3. Create Coinbase Charge
+            const { createCharge } = await import("@/src/lib/coinbase")
+
+            const chargeData = {
+                name: `Order #${order.id}`,
+                description: `Payment for ${items.length} items from Portfolio Shop`,
+                pricing_type: "fixed_price" as const,
+                local_price: {
+                    amount: (totalAmount / 100).toFixed(2),
+                    currency: "USD",
+                },
+                metadata: {
+                    orderId: order.id,
+                    userId: session?.user?.id || "",
+                    email: session?.user?.email || ""
+                },
+                redirect_url: `${baseUrl}/shop/success?coinbase=true&orderId=${order.id}`,
+                cancel_url: `${baseUrl}/shop?canceled=1`,
+            }
+
+            const charge = await createCharge(chargeData)
+
+            // 4. Update Order with Charge ID
+            await db.order.update({
+                where: { id: order.id },
+                data: {
+                    coinbaseChargeId: charge.id || charge.code,
+                    coinbaseStatus: "NEW"
+                } as any
+            })
 
             return NextResponse.json(
-                { url: checkoutUrl },
+                { url: charge.hosted_url },
                 { headers: corsHeaders }
             )
+
         } catch (error: any) {
             console.error("Coinbase checkout error:", error)
             return NextResponse.json(
