@@ -219,6 +219,8 @@ export async function POST(req: Request) {
                 throw new Error("Coinbase API Key not configured")
             }
 
+            // Note: /charges is deprecated. Using /checkouts to create a dynamic checkout.
+            // Checkouts persist, so this creates a new checkout definition for every order.
             const payload = {
                 name: "Purchase from Portfolio Shop",
                 description: items.map((i) => i.name).join(", "),
@@ -232,11 +234,14 @@ export async function POST(req: Request) {
                     productIds: JSON.stringify(productIds),
                     couponId: couponId || "",
                 },
+                requested_info: ["name", "email"],
+                // redirect_url might not be supported dynamically in /checkouts payload by default,
+                // but we pass it just in case or rely on webhook + manual user navigation.
                 redirect_url: `${baseUrl}/shop/success?coinbase=true`,
                 cancel_url: `${baseUrl}/shop?canceled=1`,
             }
 
-            const response = await fetch("https://api.commerce.coinbase.com/charges", {
+            const response = await fetch("https://api.commerce.coinbase.com/checkouts", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -251,11 +256,16 @@ export async function POST(req: Request) {
 
             if (!response.ok) {
                 console.error("Coinbase error:", data)
-                throw new Error(data.error?.message || "Failed to create Coinbase charge")
+                throw new Error(data.error?.message || "Failed to create Coinbase checkout")
             }
 
+            // For checkouts, the ID is returned. URL is usually constructed.
+            // Check if hosted_url exists (some versions return it), otherwise construct it.
+            const checkoutId = data.data.id
+            const checkoutUrl = `https://commerce.coinbase.com/checkout/${checkoutId}`
+
             return NextResponse.json(
-                { url: data.data.hosted_url },
+                { url: checkoutUrl },
                 { headers: corsHeaders }
             )
         } catch (error: any) {
