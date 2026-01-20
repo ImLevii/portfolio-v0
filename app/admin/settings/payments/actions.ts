@@ -56,6 +56,12 @@ export async function getPaymentMethods() {
                     displayName: "Bank Transfer",
                     isEnabled: false,
                     config: JSON.stringify({ bankName: "", accountNumber: "" })
+                },
+                {
+                    name: "coinbase",
+                    displayName: "Coinbase",
+                    isEnabled: false,
+                    config: JSON.stringify({ apiKey: "", webhookSecret: "", mode: "live" })
                 }
             ]
 
