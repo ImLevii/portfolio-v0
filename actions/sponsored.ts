@@ -24,9 +24,19 @@ export async function getSponsoredMessages() {
             return { success: false, error: "Unauthorized" }
         }
 
-        const messages = await db.sponsoredMessage.findMany({
+        const messagesRaw = await db.sponsoredMessage.findMany({
             orderBy: { createdAt: 'desc' }
         })
+
+        const messages: SponsoredMessageData[] = messagesRaw.map(msg => ({
+            id: msg.id,
+            title: msg.title,
+            description: msg.description,
+            imageUrl: msg.imageUrl,
+            linkUrl: msg.linkUrl,
+            frequency: msg.frequency,
+            isActive: msg.isActive
+        }))
 
         return { success: true, messages }
     } catch (error) {

@@ -24,7 +24,14 @@ export default async function EditCategoryPage({ params }: { params: { id: strin
             </div>
 
             <CategoryForm
-                initialData={category}
+                initialData={{
+                    id: category.id,
+                    name: category.name,
+                    slug: category.slug,
+                    description: category.description,
+                    image: category.image,
+                    order: category.order
+                }}
                 action={updateCategory.bind(null, category.id)}
             />
         </div>
