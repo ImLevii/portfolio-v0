@@ -60,6 +60,12 @@ function SuccessContent() {
                 removeAll()
             }
             setMessage("Your order has been placed successfully! Please ensure you have completed the payment transfer. Your digital assets will be delivered once the payment is confirmed by an administrator.")
+        } else if (searchParams.get("coinbase")) {
+            // Coinbase
+            if (items.length > 0) {
+                removeAll()
+            }
+            setMessage("Your payment is being processed. You will receive an email confirmation once the transaction is confirmed on the blockchain.")
         }
     }, [method, token, searchParams, removeAll, items.length])
 

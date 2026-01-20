@@ -207,6 +207,65 @@ export async function POST(req: Request) {
         }
     }
 
+    if (paymentMethodId === "coinbase") {
+        try {
+            const amountString = (totalAmount / 100).toFixed(2)
+
+            const coinbaseMethod = await db.paymentMethod.findUnique({ where: { name: "coinbase" } })
+            const config = coinbaseMethod?.config ? JSON.parse(coinbaseMethod.config) : {}
+            const apiKey = config.apiKey || process.env.COINBASE_API_KEY
+
+            if (!apiKey) {
+                throw new Error("Coinbase API Key not configured")
+            }
+
+            const payload = {
+                name: "Purchase from Portfolio Shop",
+                description: items.map((i) => i.name).join(", "),
+                pricing_type: "fixed_price",
+                local_price: {
+                    amount: amountString,
+                    currency: "USD",
+                },
+                metadata: {
+                    userId: session?.user?.id,
+                    productIds: JSON.stringify(productIds),
+                    couponId: couponId || "",
+                },
+                redirect_url: `${baseUrl}/shop/success?coinbase=true`,
+                cancel_url: `${baseUrl}/shop?canceled=1`,
+            }
+
+            const response = await fetch("https://api.commerce.coinbase.com/charges", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CC-Api-Key": apiKey,
+                    "X-CC-Version": "2018-03-22",
+                },
+                body: JSON.stringify(payload),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                console.error("Coinbase error:", data)
+                throw new Error(data.error?.message || "Failed to create Coinbase charge")
+            }
+
+            return NextResponse.json(
+                { url: data.data.hosted_url },
+                { headers: corsHeaders }
+            )
+        } catch (error: any) {
+            console.error("Coinbase checkout error:", error)
+            return NextResponse.json(
+                { error: error.message || "Coinbase checkout failed" },
+                { status: 500, headers: corsHeaders }
+            )
+        }
+    }
+
     if (paymentMethodId === "crypto" || paymentMethodId === "bank_transfer") {
         try {
             // Create Pending Order
@@ -244,7 +303,7 @@ export async function POST(req: Request) {
                     data: {
                         uses: { increment: 1 }
                     }
-                }).catch(err => console.error("Failed to increment coupon usage:", err))
+                }).catch((err) => console.error("Failed to increment coupon usage:", err))
             }
 
             return NextResponse.json(

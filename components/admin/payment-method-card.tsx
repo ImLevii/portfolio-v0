@@ -71,9 +71,11 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                             ? "Configure Stripe payments"
                             : method.name === "paypal"
                                 ? "Configure PayPal settings"
-                                : method.name === "crypto"
-                                    ? "Configure manual crypto wallet addresses"
-                                    : "Configure manual bank transfer details"}
+                                : method.name === "coinbase"
+                                    ? "Configure Coinbase Commerce settings"
+                                    : method.name === "crypto"
+                                        ? "Configure manual crypto wallet addresses"
+                                        : "Configure manual bank transfer details"}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -89,9 +91,9 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                 </div>
             </div>
 
-            {(method.name === "bank_transfer" || method.name === "paypal" || method.name === "stripe" || method.name === "crypto") && (
+            {(method.name === "bank_transfer" || method.name === "paypal" || method.name === "stripe" || method.name === "crypto" || method.name === "coinbase") && (
                 <div className="space-y-4 pt-4 border-t border-white/10">
-                    {method.name === "paypal" || method.name === "stripe" ? (
+                    {method.name === "paypal" || method.name === "stripe" || method.name === "coinbase" ? (
                         <>
                             <div className="grid gap-4">
                                 <div className="space-y-2">
@@ -127,36 +129,36 @@ export function PaymentMethodCard({ method }: PaymentMethodCardProps) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        {method.name === "stripe" ? "Publishable Key" : "Client ID"}
+                                        {method.name === "stripe" ? "Publishable Key" : method.name === "coinbase" ? "API Key" : "Client ID"}
                                     </label>
                                     <input
                                         type="text"
-                                        value={safeParseConfig(config)[method.name === "stripe" ? "publishableKey" : "clientId"] || ""}
+                                        value={safeParseConfig(config)[method.name === "stripe" ? "publishableKey" : method.name === "coinbase" ? "apiKey" : "clientId"] || ""}
                                         onChange={(e) => {
                                             const currentConfig = safeParseConfig(config)
-                                            const key = method.name === "stripe" ? "publishableKey" : "clientId"
+                                            const key = method.name === "stripe" ? "publishableKey" : method.name === "coinbase" ? "apiKey" : "clientId"
                                             const newConfig = { ...currentConfig, [key]: e.target.value }
                                             setConfig(JSON.stringify(newConfig, null, 2))
                                         }}
                                         className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
-                                        placeholder={method.name === "stripe" ? "pk_test_..." : "Enter Client ID"}
+                                        placeholder={method.name === "stripe" ? "pk_test_..." : method.name === "coinbase" ? "Enter API Key" : "Enter Client ID"}
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        {method.name === "stripe" ? "Secret Key" : "Client Secret"}
+                                        {method.name === "stripe" ? "Secret Key" : method.name === "coinbase" ? "Webhook Secret" : "Client Secret"}
                                     </label>
                                     <input
                                         type="password"
-                                        value={safeParseConfig(config)[method.name === "stripe" ? "secretKey" : "clientSecret"] || ""}
+                                        value={safeParseConfig(config)[method.name === "stripe" ? "secretKey" : method.name === "coinbase" ? "webhookSecret" : "clientSecret"] || ""}
                                         onChange={(e) => {
                                             const currentConfig = safeParseConfig(config)
-                                            const key = method.name === "stripe" ? "secretKey" : "clientSecret"
+                                            const key = method.name === "stripe" ? "secretKey" : method.name === "coinbase" ? "webhookSecret" : "clientSecret"
                                             const newConfig = { ...currentConfig, [key]: e.target.value }
                                             setConfig(JSON.stringify(newConfig, null, 2))
                                         }}
                                         className="w-full bg-black/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-mono shadow-inner"
-                                        placeholder={method.name === "stripe" ? "sk_test_..." : "Enter Client Secret"}
+                                        placeholder={method.name === "stripe" ? "sk_test_..." : method.name === "coinbase" ? "Enter Webhook Secret" : "Enter Client Secret"}
                                     />
                                 </div>
                             </div>

@@ -29,6 +29,15 @@ async function main() {
                 clientId: "YOUR_PAYPAL_CLIENT_ID",
                 mode: "sandbox"
             })
+        },
+        {
+            name: 'coinbase',
+            displayName: 'Coinbase Commerce',
+            isEnabled: false,
+            config: JSON.stringify({
+                apiKey: "",
+                webhookSecret: ""
+            })
         }
     ]
 
