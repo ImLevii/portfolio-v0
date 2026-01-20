@@ -104,9 +104,6 @@ model Order {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   licenseKeys LicenseKey[]
   couponCode      String?
-
-  coinbaseChargeId String? @unique
-  coinbaseStatus   String? // "NEW", "PENDING", "COMPLETED", "FAILED", "EXPIRED", "UNRESOLVED", "RESOLVED", "CANCELED"
 }
 
 model Coupon {
