@@ -4,9 +4,10 @@ import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
 import { LayoutGrid } from "lucide-react"
 
-export default async function EditCategoryPage({ params }: { params: { id: string } }) {
+export default async function EditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const category = await db.category.findUnique({
-        where: { id: params.id }
+        where: { id }
     })
 
     if (!category) notFound()

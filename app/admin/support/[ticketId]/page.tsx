@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils"
 import { AdminTicketChat } from "@/components/admin/admin-ticket-chat"
 
 interface PageProps {
-    params: {
+    params: Promise<{
         ticketId: string
-    }
+    }>
 }
 
 export default async function TicketDetailPage({ params }: PageProps) {
