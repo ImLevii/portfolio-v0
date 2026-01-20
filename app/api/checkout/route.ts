@@ -225,8 +225,12 @@ export async function POST(req: Request) {
             const url = "api.coinbase.com/api/v1/payment_links"
             const requestPath = "/api/v1/payment_links"
 
-            // Format private key correctly (replace \n with actual newlines if Env var formatted that way)
-            const privateKey = keySecret.replace(/\\n/g, '\n')
+            // Format private key correctly
+            let privateKey = keySecret.replace(/\\n/g, '\n')
+
+            if (!privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
+                privateKey = `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----\n`
+            }
 
             const token = jwt.sign(
                 {
