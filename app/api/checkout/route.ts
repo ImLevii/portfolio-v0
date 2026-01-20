@@ -222,32 +222,32 @@ export async function POST(req: Request) {
             // Reverting to /charges as /checkouts requires different scope/auth.
             // ForbiddenError usually means the API key doesn't have permission for that specific endpoint.
             // We will try /charges again but handle it carefully.
-            const payload = {
-                name: "Purchase from Portfolio Shop",
-                description: items.map((i) => i.name).join(", "),
-                pricing_type: "fixed_price",
-                local_price: {
-                    amount: amountString,
-                    currency: "USD",
-                },
-                metadata: {
-                    userId: session?.user?.id,
-                    productIds: JSON.stringify(productIds),
-                    couponId: couponId || "",
-                },
-                redirect_url: `${baseUrl}/shop/success?coinbase=true`,
-                cancel_url: `${baseUrl}/shop?canceled=1`,
-            }
-
             const response = await fetch("https://api.commerce.coinbase.com/charges", {
                 method: "POST",
+                mode: "cors", // Added from reference
                 headers: {
+                    Accept: "application/json",
                     "Content-Type": "application/json",
-                    "Accept": "application/json",
                     "X-CC-Api-Key": apiKey,
-                    // Removing implicit version or setting to a neutral one might help if strict deprecation is enforced by version
+                    // Reference implementation does NOT include X-CC-Version
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({
+                    local_price: {
+                        amount: amountString,
+                        currency: "USD",
+                    },
+                    pricing_type: "fixed_price",
+                    name: "Purchase from Portfolio Shop",
+                    description: items.map((i) => i.name).join(", "),
+                    redirect_url: `${baseUrl}/shop/success?coinbase=true`,
+                    cancel_url: `${baseUrl}/shop?canceled=1`,
+                    metadata: {
+                        userId: session?.user?.id,
+                        productIds: JSON.stringify(productIds),
+                        couponId: couponId || "",
+                        email: session?.user?.email || undefined
+                    },
+                }),
             })
 
             const data = await response.json()
