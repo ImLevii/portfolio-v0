@@ -6,7 +6,7 @@ import { generateLicenseKey } from "@/lib/license"
 import crypto from "crypto"
 
 export async function POST(req: Request) {
-    const body = await req.json()
+    const body = await req.text()
     const signature = (await headers()).get("x-cc-webhook-signature")
 
     const coinbaseMethod = await db.paymentMethod.findUnique({ where: { name: "coinbase" } })
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     // Verify Signature
     try {
         const hmac = crypto.createHmac("sha256", webhookSecret)
-        const computedSignature = hmac.update(JSON.stringify(body)).digest("hex")
+        const computedSignature = hmac.update(body).digest("hex")
 
         if (computedSignature !== signature) {
             console.error("Coinbase Webhook Signature Mismatch")
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Verification failed" }, { status: 500 })
     }
 
-    const event = body.event
+    const { event } = JSON.parse(body)
 
     console.log(`Coinbase Webhook: ${event.type}`)
 

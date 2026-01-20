@@ -240,6 +240,7 @@ export async function POST(req: Request) {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Accept": "application/json",
                     "X-CC-Api-Key": apiKey,
                     "X-CC-Version": "2018-03-22",
                 },
