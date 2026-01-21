@@ -9,11 +9,9 @@ function formatPrivateKey(raw: string) {
     if (!raw) return "";
     if (raw.includes('-----BEGIN')) return raw.replace(/\\n/g, '\n');
 
-    // If it's a 64-byte key (seed + pub), we take the first 32 bytes (seed)
-    // and wrap it in a PKCS#8 DER for P-256 (ES256)
     try {
         const buffer = Buffer.from(raw, 'base64');
-        const privKey = buffer.length >= 32 ? buffer.slice(0, 32) : buffer;
+        const privKey = buffer.length >= 64 ? buffer.slice(0, 32) : buffer;
         const pkcs8Der = Buffer.concat([
             Buffer.from('3041020100301306072a8648ce3d020106082a8648ce3d030107042730250201010420', 'hex'),
             privKey
@@ -28,7 +26,7 @@ async function createCDPCharge(amount: number, description: string, metadata: an
     const keyName = process.env.COINBASE_CDP_API_KEY_NAME;
     const rawKey = process.env.COINBASE_CDP_PRIVATE_KEY;
 
-    if (!keyName || !rawKey) return null;
+    if (!keyName || !rawKey) return { error: "Missing CDP keys" };
 
     const pemKey = formatPrivateKey(rawKey);
     const method = 'POST';
@@ -59,10 +57,10 @@ async function createCDPCharge(amount: number, description: string, metadata: an
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-                'X-CC-Version': '2018-03-22'
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
-                name: "Product Purchase",
+                name: "Order Payment",
                 description: description.substring(0, 200),
                 pricing_type: "fixed_price",
                 local_price: {
@@ -74,10 +72,9 @@ async function createCDPCharge(amount: number, description: string, metadata: an
         });
 
         const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("CDP Charge Error:", error);
-        return { error: { message: "CDP creation failed" } };
+        return { status: response.status, data };
+    } catch (error: any) {
+        return { error: error.message || "CDP request failed" };
     }
 }
 
@@ -88,10 +85,11 @@ async function createLegacyCharge(apiKey: string, amount: number, description: s
             headers: {
                 "Content-Type": "application/json",
                 "X-CC-Api-Key": apiKey,
-                "X-CC-Version": "2018-03-22"
+                "X-CC-Version": "2018-03-22",
+                "Accept": "application/json"
             },
             body: JSON.stringify({
-                name: "Product Purchase",
+                name: "Order Payment",
                 description: description.substring(0, 200),
                 pricing_type: "fixed_price",
                 local_price: {
@@ -102,9 +100,30 @@ async function createLegacyCharge(apiKey: string, amount: number, description: s
             })
         });
 
-        return await response.json();
-    } catch (error) {
-        return { error: { message: "Legacy creation failed" } };
+        const data = await response.json();
+        return { status: response.status, data };
+    } catch (error: any) {
+        return { error: error.message || "Legacy request failed" };
+    }
+}
+
+export async function GET() {
+    try {
+        const coinbaseMethod = await db.paymentMethod.findUnique({ where: { name: "coinbase" } })
+        const config = coinbaseMethod?.config ? JSON.parse(coinbaseMethod.config) : {}
+        const apiKey = config.apiKey || process.env.COINBASE_API_KEY
+
+        const metadata = { test: "true" }
+        const description = "Diagnostic Check"
+        const amount = 100
+
+        const cdp = await createCDPCharge(amount, description, metadata);
+        let legacy = null;
+        if (apiKey) legacy = await createLegacyCharge(apiKey, amount, description, metadata);
+
+        return NextResponse.json({ diagnostics: { cdp, legacy } });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
@@ -122,7 +141,6 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No products selected" }, { status: 400 })
         }
 
-        // 1. Calculate Total in cents
         const products = await db.product.findMany({
             where: { id: { in: productIds } }
         })
@@ -131,10 +149,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Products not found" }, { status: 404 })
         }
 
-        let totalAmount = products.reduce((acc, curr) => acc + curr.price, 0)
+        // Calculate total respecting salePrice
+        let totalAmount = products.reduce((acc, curr) => {
+            const price = curr.isSale && curr.salePrice ? curr.salePrice : curr.price;
+            return acc + price;
+        }, 0)
+
         let appliedCouponId = null
 
-        // 2. Apply Coupon
         if (couponCode) {
             const coupon = await db.coupon.findFirst({
                 where: { code: couponCode, isEnabled: true }
@@ -150,10 +172,8 @@ export async function POST(req: Request) {
             }
         }
 
-        // 3. Handle Coinbase (Check by ID or Name)
         const coinbaseMethod = await db.paymentMethod.findUnique({ where: { name: "coinbase" } })
 
-        // We accept either the exact ID from client or if the method name is "coinbase"
         if (paymentMethodId === coinbaseMethod?.id || paymentMethodId === "coinbase") {
             const config = coinbaseMethod?.config ? JSON.parse(coinbaseMethod.config) : {}
             const apiKey = config.apiKey || process.env.COINBASE_API_KEY
@@ -166,36 +186,28 @@ export async function POST(req: Request) {
 
             const description = products.map(p => p.name).join(", ")
 
-            // Strategy A: Try CDP API (Required for newer Onchain merchants)
-            let chargeData = await createCDPCharge(totalAmount, description, metadata);
+            // 1. Try CDP
+            let result: any = await createCDPCharge(totalAmount, description, metadata);
 
-            // Strategy B: Try Legacy API (Fallback)
-            if (!chargeData || chargeData.error) {
-                console.log("CDP Charge creation failed or skipped, trying Legacy API...");
-                if (apiKey) {
-                    const legacyData = await createLegacyCharge(apiKey, totalAmount, description, metadata);
-                    // If legacy also fails with deprecation but CDP was tried, we stick with legacy error or combine them
-                    if (legacyData?.data?.hosted_url) {
-                        chargeData = legacyData;
-                    } else if (legacyData?.error) {
-                        chargeData = legacyData; // Keep legacy error if it's more descriptive
-                    }
-                }
+            // 2. Fallback to Legacy if CDP didn't return a hosted_url
+            if (!result?.data?.data?.hosted_url && apiKey) {
+                console.log("CDP failed, falling back to Legacy API...");
+                result = await createLegacyCharge(apiKey, totalAmount, description, metadata);
             }
 
-            if (chargeData?.data?.hosted_url) {
-                return NextResponse.json({ url: chargeData.data.hosted_url })
+            if (result?.data?.data?.hosted_url) {
+                return NextResponse.json({ url: result.data.data.hosted_url })
             } else {
-                console.error("Coinbase All Strategies Failed:", chargeData)
-                const errorMsg = chargeData?.error?.message || "Payment provider error. If using Onchain Commerce, ensure CDP keys are correct."
-                return NextResponse.json({ error: errorMsg }, { status: 400 })
+                const error = result?.data?.error || result?.error || { message: "Payment provider error" };
+                console.error("Coinbase failure:", error);
+                return NextResponse.json({ error: error.message, details: error }, { status: 400 })
             }
         }
 
         return NextResponse.json({ error: "Invalid payment method" }, { status: 400 })
 
-    } catch (error) {
-        console.error("Checkout error:", error)
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    } catch (error: any) {
+        console.error("Checkout Error:", error)
+        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 })
     }
 }
