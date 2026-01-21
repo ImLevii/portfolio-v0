@@ -7,17 +7,26 @@ import jwt from "jsonwebtoken"
 // Helper to format private key for CDP (supporting raw base64 and PEM)
 function formatPrivateKey(raw: string) {
     if (!raw) return "";
-    if (raw.includes('-----BEGIN')) return raw.replace(/\\n/g, '\n');
-
     try {
-        const buffer = Buffer.from(raw, 'base64');
-        const privKey = buffer.length >= 64 ? buffer.slice(0, 32) : buffer;
+        // Strip quotes if any
+        let clean = raw.trim();
+        if (clean.startsWith('"') && clean.endsWith('"')) {
+            clean = clean.substring(1, clean.length - 1);
+        }
+
+        if (clean.includes('-----BEGIN')) {
+            return clean.replace(/\\n/g, '\n');
+        }
+
+        const buffer = Buffer.from(clean, 'base64');
+        const privKey = buffer.length >= 32 ? buffer.slice(0, 32) : buffer;
         const pkcs8Der = Buffer.concat([
             Buffer.from('3041020100301306072a8648ce3d020106082a8648ce3d030107042730250201010420', 'hex'),
             privKey
         ]);
         return `-----BEGIN PRIVATE KEY-----\n${pkcs8Der.toString('base64')}\n-----END PRIVATE KEY-----`;
     } catch (e) {
+        console.error("Key format error:", e);
         return "";
     }
 }
@@ -26,7 +35,10 @@ async function createCDPCharge(amount: number, description: string, metadata: an
     const keyName = process.env.COINBASE_CDP_API_KEY_NAME;
     const rawKey = process.env.COINBASE_CDP_PRIVATE_KEY;
 
-    if (!keyName || !rawKey) return { error: "Missing CDP keys" };
+    if (!keyName || !rawKey) {
+        console.log("CDP Keys missing from env");
+        return null;
+    }
 
     const pemKey = formatPrivateKey(rawKey);
     const method = 'POST';
@@ -57,7 +69,7 @@ async function createCDPCharge(amount: number, description: string, metadata: an
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'X-CC-Version': '2018-03-22'
             },
             body: JSON.stringify({
                 name: "Order Payment",
@@ -72,9 +84,11 @@ async function createCDPCharge(amount: number, description: string, metadata: an
         });
 
         const data = await response.json();
+        console.log("CDP API Response Status:", response.status, data);
         return { status: response.status, data };
-    } catch (error: any) {
-        return { error: error.message || "CDP request failed" };
+    } catch (error) {
+        console.error("CDP Charge Fatal Error:", error);
+        return { error: { message: "CDP connection failed" } };
     }
 }
 
@@ -85,8 +99,7 @@ async function createLegacyCharge(apiKey: string, amount: number, description: s
             headers: {
                 "Content-Type": "application/json",
                 "X-CC-Api-Key": apiKey,
-                "X-CC-Version": "2018-03-22",
-                "Accept": "application/json"
+                "X-CC-Version": "2018-03-22"
             },
             body: JSON.stringify({
                 name: "Order Payment",
@@ -101,29 +114,11 @@ async function createLegacyCharge(apiKey: string, amount: number, description: s
         });
 
         const data = await response.json();
+        console.log("Legacy API Response Status:", response.status, data);
         return { status: response.status, data };
-    } catch (error: any) {
-        return { error: error.message || "Legacy request failed" };
-    }
-}
-
-export async function GET() {
-    try {
-        const coinbaseMethod = await db.paymentMethod.findUnique({ where: { name: "coinbase" } })
-        const config = coinbaseMethod?.config ? JSON.parse(coinbaseMethod.config) : {}
-        const apiKey = config.apiKey || process.env.COINBASE_API_KEY
-
-        const metadata = { test: "true" }
-        const description = "Diagnostic Check"
-        const amount = 100
-
-        const cdp = await createCDPCharge(amount, description, metadata);
-        let legacy = null;
-        if (apiKey) legacy = await createLegacyCharge(apiKey, amount, description, metadata);
-
-        return NextResponse.json({ diagnostics: { cdp, legacy } });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error) {
+        console.error("Legacy Charge Fatal Error:", error);
+        return { error: { message: "Legacy connection failed" } };
     }
 }
 
@@ -137,6 +132,8 @@ export async function POST(req: Request) {
         const body = await req.json()
         const { productIds, paymentMethodId, couponCode } = body
 
+        console.log("Checkout initiated:", { productIds, paymentMethodId, couponCode, userId: session.user.id });
+
         if (!productIds || !productIds.length) {
             return NextResponse.json({ error: "No products selected" }, { status: 400 })
         }
@@ -149,12 +146,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Products not found" }, { status: 404 })
         }
 
-        // Calculate total respecting salePrice
-        let totalAmount = products.reduce((acc, curr) => {
-            const price = curr.isSale && curr.salePrice ? curr.salePrice : curr.price;
-            return acc + price;
-        }, 0)
-
+        let totalAmount = products.reduce((acc, curr) => acc + curr.price, 0)
         let appliedCouponId = null
 
         if (couponCode) {
@@ -186,28 +178,39 @@ export async function POST(req: Request) {
 
             const description = products.map(p => p.name).join(", ")
 
-            // 1. Try CDP
-            let result: any = await createCDPCharge(totalAmount, description, metadata);
+            // Strategy A: Try CDP API
+            let chargeResult = await createCDPCharge(totalAmount, description, metadata);
 
-            // 2. Fallback to Legacy if CDP didn't return a hosted_url
-            if (!result?.data?.data?.hosted_url && apiKey) {
-                console.log("CDP failed, falling back to Legacy API...");
-                result = await createLegacyCharge(apiKey, totalAmount, description, metadata);
+            // Strategy B: Try Legacy API fallback
+            // We fallback if CDP is explicitly missing, returns an error, OR is unauthorized (401)
+            // since some endpoints/keys don't support CDP yet.
+            const shouldFallback = !chargeResult ||
+                chargeResult.error ||
+                (chargeResult.status >= 400);
+
+            if (shouldFallback) {
+                console.log(`CDP Strategy failed (Status: ${chargeResult?.status}). Trying Legacy API fallback...`);
+                if (apiKey) {
+                    chargeResult = await createLegacyCharge(apiKey, totalAmount, description, metadata);
+                }
             }
 
-            if (result?.data?.data?.hosted_url) {
-                return NextResponse.json({ url: result.data.data.hosted_url })
+            if (chargeResult?.data?.data?.hosted_url) {
+                return NextResponse.json({ url: chargeResult.data.data.hosted_url })
             } else {
-                const error = result?.data?.error || result?.error || { message: "Payment provider error" };
-                console.error("Coinbase failure:", error);
-                return NextResponse.json({ error: error.message, details: error }, { status: 400 })
+                const errorObj = chargeResult?.data?.error || chargeResult?.error || { message: "Unknown error" };
+                console.error("Coinbase Checkout Final Failure:", errorObj);
+                return NextResponse.json({
+                    error: errorObj.message || "Payment provider error",
+                    details: errorObj
+                }, { status: 400 })
             }
         }
 
         return NextResponse.json({ error: "Invalid payment method" }, { status: 400 })
 
     } catch (error: any) {
-        console.error("Checkout Error:", error)
+        console.error("Global Checkout Route Error:", error)
         return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 })
     }
 }
