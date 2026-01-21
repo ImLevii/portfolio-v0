@@ -54,19 +54,23 @@ export async function POST(req: Request) {
 
             const amountInDollars = (totalAmount / 100).toFixed(2)
 
+            if (Number(amountInDollars) <= 0) {
+                return NextResponse.json({ error: "Total amount must be greater than zero for Coinbase checkout." }, { status: 400 })
+            }
+
             // Create Coinbase Charge
             const chargeData = {
                 name: "Portfolio Purchase",
-                description: `Order for ${products.map(p => p.name).join(", ")}`,
+                description: `Order for ${products.map(p => p.name).join(", ")}`.substring(0, 199),
                 local_price: {
                     amount: amountInDollars,
                     currency: "USD"
                 },
                 pricing_type: "fixed_price",
                 metadata: {
-                    userId: session.user.id,
+                    userId: String(session.user.id),
                     productIds: JSON.stringify(productIds),
-                    couponId: couponId
+                    couponId: couponId ? String(couponId) : null
                 },
                 redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success`,
                 cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop`
@@ -85,7 +89,10 @@ export async function POST(req: Request) {
             if (!response.ok) {
                 const errorData = await response.json()
                 console.error("Coinbase Charge creation failed:", errorData)
-                return NextResponse.json({ error: "Failed to create Coinbase charge" }, { status: 500 })
+                return NextResponse.json({
+                    error: "Failed to create Coinbase charge",
+                    details: errorData
+                }, { status: 500 })
             }
 
             const charge = await response.json()
