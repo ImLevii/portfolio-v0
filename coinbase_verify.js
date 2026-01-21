@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const crypto = require('crypto');
 
 // Load env vars manually to avoid dependencies
 function loadEnv() {
@@ -33,69 +32,62 @@ function loadEnv() {
 }
 
 const env = loadEnv();
-const apiKey = env.COINBASE_API_KEY || env.NEXT_PUBLIC_COINBASE_API_KEY;
-const apiSecret = env.COINBASE_API_SECRET || env.NEXT_PUBLIC_COINBASE_API_SECRET;
+// Try to find the API key in various likely variables
+const apiKey = env.COINBASE_API_KEY || env.NEXT_COINBASE_API_KEY || env.NEXT_PUBLIC_COINBASE_API_KEY;
 
 console.log("---------------------------------------------------");
-console.log("Coinbase Credential Verification Script");
+console.log("Coinbase Commerce Verification Script");
 console.log("---------------------------------------------------");
-console.log("Loaded Keys:", Object.keys(env));
 
-if (!apiKey || !apiSecret) {
-    console.error("❌ Missing Coinbase credentials in .env.local");
-    console.log("Found API Key:", !!apiKey);
-    console.log("Found API Secret:", !!apiSecret);
+if (!apiKey) {
+    console.error("❌ Missing Coinbase Commerce API Key in .env.local");
+    console.log("   Expected one of: COINBASE_API_KEY, NEXT_COINBASE_API_KEY");
     process.exit(1);
 }
 
-console.log(`API Key:    ${apiKey.substring(0, 8)}...${apiKey.substring(apiKey.length - 4)}`);
-console.log(`API Secret: ${apiSecret.substring(0, 8)}...${apiSecret.substring(apiSecret.length - 4)}`);
+// Mask key for display
+const maskedKey = apiKey.length > 8 ? `${apiKey.substring(0, 8)}...${apiKey.substring(apiKey.length - 4)}` : '***';
+console.log(`API Key: ${maskedKey}`);
 console.log("---------------------------------------------------");
 
-function generateSignature(timestamp, method, path, body, secret) {
-    const message = timestamp + method + path + (body || '');
-    return crypto.createHmac('sha256', secret).update(message).digest('hex');
-}
-
-async function testAuth(url, mode) {
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const method = 'GET';
-    const path = '/v2/user';
-    const signature = generateSignature(timestamp, method, path, '', apiSecret);
-
+async function verifyCommerceKey() {
     return new Promise((resolve) => {
-        const req = https.request(`${url}${path}`, {
-            method: method,
+        const options = {
+            hostname: 'api.commerce.coinbase.com',
+            port: 443,
+            path: '/charges?limit=1', // Fetching a list of charges to verify auth
+            method: 'GET',
             headers: {
-                'CB-ACCESS-KEY': apiKey,
-                'CB-ACCESS-SIGN': signature,
-                'CB-ACCESS-TIMESTAMP': timestamp,
-                'CB-VERSION': '2021-01-01'
+                'X-CC-Api-Key': apiKey,
+                'X-CC-Version': '2018-03-22',
+                'Content-Type': 'application/json'
             }
-        }, (res) => {
+        };
+
+        const req = https.request(options, (res) => {
             let data = '';
             res.on('data', (chunk) => data += chunk);
             res.on('end', () => {
                 if (res.statusCode === 200) {
-                    console.log(`✅ SUCCESS: Credentials are valid for ${mode} environment!`);
+                    console.log(`✅ SUCCESS: Coinbase Commerce API Key is valid!`);
+                    console.log(`   Status: ${res.statusCode} OK`);
                     try {
                         const parsed = JSON.parse(data);
-                        if (parsed.data && parsed.data.name) {
-                            console.log(`   Account: ${parsed.data.name}`);
-                        }
-                    } catch (e) {}
+                        // Just showing we got some data back validly
+                        console.log(`   Connection verified.`);
+                    } catch (e) { }
                     resolve(true);
                 } else {
-                    console.log(`❌ FAILED: Credentials invalid for ${mode} environment (Status: ${res.statusCode})`);
-                    // Uncomment to see error details:
-                    // console.log(`   Response: ${data}`);
+                    console.log(`❌ FAILED: API Key is invalid or has insufficient permissions.`);
+                    console.log(`   Status: ${res.statusCode} ${res.statusMessage}`);
+                    console.log(`   Response: ${data}`);
                     resolve(false);
                 }
             });
         });
 
         req.on('error', (e) => {
-            console.error(`❌ Error connecting to ${mode}:`, e.message);
+            console.error(`❌ Network Error:`, e.message);
             resolve(false);
         });
 
@@ -104,28 +96,7 @@ async function testAuth(url, mode) {
 }
 
 (async () => {
-    console.log("Testing against SANDBOX...");
-    const sandboxValid = await testAuth('https://api.sandbox.coinbase.com', 'SANDBOX');
-
-    console.log("\nTesting against PRODUCTION...");
-    const productionValid = await testAuth('https://api.coinbase.com', 'PRODUCTION');
-
-    console.log("---------------------------------------------------");
-    console.log("SUMMARY:");
-    if (sandboxValid && productionValid) {
-        console.log("⚠️  Credentials work on BOTH? (Unlikely, but okay)");
-    } else if (sandboxValid) {
-        console.log("👉 These are SANDBOX credentials.");
-        console.log("   Ensure your app is using the Sandbox API URL:");
-        console.log("   https://api.sandbox.coinbase.com");
-    } else if (productionValid) {
-        console.log("👉 These are PRODUCTION credentials.");
-        console.log("   Ensure your app is using the Production API URL:");
-        console.log("   https://api.coinbase.com");
-    } else {
-        console.log("❌ These credentials are INVALID for both environments.");
-        console.log("   Please check for typos or regenerate them in the Coinbase Developer Dashboard.");
-        console.log("   Note: Ensure API permissions include 'wallet:user:read' at minimum.");
-    }
+    console.log("Testing Connection to Coinbase Commerce API...");
+    await verifyCommerceKey();
     console.log("---------------------------------------------------");
 })();
