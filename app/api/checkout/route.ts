@@ -34,7 +34,6 @@ export async function POST(req: Request) {
                 where: { code: couponCode, isActive: true }
             })
 
-            // Basic validation (more robust validation should be done potentially)
             if (coupon) {
                 if (coupon.percent) {
                     totalAmount = totalAmount - Math.round((totalAmount * coupon.percent) / 100)
@@ -47,75 +46,32 @@ export async function POST(req: Request) {
 
         // 3. Handle Payment Methods
         if (paymentMethodId === "coinbase") {
-            const apiKey = process.env.COINBASE_API_KEY || process.env.NEXT_COINBASE_API_KEY
-            if (!apiKey) {
-                return NextResponse.json({ error: "Coinbase API key not configured" }, { status: 500 })
+            const checkoutId = process.env.NEXT_PUBLIC_COINBASE_CHECKOUT_ID
+            if (!checkoutId) {
+                return NextResponse.json({ error: "Coinbase Checkout ID not configured in environment" }, { status: 500 })
             }
 
-            const amountInDollars = (totalAmount / 100).toFixed(2)
-
-            if (Number(amountInDollars) <= 0) {
-                return NextResponse.json({ error: "Total amount must be greater than zero for Coinbase checkout." }, { status: 400 })
+            // Construct Metadata for the URL to track the order
+            // Note: Coinbase Checkouts support URL parameters to pre-fill or pass metadata.
+            // Format: ?metadata[key]=value
+            const metadataQuery = new URLSearchParams()
+            metadataQuery.append("metadata[userId]", session.user.id)
+            metadataQuery.append("metadata[productIds]", JSON.stringify(productIds))
+            if (couponId) {
+                metadataQuery.append("metadata[couponId]", couponId)
+            } else {
+                metadataQuery.append("metadata[couponId]", "null")
             }
 
-            // Create Coinbase Charge
-            const chargeData = {
-                name: "Portfolio Purchase",
-                description: `Order for ${products.map(p => p.name).join(", ")}`.substring(0, 199),
-                local_price: {
-                    amount: amountInDollars,
-                    currency: "USD"
-                },
-                pricing_type: "fixed_price",
-                metadata: {
-                    userId: String(session.user.id),
-                    productIds: JSON.stringify(productIds),
-                    couponId: couponId ? String(couponId) : null
-                },
-                redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success`,
-                cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop`
-            }
+            // Note: We cannot easily enforce the exact amount via URL on a static checkout unless
+            // the checkout itself is "variable price" or we use a specific override if supported.
+            // For now, we rely on the Checkout being configured correctly on Coinbase side.
 
-            const response = await fetch("https://api.commerce.coinbase.com/charges", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CC-Api-Key": apiKey,
-                    "X-CC-Version": "2018-03-22"
-                },
-                body: JSON.stringify(chargeData)
-            })
+            const checkoutUrl = `https://commerce.coinbase.com/checkout/${checkoutId}?${metadataQuery.toString()}`
 
-            if (!response.ok) {
-                const errorData = await response.json()
-                console.error("Coinbase Charge creation failed:", errorData)
-                return NextResponse.json({
-                    error: "Failed to create Coinbase charge",
-                    details: errorData
-                }, { status: 500 })
-            }
-
-            const charge = await response.json()
-            return NextResponse.json({ url: charge.data.hosted_url })
+            return NextResponse.json({ url: checkoutUrl })
 
         } else if (paymentMethodId === "paypal") {
-            // PayPal flow usually involves client-side buttons or order creation api
-            // For now, if we don't have a server-side creation specific to 'standard' flow,
-            // we might handle it differently.
-            // But if the client expects a URL, we might need to change how paypal is handled.
-            // Assuming current 'CartPopover' implementation for PayPal uses client-side buttons?
-            // Checking CartPopover again... it seems to separate PayPal logic.
-            // The `RadioGroup` selects `paypal`, but...
-            // Wait, CartPopover checks `isPayPalSelected`.
-            // If `isPayPalSelected` is true, it renders the PayPal button (image) which calls `onCheckout`??
-            // Re-reading CartPopover...
-            // line 352: button onClick={onCheckout} ...
-            // So default layout calls onCheckout for PayPal too?
-            // Wait, previous `route.ts` I saw for `api/payment` was for CAPTURE.
-            // The `api/checkout` is expected to return a URL.
-            // If the user wants PayPal flow here, we'd create an order and return approve link.
-
-            // Stub for now or implement if easy.
             return NextResponse.json({ error: "PayPal checkout via this route not fully implemented yet" }, { status: 501 })
         }
 
