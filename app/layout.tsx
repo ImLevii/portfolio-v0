@@ -29,6 +29,7 @@ import { auth } from "@/auth"
 
 import { getSeasonalSettings } from "@/actions/seasonal-settings"
 import { getChatSettings } from "@/actions/chat-settings"
+import { getRoles } from "@/actions/roles"
 
 
 export default async function RootLayout({
@@ -43,7 +44,10 @@ export default async function RootLayout({
 
   /* Fetch initial data for chat to appear loaded instantly */
   const { getRecentMessages } = await import("@/actions/chat")
-  const initialMessages = await getRecentMessages()
+  const [initialMessages, roles] = await Promise.all([
+    getRecentMessages(),
+    getRoles()
+  ])
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -56,6 +60,7 @@ export default async function RootLayout({
             user={session?.user}
             config={chatSettings}
             initialMessages={initialMessages}
+            initialRoles={roles}
           />
           {children}
           <Toaster />

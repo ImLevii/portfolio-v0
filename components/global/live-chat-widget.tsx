@@ -25,6 +25,7 @@ import { uploadChatMedia } from "@/actions/upload"
 import { ChatUserProfileCard } from "@/components/global/chat-user-profile-card"
 import { showTerminalToast } from "@/components/global/terminal-toast"
 import { filterProfanity } from "@/lib/profanity"
+import { type RoleDefinition, DEFAULT_ROLES } from "@/lib/roles"
 
 
 interface ChatMessage {
@@ -46,7 +47,12 @@ interface ChatMessage {
 
 const MAX_CHARS = 500
 
-export function LiveChatWidget({ user, config, initialMessages = [], initialTickets = [] }: { user?: any, config?: ChatSettingsConfig, initialMessages?: ChatMessageData[], initialTickets?: any[] }) {
+export function LiveChatWidget({ user, config, initialMessages = [], initialTickets = [], initialRoles = [] }: { user?: any, config?: ChatSettingsConfig, initialMessages?: ChatMessageData[], initialTickets?: any[], initialRoles?: RoleDefinition[] }) {
+    const roles: RoleDefinition[] = initialRoles.length > 0 ? initialRoles : DEFAULT_ROLES
+    const getRoleDef = (roleKey?: string | null): RoleDefinition | null => {
+        if (!roleKey) return null
+        return roles.find(r => r.key === roleKey.toUpperCase()) ?? null
+    }
     const isAdmin = user?.role === "ADMIN" || user?.role === "Admin"
     const [isOpen, setIsOpen] = useState(false)
     const [isMinimized, setIsMinimized] = useState(false)
@@ -915,8 +921,9 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                             }
 
                                             // 2. Standard Message
-                                            const isAdmin = msg.senderRole === "ADMIN" || msg.senderRole === "Admin"
-                                            const isSupport = msg.senderRole === "SUPPORT" || msg.senderRole === "Support"
+                                            const msgRoleDef = getRoleDef(msg.senderRole)
+                                            const roleColor = msgRoleDef?.color ?? null
+                                            const rolePrefix = msgRoleDef?.prefix ?? null
                                             const isSelf = msg.senderName === user?.name // weak check but sufficient for UI
                                             const canDelete = (user as any)?.role === "ADMIN" || (user as any)?.role === "Admin"
 
@@ -934,19 +941,19 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                         )}
 
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <Avatar className={cn("h-8 w-8 border",
-                                                                isAdmin ? "border-red-500/50" :
-                                                                    isSupport ? "border-emerald-500/50" : "border-zinc-700"
-                                                            )}>
+                                                            <Avatar
+                                                                className="h-8 w-8 border border-zinc-700"
+                                                                style={roleColor ? { borderColor: `${roleColor}80` } : undefined}
+                                                            >
                                                                 {msg.senderId ? (
                                                                     <Popover>
                                                                         <PopoverTrigger asChild>
                                                                             <button className="cursor-pointer hover:opacity-80 transition-opacity">
                                                                                 <AvatarImage src={msg.senderAvatar || undefined} />
-                                                                                <AvatarFallback className={cn("text-xs",
-                                                                                    isAdmin ? "bg-red-950 text-red-400" :
-                                                                                        isSupport ? "bg-emerald-950 text-emerald-400" : "bg-zinc-800 text-zinc-400"
-                                                                                )}>
+                                                                                <AvatarFallback
+                                                                                    className="text-xs bg-zinc-800 text-zinc-400"
+                                                                                    style={roleColor ? { backgroundColor: `${roleColor}20`, color: roleColor } : undefined}
+                                                                                >
                                                                                     {msg.senderName?.slice(0, 2).toUpperCase()}
                                                                                 </AvatarFallback>
                                                                             </button>
@@ -959,33 +966,26 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                                     // Guest / System (No Profile)
                                                                     <>
                                                                         <AvatarImage src={msg.senderAvatar || undefined} />
-                                                                        <AvatarFallback className={cn("text-xs",
-                                                                            isAdmin ? "bg-red-950 text-red-400" :
-                                                                                isSupport ? "bg-emerald-950 text-emerald-400" : "bg-zinc-800 text-zinc-400"
-                                                                        )}>
+                                                                        <AvatarFallback
+                                                                            className="text-xs bg-zinc-800 text-zinc-400"
+                                                                            style={roleColor ? { backgroundColor: `${roleColor}20`, color: roleColor } : undefined}
+                                                                        >
                                                                             {msg.senderName?.slice(0, 2).toUpperCase()}
                                                                         </AvatarFallback>
                                                                     </>
                                                                 )}
                                                             </Avatar>
                                                             <div className="flex items-baseline gap-2">
-                                                                <span className={cn("text-xs font-bold tracking-wide",
-                                                                    isAdmin ? "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" :
-                                                                        isSupport ? "text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "text-zinc-200"
-                                                                )}>{msg.senderName}</span>
-                                                                {isAdmin && (
-                                                                    <span className="text-[9px] font-bold text-red-500 opacity-80 tracking-widest border-l border-red-500/20 pl-2">
-                                                                        ADMIN
-                                                                    </span>
-                                                                )}
-                                                                {isSupport && (
-                                                                    <span className="text-[9px] font-bold text-emerald-500 opacity-80 tracking-widest border-l border-emerald-500/20 pl-2">
-                                                                        SUPPORT
-                                                                    </span>
-                                                                )}
-                                                                {!isAdmin && !isSupport && msg.senderRole === "user" && (
-                                                                    <span className="text-[9px] font-medium text-blue-400/80 tracking-widest border-l border-blue-500/20 pl-2">
-                                                                        USER
+                                                                <span
+                                                                    className="text-xs font-bold tracking-wide text-zinc-200"
+                                                                    style={roleColor ? { color: roleColor, textShadow: `0 0 8px ${roleColor}80` } : undefined}
+                                                                >{msg.senderName}</span>
+                                                                {rolePrefix && (
+                                                                    <span
+                                                                        className="text-[9px] font-bold opacity-80 tracking-widest border-l pl-2"
+                                                                        style={{ color: roleColor ?? undefined, borderColor: roleColor ? `${roleColor}30` : undefined }}
+                                                                    >
+                                                                        {rolePrefix}
                                                                     </span>
                                                                 )}
                                                                 <span className="text-[10px] text-zinc-500">
@@ -995,13 +995,14 @@ export function LiveChatWidget({ user, config, initialMessages = [], initialTick
                                                         </div>
 
                                                         <div className="ml-10">
-                                                            <div className={cn("relative rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm backdrop-blur-md shadow-sm border transition-all duration-300",
-                                                                isAdmin
-                                                                    ? "bg-gradient-to-br from-red-600/10 to-red-900/5 border-red-500/10 text-red-100/90"
-                                                                    : isSupport
-                                                                        ? "bg-gradient-to-br from-emerald-600/10 to-emerald-900/5 border-emerald-500/10 text-emerald-100/90"
-                                                                        : "bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 border-white/5 text-zinc-200 hover:border-white/10"
-                                                            )}>
+                                                            <div
+                                                                className="relative rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm backdrop-blur-md shadow-sm border transition-all duration-300 bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 border-white/5 text-zinc-200 hover:border-white/10"
+                                                                style={roleColor ? {
+                                                                    background: `linear-gradient(to bottom right, ${roleColor}18, ${roleColor}0a)`,
+                                                                    borderColor: `${roleColor}20`,
+                                                                    color: `${roleColor}f0`
+                                                                } : undefined}
+                                                            >
                                                                 {msg.text}
                                                             </div>
 
