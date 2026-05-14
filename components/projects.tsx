@@ -91,37 +91,34 @@ export default function Projects() {
                     </h3>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <div className="p-6 w-full">
-                    <div className="flex gap-4 justify-end">
-                      {/* <a
-                        href={project.githubUrl}
-                        className="w-10 h-10 rounded-full bg-black/70 flex items-center justify-center text-white hover:bg-red-600 transition-colors"
-                        aria-label="View GitHub repository"
-                      >
-                        <Github className="h-5 w-5" />
-                      </a> */}
-                      <a
-                        href={project.liveUrl}
-                        className="w-10 h-10 rounded-full bg-black/70 flex items-center justify-center text-white hover:bg-red-600 transition-colors"
-                        aria-label="View live project"
-                      >
-                        <ExternalLink className="h-5 w-5" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 font-orbitron">{project.title}</h3>
                 <p className="text-gray-300 mb-4">{project.description}</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mb-5">
                   {project.tags.map((tag) => (
                     <span key={tag} className="text-xs px-3 py-1 bg-red-500/10 text-red-400 rounded-full">
                       {tag}
                     </span>
                   ))}
                 </div>
+                {project.liveUrl && project.liveUrl !== "#" && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer font-bold text-white relative shadow-lg"
+                    style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)' }}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" style={{ color: '#ef4444', filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.7))' }} />
+                    <span
+                      className="uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                      style={{ color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.8)' }}
+                    >
+                      Live Site
+                    </span>
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}
