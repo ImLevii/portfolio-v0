@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ArrowDown, Briefcase, User, Mail } from "lucide-react"
+import { Briefcase, User, Mail } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import TerminalEffect from "./terminal-effect"
@@ -544,12 +544,6 @@ export default function Hero({ geo }: HeroProps) {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <a href="#about" className="text-white/50 hover:text-red-500 transition-colors">
-          <ArrowDown className="h-6 w-6" />
-        </a>
-      </div>
     </section>
   )
 }
