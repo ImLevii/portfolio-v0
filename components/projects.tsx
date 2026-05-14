@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react"
 import { motion, useInView } from "framer-motion"
 import Image from "next/image"
-import { ExternalLink, Github } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 
 const projects = [
   {
@@ -153,22 +153,6 @@ export default function Projects() {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-center mt-12"
-        >
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-white/20 hover:border-red-500/50 text-white rounded-md transition-all duration-300 font-medium hover:bg-black/30"
-          >
-            <Github className="h-5 w-5" />
-            View More on GitHub
-          </a>
-        </motion.div>
       </div>
     </section>
   )
