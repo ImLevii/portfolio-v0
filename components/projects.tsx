@@ -25,12 +25,12 @@ const projects = [
     githubUrl: "#",
   },
   {
-    title: "",
-    description: "",
+    title: "VadedTV",
+    description: "A movie and TV streaming platform offering a sleek browsing experience with curated content, search, and media playback.",
     image: "/placeholder-animated.svg",
-    customText: "",
-    tags: [],
-    liveUrl: "#",
+    customText: "VADEDTV",
+    tags: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Streaming", "Media"],
+    liveUrl: "https://vadedtv.com",
     githubUrl: "#",
   },
   {
