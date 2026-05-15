@@ -232,7 +232,7 @@ const InteractiveIcon = ({ isActive }: { isActive: boolean }) => {
 }
 
 // XRP Price Chart Component
-const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
+const XrpChart = ({ data, price, change24h, width = 300, height = 140 }: {
   data: number[],
   price: number,
   change24h: number,
@@ -241,146 +241,173 @@ const XrpChart = ({ data, price, change24h, width = 300, height = 80 }: {
 }) => {
   if (!data || data.length === 0) return null
 
+  const pad = { top: 12, right: 10, bottom: 22, left: 52 }
+  const chartW = width - pad.left - pad.right
+  const chartH = height - pad.top - pad.bottom
+
   const minPrice = Math.min(...data)
   const maxPrice = Math.max(...data)
   const priceRange = maxPrice - minPrice || 1
 
-  const points = data.map((price, index) => {
-    const x = (index / (data.length - 1)) * width
-    const y = height - ((price - minPrice) / priceRange) * height
-    return `${x},${y}`
-  }).join(' ')
+  const toX = (i: number) => pad.left + (i / (data.length - 1)) * chartW
+  const toY = (p: number) => pad.top + chartH - ((p - minPrice) / priceRange) * chartH
 
-  const gradientId = `xrp-gradient-${Math.random().toString(36).substr(2, 9)}`
-  const changeColor = change24h >= 0 ? '#22c55e' : '#ef4444'
-  const changeSymbol = change24h >= 0 ? '↗' : '↘'
+  const linePoints = data.map((p, i) => `${toX(i)},${toY(p)}`).join(' ')
+  const areaPoints = `${pad.left},${pad.top + chartH} ${linePoints} ${pad.left + chartW},${pad.top + chartH}`
+
+  const uid = `xrp-${Math.random().toString(36).substr(2, 6)}`
+  const isPositive = change24h >= 0
+  const lineColor = isPositive ? '#22c55e' : '#ef4444'
+  const changeColor = lineColor
+  const changeSymbol = isPositive ? '▲' : '▼'
+
+  const lastX = toX(data.length - 1)
+  const lastY = toY(data[data.length - 1])
+
+  const gridLevels = [0, 0.25, 0.5, 0.75, 1]
+  const priceLevels = gridLevels.map(l => minPrice + l * priceRange)
 
   return (
-    <div className="inline-block relative">
-      <svg width={width} height={height} className="border border-gray-600 rounded-lg">
+    <div style={{ fontFamily: 'monospace', display: 'inline-block', maxWidth: '100%' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 14px',
+        background: 'rgba(3,7,18,0.95)',
+        borderBottom: '1px solid rgba(239,68,68,0.18)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 30, height: 30,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #346aa9 0%, #1a3a5c 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 0 10px rgba(52,106,169,0.7)',
+            fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: -1,
+          }}>✕</div>
+          <div>
+            <div style={{ color: '#f8fafc', fontSize: 13, fontWeight: 700, letterSpacing: 1.5 }}>XRP/USD</div>
+            <div style={{ color: '#475569', fontSize: 9, letterSpacing: 0.5, marginTop: 1 }}>LIVE · 24H CHART</div>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{
+            color: '#f8fafc', fontSize: 20, fontWeight: 700, letterSpacing: 0.5,
+            textShadow: '0 0 12px rgba(248,250,252,0.25)',
+            lineHeight: 1,
+          }}>${price.toFixed(4)}</div>
+          <div style={{
+            color: changeColor, fontSize: 11, fontWeight: 700,
+            marginTop: 3, letterSpacing: 0.5,
+            textShadow: `0 0 8px ${changeColor}88`,
+          }}>{changeSymbol} {Math.abs(change24h).toFixed(2)}%</div>
+        </div>
+      </div>
+
+      {/* SVG chart */}
+      <svg
+        width={width}
+        height={height}
+        style={{ display: 'block', background: 'rgba(3,7,18,0.97)' }}
+      >
         <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.1" />
+          <linearGradient id={`${uid}-fill`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={lineColor} stopOpacity="0.45" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0.02" />
           </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+          <filter id={`${uid}-glow`}>
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
+          <filter id={`${uid}-glow2`}>
+            <feGaussianBlur stdDeviation="5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <clipPath id={`${uid}-clip`}>
+            <rect x={pad.left} y={pad.top} width={chartW} height={chartH} />
+          </clipPath>
         </defs>
 
-        {/* Area fill */}
-        <polygon
-          points={`0,${height} ${points} ${width},${height}`}
-          fill={`url(#${gradientId})`}
+        {/* Grid lines + Y-axis labels */}
+        {gridLevels.map((level, i) => {
+          const gy = pad.top + chartH * (1 - level)
+          return (
+            <g key={i}>
+              <line
+                x1={pad.left} y1={gy}
+                x2={pad.left + chartW} y2={gy}
+                stroke={i === 0 || i === 4 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}
+                strokeWidth="1"
+                strokeDasharray={i === 0 || i === 4 ? undefined : '4,4'}
+              />
+              <text
+                x={pad.left - 5} y={gy + 4}
+                fill="#334155" fontSize="8"
+                textAnchor="end" fontFamily="monospace"
+              >{priceLevels[i].toFixed(3)}</text>
+            </g>
+          )
+        })}
+
+        {/* Area + line (clipped) */}
+        <g clipPath={`url(#${uid}-clip)`}>
+          <polygon points={areaPoints} fill={`url(#${uid}-fill)`} />
+          <polyline
+            points={linePoints}
+            fill="none"
+            stroke={lineColor}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            filter={`url(#${uid}-glow)`}
+          />
+        </g>
+
+        {/* Vertical dashed line at last point */}
+        <line
+          x1={lastX} y1={pad.top}
+          x2={lastX} y2={pad.top + chartH}
+          stroke={lineColor} strokeWidth="1"
+          strokeDasharray="3,3" opacity="0.45"
         />
 
-        {/* Line */}
-        <polyline
-          points={points}
-          fill="none"
-          stroke="#ef4444"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          filter="url(#glow)"
+        {/* Endpoint dot */}
+        <circle cx={lastX} cy={lastY} r="9"
+          fill={lineColor} opacity="0.15"
+          filter={`url(#${uid}-glow2)`}
         />
-
-        {/* Current price indicator */}
-        <circle
-          cx={width}
-          cy={height - ((data[data.length - 1] - minPrice) / priceRange) * height}
-          r="5"
-          fill="#ef4444"
-          stroke="#ffffff"
-          strokeWidth="2"
-          filter="url(#glow)"
+        <circle cx={lastX} cy={lastY} r="4"
+          fill={lineColor} stroke="#0f172a" strokeWidth="1.5"
+          filter={`url(#${uid}-glow)`}
         />
-
-        {/* Price label background */}
-        <rect
-          x={width - 170}
-          y="25"
-          width="150"
-          height="75"
-          rx="10"
-          fill="rgba(0, 0, 0, 0.85)"
-          stroke="rgba(255, 255, 255, 0.3)"
-          strokeWidth="1"
-        />
-
-        {/* Current price text */}
-        <text
-          x={width - 165}
-          y="55"
-          fill="#ffffff"
-          fontSize="18"
-          fontWeight="bold"
-          fontFamily="monospace"
-        >
-          ${price.toFixed(4)}
-        </text>
-
-        {/* 24h change */}
-        <text
-          x={width - 165}
-          y="80"
-          fill={changeColor}
-          fontSize="16"
-          fontWeight="bold"
-          fontFamily="monospace"
-        >
-          {changeSymbol} {change24h.toFixed(2)}%
-        </text>
-
-        {/* XRP label background */}
-        <rect
-          x="20"
-          y="10"
-          width="70"
-          height="40"
-          rx="8"
-          fill="rgba(0, 0, 0, 0.85)"
-          stroke="rgba(255, 255, 255, 0.3)"
-          strokeWidth="1"
-        />
-
-        {/* XRP label */}
-        <text
-          x="25"
-          y="35"
-          fill="#ef4444"
-          fontSize="16"
-          fontWeight="bold"
-          fontFamily="monospace"
-          filter="url(#glow)"
-        >
-          XRP/USD
-        </text>
 
         {/* Time labels */}
-        <text
-          x="25"
-          y={height - 25}
-          fill="#64748b"
-          fontSize="12"
-          fontFamily="monospace"
-        >
-          24h ago
-        </text>
-        <text
-          x={width - 60}
-          y={height - 25}
-          fill="#64748b"
-          fontSize="12"
-          fontFamily="monospace"
-        >
-          now
-        </text>
+        <text x={pad.left} y={height - 5} fill="#334155" fontSize="8" fontFamily="monospace">24h ago</text>
+        <text x={pad.left + chartW} y={height - 5} fill="#334155" fontSize="8" fontFamily="monospace" textAnchor="end">now</text>
       </svg>
+
+      {/* Footer stats */}
+      <div style={{
+        display: 'flex',
+        background: 'rgba(3,7,18,0.95)',
+        borderTop: '1px solid rgba(239,68,68,0.18)',
+      }}>
+        {[
+          { label: 'HIGH', value: `$${maxPrice.toFixed(4)}`, color: '#22c55e' },
+          { label: 'LOW',  value: `$${minPrice.toFixed(4)}`, color: '#ef4444' },
+          { label: 'RANGE', value: `$${priceRange.toFixed(4)}`, color: '#94a3b8' },
+        ].map((s, i) => (
+          <div key={i} style={{
+            flex: 1, padding: '6px 10px', textAlign: 'center',
+            borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+          }}>
+            <div style={{ color: '#334155', fontSize: 8, letterSpacing: 1, textTransform: 'uppercase' }}>{s.label}</div>
+            <div style={{ color: s.color, fontSize: 10, fontWeight: 700, marginTop: 2 }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -1475,8 +1502,17 @@ export default function TerminalEffect({
                 transition={{ duration: 0.5 }}
                 className="mt-4 flex justify-center"
               >
-                <div className="xrp-chart-container p-2 sm:p-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 rounded-lg backdrop-blur-sm shadow-lg max-w-full w-full sm:w-auto">
-                  <XrpChart data={xrpData.history} price={xrpData.price} change24h={xrpData.change24h} width={Math.min(450, typeof window !== 'undefined' ? window.innerWidth - 48 : 300)} height={120} />
+                <div style={{
+                  padding: '1.5px',
+                  background: 'linear-gradient(135deg, rgba(239,68,68,0.5) 0%, rgba(52,106,169,0.3) 50%, rgba(239,68,68,0.5) 100%)',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 24px rgba(239,68,68,0.12), 0 0 48px rgba(239,68,68,0.06)',
+                  maxWidth: '100%',
+                  display: 'inline-block',
+                }}>
+                  <div style={{ borderRadius: '9px', overflow: 'hidden', maxWidth: '100%' }}>
+                    <XrpChart data={xrpData.history} price={xrpData.price} change24h={xrpData.change24h} width={Math.min(420, typeof window !== 'undefined' ? window.innerWidth - 48 : 300)} height={140} />
+                  </div>
                 </div>
               </motion.div>
             )}
