@@ -8,14 +8,25 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SignIn } from "@/components/auth/sign-in"
 import { UserMenu } from "@/components/auth/user-menu"
+import type { SeasonalSettingsConfig } from "@/actions/seasonal-settings"
 
 import { CartPopover } from "@/components/shop/cart-popover"
 
-export default function Navbar({ user }: { user?: any }) {
+export default function Navbar({ user, seasonalSettings }: { user?: any; seasonalSettings?: SeasonalSettingsConfig }) {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const isAdmin = pathname?.startsWith("/admin")
+
+  const isSummer = (() => {
+    if (!(seasonalSettings?.enabled ?? true)) return false
+    if (seasonalSettings?.mode === 'summer') return true
+    if (!seasonalSettings?.mode || seasonalSettings?.mode === 'auto') {
+      const month = new Date().getMonth()
+      return month >= 5 && month <= 7
+    }
+    return false
+  })()
   const isShop = pathname?.startsWith("/shop") || pathname?.startsWith("/settings") || pathname?.startsWith("/licenses") || isAdmin
 
   useEffect(() => {
@@ -88,6 +99,7 @@ export default function Navbar({ user }: { user?: any }) {
             <Code className={cn("h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 transition-transform duration-300 group-hover:scale-110", accentColor)} />
             <div className={cn("absolute inset-0 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300", bgOpacityColor)}></div>
           </div>
+          {isSummer && <PalmTree className="h-6 w-5 sm:h-7 sm:w-6 drop-shadow-[0_0_5px_rgba(34,197,94,0.45)]" />}
           <span className={cn("text-lg sm:text-xl lg:text-2xl font-bold font-orbitron text-white transition-colors duration-300", isShop ? "group-hover:text-green-300" : "group-hover:text-red-300")}>
             LEVIK<span className={accentColor}>.DEV</span>
           </span>
@@ -160,5 +172,44 @@ export default function Navbar({ user }: { user?: any }) {
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+function PalmTree({ className }: { className?: string }) {
+  return (
+    <motion.svg
+      width="24"
+      height="32"
+      viewBox="0 0 24 32"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Whole tree sways gently from trunk base */}
+      <motion.g
+        animate={{ rotate: [-3, 3.5, -3] }}
+        style={{ transformOrigin: "12px 31px" }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {/* Trunk */}
+        <path d="M12 31 Q11 25 10 19 Q9 13 11 10" stroke="#92400e" strokeWidth="3" strokeLinecap="round" fill="none" />
+        {/* Trunk texture */}
+        <path d="M11.5 27 Q10.5 21 10 16" stroke="#78350f" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.5" />
+        {/* Fronds — secondary motion pivoting at the treetop */}
+        <motion.g
+          animate={{ rotate: [-5, 7, -5] }}
+          style={{ transformOrigin: "11px 10px" }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+        >
+          <path d="M11 10 Q5 7 0 6"    stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+          <path d="M11 10 Q5 13 0 17"  stroke="#15803d" strokeWidth="2"   strokeLinecap="round" fill="none" />
+          <path d="M11 10 Q12 4 12 0"  stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <path d="M11 10 Q17 7 23 6"  stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+          <path d="M11 10 Q17 13 23 17" stroke="#15803d" strokeWidth="2"  strokeLinecap="round" fill="none" />
+          {/* Coconuts */}
+          <circle cx="10"   cy="12"   r="2"   fill="#b45309" />
+          <circle cx="13"   cy="11.5" r="1.7" fill="#a16207" />
+        </motion.g>
+      </motion.g>
+    </motion.svg>
   )
 }

@@ -90,7 +90,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                             <SelectItem value="summer">
                                                 <div className="flex items-center gap-2">
                                                     <Sun className="h-3 w-3 text-yellow-400" />
-                                                    <span>Summer (Fireflies)</span>
+                                                    <span>Summer (Palm Tree)</span>
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="none">None</SelectItem>
@@ -146,24 +146,6 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                                     step={1}
                                     onValueChange={(val) => handleChange("leavesDensity", val[0])}
                                     className="text-orange-500"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <Label className="flex items-center gap-2 text-zinc-300">
-                                        <Sun className="h-4 w-4 text-yellow-400" />
-                                        Firefly Density
-                                    </Label>
-                                    <span className="font-mono text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/20">{settings.summerDensity ?? 40}%</span>
-                                </div>
-                                <NeonSlider
-                                    value={[settings.summerDensity ?? 40]}
-                                    min={1}
-                                    max={100}
-                                    step={1}
-                                    onValueChange={(val) => handleChange("summerDensity", val[0])}
-                                    className="text-yellow-500"
                                 />
                             </div>
                         </div>

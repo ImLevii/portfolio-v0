@@ -66,7 +66,7 @@ export default async function RootLayout({
       <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
           <ScrollToTop />
-          <Navbar user={session?.user} />
+          <Navbar user={session?.user} seasonalSettings={seasonalSettings} />
           <SeasonalEffects config={seasonalSettings} />
           <LiveChatWidget
             user={session?.user}
