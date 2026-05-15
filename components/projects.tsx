@@ -19,7 +19,7 @@ const projects = [
     title: "Portfolio Website",
     description: "A responsive portfolio website showcasing projects and skills with a modern design.",
     image: "/placeholder-animated.svg",
-    customText: "LEVI.DEV",
+    customText: "LEVIK.DEV",
     tags: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Three.js", "Radix UI"],
     liveUrl: "#",
     githubUrl: "#",
@@ -137,17 +137,17 @@ export default function Projects() {
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Status pill — non-interactive */}
                       <div
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/[0.07] border font-bold"
+                        className="inline-flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md bg-white/[0.07] border font-bold"
                         style={{ ...glassStyle, borderColor: statusBorder }}
                       >
-                        <span className="relative flex h-2 w-2 flex-shrink-0">
+                        <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2 flex-shrink-0">
                           {isOnline && (
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: dotColor }} />
                           )}
-                          <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: dotColor }} />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2" style={{ backgroundColor: dotColor }} />
                         </span>
                         <span
-                          className="uppercase font-bold tracking-wider text-xs font-orbitron"
+                          className="uppercase font-bold tracking-wider text-[9px] sm:text-xs font-orbitron"
                           style={{ color: statusColor, textShadow: isOnline || isOffline ? `0 0 8px ${statusGlow}` : 'none' }}
                         >
                           {statusLabel}
@@ -159,15 +159,15 @@ export default function Projects() {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 cursor-pointer font-bold"
+                        className="inline-flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 cursor-pointer font-bold"
                         style={glassStyle}
                       >
                         <ExternalLink
-                          className="h-3.5 w-3.5 flex-shrink-0"
+                          className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0"
                           style={{ color: '#ef4444', filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.8))' }}
                         />
                         <span
-                          className="uppercase font-bold tracking-wider text-xs font-orbitron"
+                          className="uppercase font-bold tracking-wider text-[9px] sm:text-xs font-orbitron"
                           style={{ color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.8)' }}
                         >
                           Visit Site
