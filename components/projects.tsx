@@ -123,31 +123,56 @@ export default function Projects() {
                   const isOnline = status === 'online'
                   const isOffline = status === 'offline'
                   const dotColor = isOnline ? '#22c55e' : isOffline ? '#ef4444' : '#6b7280'
-                  const labelColor = isOnline ? '#22c55e' : isOffline ? '#ef4444' : '#ef4444'
-                  const glowColor = isOnline ? 'rgba(34,197,94,0.8)' : isOffline ? 'rgba(239,68,68,0.8)' : 'rgba(239,68,68,0.8)'
+                  const statusLabel = isOnline ? 'Online' : isOffline ? 'Offline' : 'Checking...'
+                  const statusColor = isOnline ? '#22c55e' : isOffline ? '#ef4444' : '#9ca3af'
+                  const statusGlow = isOnline ? 'rgba(34,197,94,0.7)' : isOffline ? 'rgba(239,68,68,0.7)' : 'transparent'
+                  const statusBorder = isOnline ? 'rgba(34,197,94,0.35)' : isOffline ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.12)'
+                  const glassStyle = {
+                    backdropFilter: 'blur(16px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                  }
                   return (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer font-bold text-white relative shadow-lg"
-                      style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)' }}
-                    >
-                      {/* Status dot */}
-                      <span className="relative flex h-2 w-2">
-                        {isOnline && (
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: dotColor }} />
-                        )}
-                        <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: dotColor }} />
-                      </span>
-                      <ExternalLink className="h-3.5 w-3.5" style={{ color: labelColor, filter: `drop-shadow(0 0 4px ${glowColor})` }} />
-                      <span
-                        className="uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
-                        style={{ color: labelColor, textShadow: `0 0 8px ${glowColor}` }}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Status pill — non-interactive */}
+                      <div
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/[0.07] border font-bold"
+                        style={{ ...glassStyle, borderColor: statusBorder }}
                       >
-                        {status === 'checking' ? 'Checking...' : isOnline ? 'Online' : 'Offline'}
-                      </span>
-                    </a>
+                        <span className="relative flex h-2 w-2 flex-shrink-0">
+                          {isOnline && (
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: dotColor }} />
+                          )}
+                          <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: dotColor }} />
+                        </span>
+                        <span
+                          className="uppercase font-bold tracking-wider text-xs font-orbitron"
+                          style={{ color: statusColor, textShadow: isOnline || isOffline ? `0 0 8px ${statusGlow}` : 'none' }}
+                        >
+                          {statusLabel}
+                        </span>
+                      </div>
+
+                      {/* Visit URL button */}
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 cursor-pointer font-bold"
+                        style={glassStyle}
+                      >
+                        <ExternalLink
+                          className="h-3.5 w-3.5 flex-shrink-0"
+                          style={{ color: '#ef4444', filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.8))' }}
+                        />
+                        <span
+                          className="uppercase font-bold tracking-wider text-xs font-orbitron"
+                          style={{ color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.8)' }}
+                        >
+                          Visit Site
+                        </span>
+                      </a>
+                    </div>
                   )
                 })()}
               </div>
