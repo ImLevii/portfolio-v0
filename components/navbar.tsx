@@ -99,7 +99,7 @@ export default function Navbar({ user, seasonalSettings }: { user?: any; seasona
             <Code className={cn("h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 transition-transform duration-300 group-hover:scale-110", accentColor)} />
             <div className={cn("absolute inset-0 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300", bgOpacityColor)}></div>
           </div>
-          {isSummer && <PalmTree className="h-6 w-5 sm:h-7 sm:w-6 drop-shadow-[0_0_5px_rgba(34,197,94,0.45)]" />}
+          {isSummer && <PalmTree className="h-7 w-5 sm:h-8 sm:w-6 drop-shadow-[0_0_6px_rgba(34,197,94,0.5)]" />}
           <span className={cn("text-lg sm:text-xl lg:text-2xl font-bold font-orbitron text-white transition-colors duration-300", isShop ? "group-hover:text-green-300" : "group-hover:text-red-300")}>
             LEVIK<span className={accentColor}>.DEV</span>
           </span>
@@ -178,36 +178,120 @@ export default function Navbar({ user, seasonalSettings }: { user?: any; seasona
 function PalmTree({ className }: { className?: string }) {
   return (
     <motion.svg
-      width="24"
-      height="32"
-      viewBox="0 0 24 32"
+      width="26"
+      height="36"
+      viewBox="0 0 52 70"
       className={className}
       aria-hidden="true"
     >
+      <defs>
+        {/* Trunk: cylindrical shading — dark edges, warm highlight at center */}
+        <linearGradient id="pt-trunk" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="#1c0800" />
+          <stop offset="20%"  stopColor="#7c3410" />
+          <stop offset="46%"  stopColor="#c8803a" />
+          <stop offset="72%"  stopColor="#6b2c0e" />
+          <stop offset="100%" stopColor="#1c0800" />
+        </linearGradient>
+        {/* Per-frond gradients for directional light from upper-left */}
+        <linearGradient id="pt-fl"  x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%"   stopColor="#4ade80" /><stop offset="100%" stopColor="#14532d" /></linearGradient>
+        <linearGradient id="pt-fr"  x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%"   stopColor="#4ade80" /><stop offset="100%" stopColor="#14532d" /></linearGradient>
+        <linearGradient id="pt-ft"  x1="50%" y1="100%" x2="50%" y2="0%"><stop offset="0%"   stopColor="#22c55e" /><stop offset="100%" stopColor="#86efac" /></linearGradient>
+        <linearGradient id="pt-fdl" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%"   stopColor="#16a34a" /><stop offset="100%" stopColor="#052e16" /></linearGradient>
+        <linearGradient id="pt-fdr" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%"   stopColor="#16a34a" /><stop offset="100%" stopColor="#052e16" /></linearGradient>
+        {/* Coconut radial gradients — bright specular highlight + deep shadow */}
+        <radialGradient id="pt-c1" cx="34%" cy="28%" r="65%">
+          <stop offset="0%"   stopColor="#fbbf24" />
+          <stop offset="50%"  stopColor="#92400e" />
+          <stop offset="100%" stopColor="#1c0800" />
+        </radialGradient>
+        <radialGradient id="pt-c2" cx="34%" cy="28%" r="65%">
+          <stop offset="0%"   stopColor="#d97706" />
+          <stop offset="50%"  stopColor="#7c2d12" />
+          <stop offset="100%" stopColor="#1c0800" />
+        </radialGradient>
+        <radialGradient id="pt-c3" cx="34%" cy="28%" r="65%">
+          <stop offset="0%"   stopColor="#ca8a04" />
+          <stop offset="50%"  stopColor="#7c3410" />
+          <stop offset="100%" stopColor="#1c0800" />
+        </radialGradient>
+      </defs>
+
       {/* Whole tree sways gently from trunk base */}
       <motion.g
         animate={{ rotate: [-3, 3.5, -3] }}
-        style={{ transformOrigin: "12px 31px" }}
+        style={{ transformOrigin: "26px 69px" }}
         transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        {/* Trunk */}
-        <path d="M12 31 Q11 25 10 19 Q9 13 11 10" stroke="#92400e" strokeWidth="3" strokeLinecap="round" fill="none" />
-        {/* Trunk texture */}
-        <path d="M11.5 27 Q10.5 21 10 16" stroke="#78350f" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.5" />
-        {/* Fronds — secondary motion pivoting at the treetop */}
+        {/* Ground shadow — grounds the tree */}
+        <ellipse cx="26" cy="69" rx="7" ry="1.5" fill="#000" opacity="0.22" />
+
+        {/* ── TRUNK ── */}
+        {/* Filled cylindrical shape: wider at base, slight left lean */}
+        <path
+          d="M22 69 C21 56 19 40 20 28 C21 23 23 20 26 20 C29 20 31 23 31 28 C30 40 29 56 30 69 Z"
+          fill="url(#pt-trunk)"
+        />
+        {/* Trunk highlight stripe — center column brightens further */}
+        <path
+          d="M25 69 C24.5 56 24 42 25 28"
+          stroke="#e8a060" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.25"
+        />
+        {/* Frond scar rings (horizontal arcs — classic palm texture) */}
+        <path d="M20 61 Q26 60 31 61" stroke="#100500" strokeWidth="0.9" fill="none" opacity="0.6" />
+        <path d="M20 53 Q26 52 31 53" stroke="#100500" strokeWidth="0.9" fill="none" opacity="0.6" />
+        <path d="M20 46 Q26 45 31 46" stroke="#100500" strokeWidth="0.9" fill="none" opacity="0.5" />
+        <path d="M20 39 Q26 38 31 39" stroke="#100500" strokeWidth="0.8" fill="none" opacity="0.45" />
+        <path d="M20 32 Q26 31 30 32" stroke="#100500" strokeWidth="0.8" fill="none" opacity="0.35" />
+
+        {/* ── FRONDS — secondary sway pivoting at crown ── */}
         <motion.g
           animate={{ rotate: [-5, 7, -5] }}
-          style={{ transformOrigin: "11px 10px" }}
+          style={{ transformOrigin: "24px 22px" }}
           transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
         >
-          <path d="M11 10 Q5 7 0 6"    stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-          <path d="M11 10 Q5 13 0 17"  stroke="#15803d" strokeWidth="2"   strokeLinecap="round" fill="none" />
-          <path d="M11 10 Q12 4 12 0"  stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-          <path d="M11 10 Q17 7 23 6"  stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-          <path d="M11 10 Q17 13 23 17" stroke="#15803d" strokeWidth="2"  strokeLinecap="round" fill="none" />
-          {/* Coconuts */}
-          <circle cx="10"   cy="12"   r="2"   fill="#b45309" />
-          <circle cx="13"   cy="11.5" r="1.7" fill="#a16207" />
+          {/* Upper-left frond: filled leaf silhouette + midrib + leaflets */}
+          <path d="M26 22 C18 17 10 12 1 8 C7 11 15 15 21 20 Z"        fill="url(#pt-fl)" />
+          <path d="M26 22 C18 17 10 12 1 8"                             stroke="#0f4c24" strokeWidth="0.85" fill="none" />
+          <line x1="21" y1="19" x2="19" y2="14" stroke="#166534" strokeWidth="0.75" opacity="0.8" />
+          <line x1="15" y1="16" x2="12" y2="11" stroke="#166534" strokeWidth="0.75" opacity="0.8" />
+          <line x1="9"  y1="13" x2="5"  y2="8"  stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+
+          {/* Lower-left frond: drooping */}
+          <path d="M26 22 C17 27 9 32 1 37 C7 32 16 27 22 23 Z"         fill="url(#pt-fdl)" />
+          <path d="M26 22 C17 27 9 32 1 37"                              stroke="#0f4c24" strokeWidth="0.85" fill="none" />
+          <line x1="20" y1="25" x2="17" y2="30" stroke="#166534" strokeWidth="0.75" opacity="0.8" />
+          <line x1="12" y1="30" x2="9"  y2="35" stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+
+          {/* Top frond: upward center — slim leaf */}
+          <path d="M26 22 C24 14 22 7 21 1 C24 7 27 14 26 22 Z"         fill="url(#pt-ft)" />
+          <path d="M26 22 C25 14 24 7 23 1"                              stroke="#0f4c24" strokeWidth="0.85" fill="none" />
+          <line x1="24" y1="15" x2="21" y2="13" stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+          <line x1="23" y1="9"  x2="20" y2="7"  stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+          <line x1="24" y1="15" x2="27" y2="13" stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+          <line x1="23" y1="9"  x2="26" y2="7"  stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+
+          {/* Upper-right frond */}
+          <path d="M26 22 C34 17 42 12 51 8 C45 11 37 15 31 20 Z"       fill="url(#pt-fr)" />
+          <path d="M26 22 C34 17 42 12 51 8"                             stroke="#0f4c24" strokeWidth="0.85" fill="none" />
+          <line x1="31" y1="19" x2="33" y2="14" stroke="#166534" strokeWidth="0.75" opacity="0.8" />
+          <line x1="37" y1="16" x2="40" y2="11" stroke="#166534" strokeWidth="0.75" opacity="0.8" />
+          <line x1="43" y1="13" x2="47" y2="8"  stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+
+          {/* Lower-right frond: drooping */}
+          <path d="M26 22 C35 27 43 32 51 37 C45 32 36 27 30 23 Z"      fill="url(#pt-fdr)" />
+          <path d="M26 22 C35 27 43 32 51 37"                            stroke="#0f4c24" strokeWidth="0.85" fill="none" />
+          <line x1="32" y1="25" x2="35" y2="30" stroke="#166534" strokeWidth="0.75" opacity="0.8" />
+          <line x1="40" y1="30" x2="43" y2="35" stroke="#166534" strokeWidth="0.65" opacity="0.7" />
+
+          {/* ── Coconuts: radial-gradient spheres clustered at crown ── */}
+          <circle cx="23"   cy="25"   r="4"   fill="url(#pt-c1)" />
+          <circle cx="28.5" cy="25.5" r="3.5" fill="url(#pt-c2)" />
+          <circle cx="25"   cy="27.5" r="3"   fill="url(#pt-c3)" />
+          {/* Specular highlight dots */}
+          <circle cx="21.8" cy="23.5" r="1.3" fill="white" opacity="0.2" />
+          <circle cx="27.2" cy="24"   r="1.1" fill="white" opacity="0.18" />
+          <circle cx="24"   cy="26"   r="0.9" fill="white" opacity="0.16" />
         </motion.g>
       </motion.g>
     </motion.svg>
