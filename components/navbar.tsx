@@ -19,9 +19,11 @@ export default function Navbar({ user, seasonalSettings }: { user?: any; seasona
   const isAdmin = pathname?.startsWith("/admin")
 
   const isSummer = (() => {
-    if (!(seasonalSettings?.enabled ?? true)) return false
+    // Explicit admin choice — always show palm tree regardless of `enabled`
     if (seasonalSettings?.mode === 'summer') return true
+    // Auto mode — respect enabled flag + check calendar month (Jun–Aug)
     if (!seasonalSettings?.mode || seasonalSettings?.mode === 'auto') {
+      if (!(seasonalSettings?.enabled ?? true)) return false
       const month = new Date().getMonth()
       return month >= 5 && month <= 7
     }
@@ -96,10 +98,13 @@ export default function Navbar({ user, seasonalSettings }: { user?: any; seasona
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative z-50" style={{ paddingLeft: 'max(1rem, env(safe-area-inset-left))', paddingRight: 'max(1rem, env(safe-area-inset-right))' }}>
         <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
           <div className="relative">
-            <Code className={cn("h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 transition-transform duration-300 group-hover:scale-110", accentColor)} />
+            {isSummer ? (
+              <PalmTree className="h-7 w-5 sm:h-8 sm:w-6 lg:h-10 lg:w-8 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_6px_rgba(34,197,94,0.5)]" />
+            ) : (
+              <Code className={cn("h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 transition-transform duration-300 group-hover:scale-110", accentColor)} />
+            )}
             <div className={cn("absolute inset-0 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300", bgOpacityColor)}></div>
           </div>
-          {isSummer && <PalmTree className="h-7 w-5 sm:h-8 sm:w-6 drop-shadow-[0_0_6px_rgba(34,197,94,0.5)]" />}
           <span className={cn("text-lg sm:text-xl lg:text-2xl font-bold font-orbitron text-white transition-colors duration-300", isShop ? "group-hover:text-green-300" : "group-hover:text-red-300")}>
             LEVIK<span className={accentColor}>.DEV</span>
           </span>
