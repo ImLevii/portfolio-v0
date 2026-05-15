@@ -54,8 +54,9 @@ export default function Projects() {
     urls.forEach(async (url) => {
       setSiteStatus(prev => ({ ...prev, [url]: 'checking' }))
       try {
-        await fetch(url, { mode: 'no-cors', signal: AbortSignal.timeout(6000) })
-        setSiteStatus(prev => ({ ...prev, [url]: 'online' }))
+        const res = await fetch(`/api/status?url=${encodeURIComponent(url)}`)
+        const data = await res.json()
+        setSiteStatus(prev => ({ ...prev, [url]: data.status === 'online' ? 'online' : 'offline' }))
       } catch {
         setSiteStatus(prev => ({ ...prev, [url]: 'offline' }))
       }
