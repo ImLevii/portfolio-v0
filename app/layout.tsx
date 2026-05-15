@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Orbitron } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/navbar"
@@ -23,6 +23,18 @@ const orbitron = Orbitron({
 export const metadata: Metadata = {
   title: "Levi | Developer & Designer",
   description: "Professional portfolio showcasing my work and skills"
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#000000" },
+  ],
 }
 
 import { auth } from "@/auth"

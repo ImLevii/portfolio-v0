@@ -82,7 +82,7 @@ export default function Navbar({ user }: { user?: any }) {
           : "py-4 sm:py-6 bg-transparent"
       )}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative z-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative z-50" style={{ paddingLeft: 'max(1rem, env(safe-area-inset-left))', paddingRight: 'max(1rem, env(safe-area-inset-right))' }}>
         <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
           <div className="relative">
             <Code className={cn("h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 transition-transform duration-300 group-hover:scale-110", accentColor)} />
@@ -117,7 +117,7 @@ export default function Navbar({ user }: { user?: any }) {
           </div>
           <div className="w-px h-8 bg-white/10 mx-1"></div>
           <button
-            className="relative p-2 text-white hover:bg-white/10 rounded-lg transition-colors border border-white/10"
+            className="relative p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors border border-white/10"
             onClick={toggleMenu}
             aria-label="Toggle menu"
             aria-expanded={isOpen}
