@@ -1236,9 +1236,13 @@ export default function TerminalEffect({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className={`terminal-container relative w-full max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm rounded-md shadow-lg ${className}`}
+      className={`terminal-container relative w-full max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto rounded-xl overflow-hidden ${className}`}
       style={{
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        boxShadow: '0 0 0 1px rgba(239,68,68,0.1), 0 0 80px rgba(239,68,68,0.06), 0 32px 64px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)',
       }}
       onMouseEnter={() => setHoverEffect(true)}
       onMouseLeave={() => setHoverEffect(false)}
@@ -1249,24 +1253,24 @@ export default function TerminalEffect({
         className="absolute inset-0 w-full h-full rounded-md pointer-events-none z-0"
       />
 
-      {/* Enhanced CRT scanlines */}
+      {/* Subtle CRT scanline texture */}
       <div
-        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/8 to-transparent rounded-md pointer-events-none z-10"
+        className="absolute inset-0 pointer-events-none z-10"
         style={{
-          backgroundSize: '100% 3px',
-          animation: 'scanlines 0.08s linear infinite'
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)',
         }}
       />
 
-      {/* Moving scanline with glow */}
+      {/* Moving light-sweep scanline */}
       <div
-        className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/30 to-transparent rounded-md pointer-events-none z-20"
+        className="absolute left-0 right-0 pointer-events-none z-20"
         style={{
-          height: '3px',
+          height: '1px',
           top: `${scanlinePosition}%`,
           transition: 'top 0.03s linear',
-          filter: 'blur(1px)',
-          boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)'
+          background: 'linear-gradient(to right, transparent 0%, rgba(239,68,68,0.35) 20%, rgba(239,68,68,0.55) 50%, rgba(239,68,68,0.35) 80%, transparent 100%)',
+          boxShadow: '0 0 8px rgba(239,68,68,0.35), 0 0 2px rgba(239,68,68,0.7)',
+          filter: 'blur(0.5px)',
         }}
       />
 
@@ -1275,9 +1279,9 @@ export default function TerminalEffect({
         className={`relative z-30 rounded-md overflow-hidden`}
       >
         {/* Enhanced terminal header with depth */}
-        <div className="terminal-header flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 px-1.5 py-1 sm:px-3 sm:py-2 md:px-4 md:py-3 lg:px-6 lg:py-4 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-b border-white/20 rounded-t-md relative overflow-hidden backdrop-blur-sm min-h-[36px]">
+        <div className="terminal-header flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 px-1.5 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2.5 lg:px-5 lg:py-3 border-b relative overflow-hidden min-h-[36px]" style={{ background: 'rgba(0,0,0,0.72)', borderColor: 'rgba(255,255,255,0.08)' }}>
           {/* Header background pattern */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] via-transparent to-white/[0.02]"></div>
           <div className="flex gap-0.5 sm:gap-2 relative z-10">
             <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer" title="Close"></div>
             <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer" title="Minimize"></div>
@@ -1288,9 +1292,11 @@ export default function TerminalEffect({
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-0.5 sm:gap-2 md:gap-4 text-[10px] sm:text-xs font-mono relative z-10 min-w-0">
             <motion.div
-              className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm min-w-0"
+              className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md bg-white/10 border border-white/20 backdrop-blur-md min-w-0"
               style={{
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                backdropFilter: 'blur(16px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(180%)',
               }}
             >
               <div className="flex items-center gap-1 sm:gap-2">
@@ -1334,9 +1340,11 @@ export default function TerminalEffect({
             {/* Compact Enhanced Date & Time display */}
             {isClient && (
               <motion.div
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm relative overflow-hidden"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md bg-white/10 border border-white/20 backdrop-blur-md relative overflow-hidden"
                 style={{
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                 }}
               >
                 <div className="flex items-center gap-1 sm:gap-2">
@@ -1411,14 +1419,16 @@ export default function TerminalEffect({
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 border border-white/20 backdrop-blur-md"
                 style={{
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                 }}
               >
-                <div className="w-2 h-2 animate-pulse shadow-sm" style={{
+                <div className="w-2 h-2 animate-pulse rounded-full" style={{
                   backgroundColor: '#dc2626',
-                  boxShadow: '0 1px 2px rgba(220, 38, 38, 0.5)'
+                  boxShadow: '0 0 6px rgba(220,38,38,0.8)'
                 }}></div>
                 <span style={{
                   color: '#ef4444',
@@ -1426,7 +1436,8 @@ export default function TerminalEffect({
                   fontSize: '11px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.8px',
-                  textShadow: '0 0 4px rgba(239, 68, 68, 0.5)'
+                  textShadow: '0 0 8px rgba(239,68,68,0.8)',
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
                 }}>
                   MATRIX
                 </span>
@@ -1436,14 +1447,16 @@ export default function TerminalEffect({
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 border border-white/20 backdrop-blur-md"
                 style={{
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                 }}
               >
-                <div className="w-2 h-2 animate-pulse shadow-sm" style={{
+                <div className="w-2 h-2 animate-pulse rounded-full" style={{
                   backgroundColor: '#dc2626',
-                  boxShadow: '0 1px 2px rgba(220, 38, 38, 0.5)'
+                  boxShadow: '0 0 6px rgba(220,38,38,0.8)'
                 }}></div>
                 <span style={{
                   color: '#ef4444',
@@ -1451,7 +1464,8 @@ export default function TerminalEffect({
                   fontSize: '11px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.8px',
-                  textShadow: '0 0 4px rgba(239, 68, 68, 0.5)'
+                  textShadow: '0 0 8px rgba(239,68,68,0.8)',
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
                 }}>
                   PARTICLES
                 </span>
@@ -1466,11 +1480,11 @@ export default function TerminalEffect({
           className="terminal-body hide-scrollbar backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 font-mono text-xs sm:text-sm md:text-base border-t overflow-y-auto relative shadow-inner"
           style={{
             maxHeight: "70vh",
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
             color: '#f8fafc',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(239, 68, 68, 0.03) 0%, transparent 50%)',
-            boxShadow: 'inset 0 -8px 24px 0 rgba(0,0,0,0.25)'
+            borderColor: 'rgba(255, 255, 255, 0.06)',
+            backgroundImage: 'radial-gradient(ellipse at 15% 0%, rgba(239,68,68,0.07) 0%, transparent 50%), radial-gradient(ellipse at 85% 100%, rgba(239,68,68,0.04) 0%, transparent 50%)',
+            boxShadow: 'inset 0 8px 32px rgba(0,0,0,0.5), inset 0 -8px 24px rgba(0,0,0,0.2)'
           }}
           onClick={() => {
             if (isInteractive && inputRef.current) {
@@ -1611,9 +1625,9 @@ export default function TerminalEffect({
         </motion.div>
 
         {/* Enhanced terminal footer with depth */}
-        <div className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-black/90 via-gray-900/80 to-black/90 border-t border-white/20 text-xs font-mono relative overflow-hidden backdrop-blur-sm">
+        <div className="px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2 border-t text-xs font-mono relative overflow-hidden" style={{ background: 'rgba(0,0,0,0.72)', borderColor: 'rgba(255,255,255,0.08)' }}>
           {/* Footer background pattern */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/3 via-transparent to-white/3 opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] via-transparent to-white/[0.02]"></div>
 
           <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-4 relative z-10" style={{ color: '#64748b' }}>
             {/* Enhanced mode toggle button with Glass UI */}
@@ -1688,10 +1702,21 @@ export default function TerminalEffect({
               </motion.div>
             </div>
 
-            <div className="flex items-center gap-4 text-xs">
-              <span>CPU: {cpuUsage.toFixed(1)}%</span>
-              <span>MEM: {memoryUsage.toFixed(1)}%</span>
-              <span>Load: {systemLoad.toFixed(1)}%</span>
+            <div className="flex items-center gap-1.5">
+              {([
+                { label: 'CPU',  value: `${cpuUsage.toFixed(0)}%`,    hi: cpuUsage > 70 },
+                { label: 'MEM',  value: `${memoryUsage.toFixed(0)}%`, hi: memoryUsage > 70 },
+                { label: 'LOAD', value: `${systemLoad.toFixed(0)}%`,  hi: systemLoad > 70 },
+              ] as Array<{ label: string; value: string; hi: boolean }>).map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.08]"
+                  style={{ fontSize: '9px' }}
+                >
+                  <span style={{ color: '#475569', letterSpacing: '0.5px', fontWeight: 600 }}>{stat.label}</span>
+                  <span style={{ color: stat.hi ? '#ef4444' : '#22c55e', fontWeight: 700, textShadow: stat.hi ? '0 0 6px rgba(239,68,68,0.7)' : '0 0 6px rgba(34,197,94,0.7)' }}>{stat.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
