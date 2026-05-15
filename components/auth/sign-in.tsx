@@ -11,8 +11,8 @@ export function SignIn({ compact = false, isShop = false }: { compact?: boolean,
             <div
                 className={cn(
                     "relative flex items-center justify-center rounded-md bg-white/10 border border-white/20 backdrop-blur-md hover:bg-white/15 transition-all duration-300 cursor-pointer group shadow-lg",
-                    "min-h-[40px] min-w-[40px]",
-                    compact ? "gap-0 sm:gap-2 px-2.5 sm:px-3" : "gap-2 px-3"
+                    "min-h-[44px] min-w-[44px]",
+                    compact ? "gap-0 md:gap-2 px-2.5 md:px-3" : "gap-2 px-3"
                 )}
                 style={{
                     boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
@@ -21,13 +21,13 @@ export function SignIn({ compact = false, isShop = false }: { compact?: boolean,
                 }}
             >
                 <LogIn
-                    className="h-[18px] w-[18px] sm:h-5 sm:w-5 flex-shrink-0"
+                    className="h-5 w-5 flex-shrink-0"
                     style={{ color: hexColor, filter: `drop-shadow(0 0 6px ${shadowColor})` }}
                 />
                 <span
                     className={cn(
-                        "relative z-10 uppercase font-bold tracking-wider font-orbitron text-[10px] sm:text-xs",
-                        compact ? "hidden sm:inline" : ""
+                        "relative z-10 uppercase font-bold tracking-wider font-orbitron text-xs",
+                        compact ? "hidden md:inline" : ""
                     )}
                     style={{
                         color: hexColor,

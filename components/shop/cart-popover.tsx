@@ -150,8 +150,8 @@ export function CartPopover({ user }: { user?: any }) {
                 <button
                     className={cn(
                         "relative flex items-center justify-center rounded-md bg-white/10 border border-white/20 backdrop-blur-md hover:bg-white/15 transition-all duration-300 cursor-pointer group shadow-lg",
-                        "min-h-[40px] min-w-[40px] sm:min-w-0",
-                        "gap-0 sm:gap-2 px-2.5 sm:px-3",
+                        "min-h-[44px] min-w-[44px] md:min-w-0",
+                        "gap-0 md:gap-2 px-2.5 md:px-3",
                         "font-bold text-white"
                     )}
                     style={{
@@ -161,11 +161,11 @@ export function CartPopover({ user }: { user?: any }) {
                     }}
                 >
                     <ShoppingCart
-                        className="h-[18px] w-[18px] sm:h-5 sm:w-5 flex-shrink-0"
+                        className="h-5 w-5 flex-shrink-0"
                         style={{ color: '#22c55e', filter: 'drop-shadow(0 0 6px rgba(34,197,94,0.8))' }}
                     />
                     <span
-                        className="hidden sm:inline relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-xs font-orbitron"
+                        className="hidden md:inline relative z-10 uppercase font-bold tracking-wider text-xs font-orbitron"
                         style={{
                             color: '#22c55e',
                             textShadow: '0 0 8px rgba(34,197,94,0.8)',

@@ -17,7 +17,7 @@ export function UserMenu({ user }: { user: any }) {
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-white/20 transition-all duration-300">
+                <Button variant="ghost" className="relative h-9 w-9 min-h-[44px] min-w-[44px] rounded-full ring-2 ring-transparent hover:ring-white/20 transition-all duration-300">
                     <Avatar className="h-9 w-9 border-2 border-gray-700/50">
                         <AvatarImage src={user.image} alt={user.name} />
                         <AvatarFallback className="bg-gray-800 text-white font-orbitron font-bold">{user.name?.charAt(0)}</AvatarFallback>
