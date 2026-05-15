@@ -91,7 +91,7 @@ async function handleChargeConfirmed(charge: any) {
             where: { id: { in: productIds } }
         })
 
-        const totalAmount = charge.pricing.local.amount * 100 // Convert back to cents
+        const totalAmount = Math.round(parseFloat(charge.pricing.local.amount) * 100) // Convert back to cents
 
         const order = await db.order.create({
             data: {
@@ -101,7 +101,7 @@ async function handleChargeConfirmed(charge: any) {
                 currency: "usd",
                 status: "completed",
                 paymentMethod: "coinbase",
-                couponCode: couponId ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
+                couponCode: couponId && couponId !== 'none' ? (await db.coupon.findUnique({ where: { id: couponId } }))?.code : undefined,
                 items: {
                     create: items.map((item) => ({
                         productId: item.id,
@@ -133,7 +133,7 @@ async function handleChargeConfirmed(charge: any) {
         }
 
         // Increment Coupon Usage
-        if (couponId) {
+        if (couponId && couponId !== 'none') {
             await db.coupon.update({
                 where: { id: couponId },
                 data: { uses: { increment: 1 } }

@@ -64,6 +64,7 @@ async function createCDPCharge(amount: number, description: string, metadata: an
             }
         );
 
+        const appUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const response = await fetch(`https://${host}${path}`, {
             method,
             headers: {
@@ -79,6 +80,8 @@ async function createCDPCharge(amount: number, description: string, metadata: an
                     amount: (amount / 100).toFixed(2),
                     currency: "USD"
                 },
+                redirect_url: `${appUrl}/shop/success?coinbase=true`,
+                cancel_url: `${appUrl}/shop`,
                 metadata
             })
         });
@@ -94,6 +97,7 @@ async function createCDPCharge(amount: number, description: string, metadata: an
 
 async function createLegacyCharge(apiKey: string, amount: number, description: string, metadata: any) {
     try {
+        const appUrlLegacy = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const response = await fetch("https://api.commerce.coinbase.com/charges", {
             method: "POST",
             headers: {
@@ -109,6 +113,8 @@ async function createLegacyCharge(apiKey: string, amount: number, description: s
                     amount: (amount / 100).toFixed(2),
                     currency: "USD"
                 },
+                redirect_url: `${appUrlLegacy}/shop/success?coinbase=true`,
+                cancel_url: `${appUrlLegacy}/shop`,
                 metadata
             })
         });
@@ -151,14 +157,14 @@ export async function POST(req: Request) {
 
         if (couponCode) {
             const coupon = await db.coupon.findFirst({
-                where: { code: couponCode, isEnabled: true }
+                where: { code: couponCode, isActive: true }
             })
 
             if (coupon) {
-                if (coupon.type === "PERCENTAGE") {
-                    totalAmount = Math.round(totalAmount * (1 - coupon.value / 100))
-                } else {
-                    totalAmount = Math.max(0, totalAmount - coupon.value)
+                if (coupon.percent) {
+                    totalAmount = Math.round(totalAmount * (1 - coupon.percent / 100))
+                } else if (coupon.amount) {
+                    totalAmount = Math.max(0, totalAmount - coupon.amount)
                 }
                 appliedCouponId = coupon.id
             }
