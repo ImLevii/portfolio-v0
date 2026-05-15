@@ -2,6 +2,7 @@
 
 import { ShoppingCart, Trash2, X } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 
 import useCart from "@/hooks/use-cart"
@@ -146,18 +147,24 @@ export function CartPopover({ user }: { user?: any }) {
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-                <button className="flex items-center justify-center gap-0 sm:gap-3 px-2 sm:px-3 py-1.5 rounded-md bg-gradient-to-r from-gray-800/60 to-gray-900/60 border border-gray-700/40 backdrop-blur-sm hover:bg-gray-800/80 transition-all duration-300 cursor-pointer group font-bold text-base text-white relative shadow-lg min-w-[32px] sm:min-w-0"
-                    style={{
-                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)'
-                    }}
+                <button
+                    className={cn(
+                        "relative flex items-center justify-center rounded-lg transition-all duration-200 cursor-pointer group",
+                        "min-h-[40px] min-w-[40px] sm:min-w-0",
+                        "gap-0 sm:gap-2 px-2.5 sm:px-3.5",
+                        "bg-white/[0.04] border border-white/[0.1] backdrop-blur-md",
+                        "hover:bg-white/[0.07] hover:border-green-500/40",
+                        "hover:shadow-[0_0_0_1px_rgba(34,197,94,0.08),0_4px_20px_rgba(0,0,0,0.45)]",
+                        "shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_4px_12px_rgba(0,0,0,0.3)]",
+                        "font-bold text-white"
+                    )}
                 >
-                    <ShoppingCart className="h-5 w-5 text-green-500" />
+                    <ShoppingCart className="h-[18px] w-[18px] sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
                     <span
-                        className="hidden sm:inline relative z-10 uppercase font-bold tracking-wider text-xs font-orbitron"
+                        className="hidden sm:inline relative z-10 uppercase font-bold tracking-wider text-[10px] sm:text-[11px] font-orbitron"
                         style={{
                             color: '#22c55e',
-                            textShadow: '0 0 8px rgba(34,197,94,0.8)',
-                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                            textShadow: '0 0 10px rgba(34,197,94,0.75)',
                         }}
                     >
                         Cart
