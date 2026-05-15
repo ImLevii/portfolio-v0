@@ -63,7 +63,9 @@ export default function Projects() {
   }, [])
 
   return (
-    <section id="projects" className="section-padding py-24">
+    <section id="projects" className="section-padding py-24 relative overflow-hidden">
+      {/* Section ambient glow */}
+      <div className="absolute -left-48 top-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" aria-hidden="true" style={{ background: 'radial-gradient(ellipse, rgba(239,68,68,0.055) 0%, transparent 65%)' }} />
       <div className="container mx-auto">
         <motion.div
           ref={ref}

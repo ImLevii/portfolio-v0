@@ -73,6 +73,8 @@ export default function Skills() {
 
   return (
     <section id="skills" className="section-padding py-24 relative overflow-hidden">
+      {/* Section ambient glow */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] rounded-full pointer-events-none" aria-hidden="true" style={{ background: 'radial-gradient(ellipse, rgba(239,68,68,0.04) 0%, transparent 70%)' }} />
       <div className="container mx-auto relative z-10">
         <motion.div
           ref={ref}

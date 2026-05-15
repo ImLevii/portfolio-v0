@@ -281,7 +281,9 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="section-padding py-24 bg-black/50">
+    <section id="contact" className="section-padding py-24 relative overflow-hidden">
+      {/* Section ambient glow */}
+      <div className="absolute right-1/4 -top-32 w-[700px] h-[500px] rounded-full pointer-events-none" aria-hidden="true" style={{ background: 'radial-gradient(ellipse, rgba(239,68,68,0.06) 0%, transparent 65%)' }} />
       <div className="container mx-auto">
         <motion.div
           ref={ref}
