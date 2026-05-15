@@ -4,13 +4,14 @@ import { auth } from "@/auth"
 import { db as prisma } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
-export type SeasonalMode = "auto" | "winter" | "autumn" | "none"
+export type SeasonalMode = "auto" | "winter" | "autumn" | "summer" | "none"
 
 export interface SeasonalSettingsConfig {
     mode: SeasonalMode
     enabled: boolean
     snowDensity: number // 1-100
     leavesDensity: number // 1-100
+    summerDensity: number // 1-100
     musicEnabled: boolean
     musicDuration: number // seconds
     musicFadeOut: boolean
@@ -24,6 +25,7 @@ const DEFAULT_SETTINGS: SeasonalSettingsConfig = {
     enabled: true,
     snowDensity: 50,
     leavesDensity: 30,
+    summerDensity: 40,
     musicEnabled: true,
     musicDuration: 15,
     musicFadeOut: true,

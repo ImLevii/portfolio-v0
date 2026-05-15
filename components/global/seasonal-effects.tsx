@@ -12,7 +12,7 @@ interface SeasonalEffectsProps {
 
 export function SeasonalEffects({ config }: SeasonalEffectsProps) {
     const { weatherEffects, soundEffects, soundtrackVolume, generalVolume } = useVisualEffectsStore()
-    const [season, setSeason] = useState<"winter" | "autumn" | null>(null)
+    const [season, setSeason] = useState<"winter" | "autumn" | "summer" | null>(null)
     const pathname = usePathname()
     const [hasInteracted, setHasInteracted] = useState(false)
 
@@ -26,8 +26,9 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
 
     useEffect(() => {
         const month = new Date().getMonth()
-        if (month === 11) setSeason("winter")      // December
-        else if (month === 10) setSeason("autumn") // November
+        if (month === 11 || month === 0 || month === 1) setSeason("winter")       // Dec–Feb
+        else if (month === 9 || month === 10) setSeason("autumn")                // Oct–Nov
+        else if (month >= 5 && month <= 7) setSeason("summer")                  // Jun–Aug
         else setSeason(null)
 
         // Pre-initialize audio objects so they are ready for the click handler
@@ -213,6 +214,7 @@ export function SeasonalEffects({ config }: SeasonalEffectsProps) {
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
             {currentSeason === "winter" && <SnowEffect />}
             {currentSeason === "autumn" && <LeavesEffect />}
+            {currentSeason === "summer" && <FirefliesEffect />}
         </div>
     )
 }
@@ -430,4 +432,148 @@ function LeavesEffect() {
     }, [])
 
     return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-60" />
+}
+
+function FirefliesEffect() {
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+
+    useEffect(() => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return
+
+        let animFrameId: number
+
+        interface Firefly {
+            x: number; y: number
+            targetX: number; targetY: number
+            radius: number; glowRadius: number
+            opacity: number; opacityTarget: number; opacitySpeed: number
+            hue: number
+            speed: number
+            wanderTimer: number; wanderInterval: number
+            phase: "on" | "off"; phaseTimer: number; phaseDuration: number
+            trail: { x: number; y: number; alpha: number }[]
+        }
+
+        let fireflies: Firefly[] = []
+        const rand = (a: number, b: number) => Math.random() * (b - a) + a
+
+        const mkFirefly = (): Firefly => {
+            const x = rand(0, canvas.width)
+            const y = rand(canvas.height * 0.08, canvas.height * 0.92)
+            const phase: "on" | "off" = Math.random() > 0.45 ? "on" : "off"
+            return {
+                x, y,
+                targetX: x + rand(-180, 180),
+                targetY: y + rand(-120, 120),
+                radius: rand(1.4, 2.8),
+                glowRadius: rand(10, 26),
+                opacity: phase === "on" ? rand(0.4, 0.9) : 0,
+                opacityTarget: phase === "on" ? rand(0.5, 1.0) : 0,
+                opacitySpeed: rand(0.006, 0.018),
+                hue: rand(48, 92),   // warm yellow → yellow-green
+                speed: rand(0.25, 0.75),
+                wanderTimer: 0,
+                wanderInterval: rand(80, 220),
+                phase,
+                phaseTimer: rand(0, 100) | 0,
+                phaseDuration: rand(50, 160),
+                trail: [],
+            }
+        }
+
+        const resize = () => {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+            const count = Math.max(20, Math.floor(window.innerWidth / 22))
+            fireflies = Array.from({ length: count }, mkFirefly)
+        }
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+            for (const ff of fireflies) {
+                // --- Phase tick ---
+                ff.phaseTimer++
+                if (ff.phaseTimer >= ff.phaseDuration) {
+                    ff.phase = ff.phase === "on" ? "off" : "on"
+                    ff.phaseTimer = 0
+                    ff.phaseDuration = rand(40, 200)
+                    ff.opacityTarget = ff.phase === "on" ? rand(0.5, 1.0) : 0
+                }
+
+                // --- Opacity lerp ---
+                const diff = ff.opacityTarget - ff.opacity
+                ff.opacity += diff * 0.04 + (diff > 0 ? 1 : -1) * ff.opacitySpeed
+                ff.opacity = Math.max(0, Math.min(1, ff.opacity))
+
+                // --- Wander ---
+                ff.wanderTimer++
+                if (ff.wanderTimer >= ff.wanderInterval) {
+                    ff.wanderTimer = 0
+                    ff.wanderInterval = rand(60, 200)
+                    ff.targetX = Math.max(20, Math.min(canvas.width - 20, ff.x + rand(-220, 220)))
+                    ff.targetY = Math.max(canvas.height * 0.05, Math.min(canvas.height * 0.95, ff.y + rand(-110, 110)))
+                }
+                const dx = ff.targetX - ff.x
+                const dy = ff.targetY - ff.y
+                const dist = Math.sqrt(dx * dx + dy * dy)
+                if (dist > 1) { ff.x += (dx / dist) * ff.speed; ff.y += (dy / dist) * ff.speed }
+
+                // --- Trail ---
+                if (ff.opacity > 0.05) {
+                    ff.trail.unshift({ x: ff.x, y: ff.y, alpha: ff.opacity * 0.22 })
+                    if (ff.trail.length > 10) ff.trail.pop()
+                }
+
+                if (ff.opacity < 0.02) continue
+
+                // --- Draw trail ---
+                for (let t = 0; t < ff.trail.length; t++) {
+                    const tp = ff.trail[t]
+                    const a = tp.alpha * (1 - t / ff.trail.length) * 0.6
+                    if (a < 0.005) continue
+                    ctx.beginPath()
+                    ctx.arc(tp.x, tp.y, ff.radius * 0.55, 0, Math.PI * 2)
+                    ctx.fillStyle = `hsla(${ff.hue}, 100%, 78%, ${a})`
+                    ctx.fill()
+                }
+
+                // --- Draw outer glow ---
+                const gr = ctx.createRadialGradient(ff.x, ff.y, 0, ff.x, ff.y, ff.glowRadius * (0.5 + ff.opacity * 0.5))
+                gr.addColorStop(0, `hsla(${ff.hue}, 100%, 88%, ${ff.opacity * 0.85})`)
+                gr.addColorStop(0.28, `hsla(${ff.hue}, 95%, 65%, ${ff.opacity * 0.35})`)
+                gr.addColorStop(0.7, `hsla(${ff.hue}, 90%, 50%, ${ff.opacity * 0.08})`)
+                gr.addColorStop(1, `hsla(${ff.hue}, 80%, 40%, 0)`)
+                ctx.beginPath()
+                ctx.arc(ff.x, ff.y, ff.glowRadius * (0.5 + ff.opacity * 0.5), 0, Math.PI * 2)
+                ctx.fillStyle = gr
+                ctx.fill()
+
+                // --- Draw core dot ---
+                ctx.beginPath()
+                ctx.arc(ff.x, ff.y, ff.radius, 0, Math.PI * 2)
+                ctx.fillStyle = `hsla(${ff.hue}, 100%, 97%, ${ff.opacity})`
+                ctx.shadowBlur = ff.radius * 4
+                ctx.shadowColor = `hsla(${ff.hue}, 100%, 80%, ${ff.opacity})`
+                ctx.fill()
+                ctx.shadowBlur = 0
+            }
+
+            animFrameId = requestAnimationFrame(draw)
+        }
+
+        window.addEventListener("resize", resize)
+        resize()
+        draw()
+
+        return () => {
+            window.removeEventListener("resize", resize)
+            cancelAnimationFrame(animFrameId)
+        }
+    }, [])
+
+    return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
 }
