@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google"
 
 export default {
     providers: [GitHub, Google],
+    trustHost: true,
     pages: {
         signIn: "/auth/signin",
         error: "/auth/signin",
