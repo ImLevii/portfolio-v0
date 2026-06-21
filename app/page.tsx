@@ -15,23 +15,32 @@ export default async function Home() {
   // Fallback for local dev
   if (!ip || ip === '::1' || ip === '127.0.0.1') ip = ''
 
-  // Fetch geolocation data from ipinfo.io (or similar)
+  // Fetch geolocation data from ipinfo.io with timeout protection
   let geo = null
   try {
-    const res = await fetch(`https://ipinfo.io/${ip}?token=febca1646e0805`, { next: { revalidate: 60 } })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+    
+    const res = await fetch(`https://ipinfo.io/${ip}?token=febca1646e0805`, { 
+      next: { revalidate: 60 },
+      signal: controller.signal
+    })
+    
+    clearTimeout(timeoutId)
+    
     if (res.ok) {
       const data = await res.json()
       geo = {
         ip: data.ip,
         city: data.city,
         region: data.region,
-
-        
         country: data.country,
         privacy: data.privacy
       }
     }
   } catch (e) {
+    // Silently fail - geo features are optional
+    console.error('Geolocation fetch failed:', e instanceof Error ? e.message : 'Unknown error')
     geo = null
   }
 
