@@ -4,8 +4,12 @@ import Projects from "@/components/projects"
 import Contact from "@/components/contact"
 import Skills from "@/components/skills"
 import DebugMatrixWrapper from './components/debug-matrix-wrapper'
+import { getProjectsSection, getVisibleProjects } from "@/lib/projects"
 
 export default async function Home() {
+  // Start DB reads now so they run in parallel with the geo lookup below (neither rejects)
+  const projectsDataPromise = Promise.all([getVisibleProjects(), getProjectsSection()])
+
   // Get IP address from headers (works on Vercel, fallback to demo IP)
   let ip = null
   if (typeof window === 'undefined') {
@@ -43,6 +47,8 @@ export default async function Home() {
     console.error('Geolocation fetch failed:', e instanceof Error ? e.message : 'Unknown error')
     geo = null
   }
+
+  const [projects, projectsSection] = await projectsDataPromise
 
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden font-bold relative">
@@ -100,7 +106,7 @@ export default async function Home() {
         <div className="section-divider mx-8 md:mx-16" aria-hidden="true" />
         <Skills />
         <div className="section-divider mx-8 md:mx-16" aria-hidden="true" />
-        <Projects />
+        <Projects projects={projects} section={projectsSection} />
         <div className="section-divider mx-8 md:mx-16" aria-hidden="true" />
         <Contact />
       </div>

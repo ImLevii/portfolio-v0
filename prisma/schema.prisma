@@ -240,6 +240,22 @@ model SponsoredMessage {
   updatedAt   DateTime @updatedAt
 }
 
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  image       String?  // Local path (/images/x.png) or https URL
+  customText  String?  // Overlay text rendered on top of the image
+  tags        String[]
+  liveUrl     String?
+  githubUrl   String?
+  showStatus  Boolean  @default(true) // Show online/offline pill for liveUrl
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model SupportCategory {
   id          String   @id @default(cuid())
   title       String

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake, MessageSquare, HeadphonesIcon, Megaphone, LayoutGrid } from "lucide-react"
+import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake, MessageSquare, HeadphonesIcon, Megaphone, LayoutGrid, FolderKanban } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { handleSignOut } from "@/app/actions"
 
@@ -20,6 +20,7 @@ export function AdminSidebar() {
         { href: "/admin/orders", label: "Orders", icon: Package },
         { href: "/admin/customers", label: "Users & Roles", icon: Users },
         { href: "/admin/support", label: "Support Hub", icon: HeadphonesIcon },
+        { href: "/admin/projects", label: "Projects", icon: FolderKanban },
         { href: "/admin/carousel", label: "Carousel", icon: LayoutDashboard }, // Added Carousel link
         { href: "/admin/coupons", label: "Coupons", icon: Package },
         { href: "/admin/seasonal", label: "Seasonal Effects", icon: Snowflake },
