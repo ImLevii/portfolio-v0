@@ -4,6 +4,7 @@ import Link from "next/link"
 import { HeadphonesIcon, Clock, CheckCircle, AlertCircle, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SupportCategoryManager } from "@/components/admin/support-category-manager"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 
 export const dynamic = 'force-dynamic'
 
@@ -13,22 +14,17 @@ export default async function SupportDashboard() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4 border-b border-gray-800/60 pb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                    <HeadphonesIcon className="h-6 w-6" />
-                </div>
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-orbitron text-white neon-text-glow">Support Hub</h1>
-                    <p className="text-zinc-400">Manage support tickets and user inquiries.</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title="Support Hub"
+                description="Manage support tickets and user inquiries."
+                icon={HeadphonesIcon}
+                accent="purple"
+            />
 
             {/* Category Management */}
             <SupportCategoryManager initialCategories={categories} />
 
-            <div className="flex items-center gap-2 mt-8 mb-4">
-                <h2 className="text-xl font-bold text-white">Recent Tickets</h2>
-            </div>
+            <h2 className="pt-2 font-orbitron text-xl font-bold text-white">Recent Tickets</h2>
 
             <div className="grid gap-4">
                 {tickets.length === 0 ? (

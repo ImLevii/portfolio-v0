@@ -1,7 +1,6 @@
-
-
 import { db } from "@/lib/db"
 import { Package } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { OrderActions } from "@/components/admin/order-actions"
 
 export default async function AdminOrdersPage() {
@@ -21,16 +20,16 @@ export default async function AdminOrdersPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Orders Management</h1>
-                    <p className="text-gray-400 mt-2">View and manage customer orders</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title="Orders"
+                description="View and manage customer orders"
+                icon={Package}
+                accent="blue"
+            />
 
-            <div className="glass-panel p-6 rounded-2xl border border-gray-800/60">
-                <div className="rounded-xl border border-gray-800/60 overflow-hidden">
-                    <table className="w-full text-left text-sm">
+            <div className="glass-panel rounded-2xl border border-gray-800/60 p-3 sm:p-6">
+                <div className="overflow-x-auto rounded-xl border border-gray-800/60">
+                    <table className="w-full min-w-[760px] text-left text-sm">
                         <thead className="bg-black/40 text-gray-400 font-orbitron text-xs uppercase tracking-wider">
                             <tr className="border-b border-gray-800/60">
                                 <th className="px-6 py-4 font-medium">Order ID</th>

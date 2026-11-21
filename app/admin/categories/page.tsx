@@ -2,7 +2,8 @@ import { db } from "@/lib/db"
 import { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Plus, Pencil, Trash2, LayoutGrid, ArrowUp, ArrowDown } from "lucide-react"
+import { Plus, Pencil, Trash2, Tags, ArrowUp, ArrowDown } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { deleteCategory, updateCategoryOrder } from "./actions"
 
@@ -21,29 +22,29 @@ export default async function CategoriesPage() {
     // We will just list categories.
 
     return (
-        <div className="space-y-8 p-4 md:p-8">
-            <div className="flex items-center justify-between border-b border-white/5 pb-6">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-                        <LayoutGrid className="h-6 w-6" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight font-orbitron text-white">Categories</h1>
-                        <p className="text-zinc-400">Manage product categories and organization</p>
-                    </div>
-                </div>
-                <Link href="/admin/categories/new">
-                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 font-orbitron">
-                        <Plus className="mr-2 h-4 w-4" /> Add Category
+        <div className="space-y-6">
+            <AdminPageHeader
+                title="Categories"
+                description="Manage product categories and organization"
+                icon={Tags}
+                accent="purple"
+                actions={
+                    <Button
+                        asChild
+                        className="rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 font-orbitron font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:from-emerald-500 hover:to-green-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]"
+                    >
+                        <Link href="/admin/categories/new">
+                            <Plus className="mr-2 h-4 w-4" /> ADD CATEGORY
+                        </Link>
                     </Button>
-                </Link>
-            </div>
+                }
+            />
 
             <div className="grid gap-4">
                 {categories.length === 0 ? (
-                    <Card className="bg-black/40 border-white/5 border-dashed">
+                    <Card className="border-dashed border-white/10 bg-black/40">
                         <CardContent className="flex flex-col items-center justify-center py-12 text-zinc-500">
-                            <LayoutGrid className="h-12 w-12 mb-4 opacity-50" />
+                            <Tags className="h-12 w-12 mb-4 opacity-50" />
                             <p className="text-lg font-medium">No categories found</p>
                             <p className="text-sm">Create your first category to get started</p>
                         </CardContent>

@@ -51,6 +51,9 @@ export default function Navbar({ user, seasonalSettings }: { user?: any; seasona
     }
   }, [isOpen])
 
+  // The admin area renders its own top bar (components/admin/admin-topbar.tsx)
+  if (isAdmin) return null
+
   const mainLinks = [
     { name: "HOME", href: "/#home" },
     { name: "ABOUT", href: "/#about" },
@@ -60,20 +63,13 @@ export default function Navbar({ user, seasonalSettings }: { user?: any; seasona
     { name: "CONTACT", href: "/#contact" },
   ]
 
-  const adminLinks = [
-    { name: "DASHBOARD", href: "/admin" },
-    { name: "PRODUCTS", href: "/admin/products" },
-    { name: "LICENSES", href: "/licenses" },
-    { name: "SETTINGS", href: "/settings" },
-  ]
-
   const shopLinks = [
     { name: "SHOP", href: "/shop" },
     { name: "LICENSES", href: "/licenses" },
     { name: "SETTINGS", href: "/settings" },
   ]
 
-  const navLinks = isAdmin ? adminLinks : (isShop || user ? shopLinks : mainLinks)
+  const navLinks = isShop || user ? shopLinks : mainLinks
 
   const toggleMenu = () => setIsOpen(!isOpen)
 

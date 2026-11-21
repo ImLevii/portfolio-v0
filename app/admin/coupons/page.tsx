@@ -1,5 +1,7 @@
+import { TicketPercent } from "lucide-react"
 import { db } from "@/lib/db"
 import { CouponManager } from "@/components/admin/coupon-manager"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 
 export default async function CouponsPage() {
     const coupons = await db.coupon.findMany({
@@ -7,10 +9,13 @@ export default async function CouponsPage() {
     })
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight text-white font-orbitron neon-text-glow">Coupons</h2>
-            </div>
+        <div className="space-y-6">
+            <AdminPageHeader
+                title="Coupons"
+                description="Create discount codes and track their usage."
+                icon={TicketPercent}
+                accent="orange"
+            />
             <CouponManager coupons={coupons} />
         </div>
     )

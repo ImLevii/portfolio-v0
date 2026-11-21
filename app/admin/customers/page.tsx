@@ -3,6 +3,8 @@ import { UsersTable } from "@/components/admin/users-table"
 import { RoleManager } from "@/components/admin/role-manager"
 import { getRoles } from "@/actions/roles"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
+import { Users } from "lucide-react"
 
 export default async function UsersPage() {
     // Parallel fetching
@@ -24,13 +26,13 @@ export default async function UsersPage() {
     ])
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Users & Roles</h1>
-                    <p className="text-gray-400 mt-2">Manage users, assign roles, and configure permissions.</p>
-                </div>
-            </div>
+        <div className="space-y-6">
+            <AdminPageHeader
+                title="Users & Roles"
+                description="Manage users, assign roles, and configure permissions."
+                icon={Users}
+                accent="purple"
+            />
 
             <Tabs defaultValue="users" className="space-y-6">
                 <TabsList className="bg-black/40 border border-white/10 p-1 rounded-xl">

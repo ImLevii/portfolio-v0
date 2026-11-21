@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
-import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, EyeOff, ShoppingBag } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { deleteProduct, toggleProductListing } from "@/app/admin/products/actions"
 
 export default async function AdminProductsPage() {
@@ -9,21 +10,26 @@ export default async function AdminProductsPage() {
     })
 
     return (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Products</h1>
-                <Link
-                    href="/admin/products/new"
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-xl font-bold font-orbitron transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-[0.98]"
-                >
-                    <Plus className="h-5 w-5" />
-                    ADD PRODUCT
-                </Link>
-            </div>
+        <div className="space-y-6">
+            <AdminPageHeader
+                title="Products"
+                description="Manage what's listed in the shop."
+                icon={ShoppingBag}
+                accent="orange"
+                actions={
+                    <Link
+                        href="/admin/products/new"
+                        className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 font-orbitron text-sm font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:from-emerald-500 hover:to-green-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-[0.98]"
+                    >
+                        <Plus className="h-4 w-4" />
+                        ADD PRODUCT
+                    </Link>
+                }
+            />
 
-            <div className="glass-panel p-6 rounded-2xl border border-gray-800/60">
-                <div className="rounded-xl border border-gray-800/60 overflow-hidden">
-                    <table className="w-full text-left text-sm">
+            <div className="glass-panel rounded-2xl border border-gray-800/60 p-3 sm:p-6">
+                <div className="overflow-x-auto rounded-xl border border-gray-800/60">
+                    <table className="w-full min-w-[560px] text-left text-sm">
                         <thead className="bg-black/40 text-gray-400 font-orbitron text-xs uppercase tracking-wider">
                             <tr>
                                 <th className="px-6 py-4 font-medium">Name</th>
@@ -43,7 +49,8 @@ export default async function AdminProductsPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {/* Always visible: hover-only actions were unreachable on touch screens and keyboards */}
+                                        <div className="flex justify-end gap-2 opacity-70 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                             {/* Toggle Listing Button */}
                                             <form action={async () => {
                                                 "use server"

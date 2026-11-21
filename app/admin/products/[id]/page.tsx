@@ -2,6 +2,8 @@ import { ProductForm } from "@/components/admin/product-form"
 import { updateProduct } from "../actions"
 import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
+import { ShoppingBag } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 
 interface EditProductPageProps {
     params: Promise<{
@@ -26,8 +28,14 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     const updateAction = updateProduct.bind(null, id)
 
     return (
-        <div className="space-y-8">
-            <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">Edit Product</h1>
+        <div className="space-y-6">
+            <AdminPageHeader
+                title="Edit Product"
+                description={product.name}
+                icon={ShoppingBag}
+                accent="orange"
+                backHref="/admin/products"
+            />
             <ProductForm
                 initialData={{
                     id: product.id,

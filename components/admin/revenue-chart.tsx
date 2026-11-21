@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Area, AreaChart } from "recharts"
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Area, AreaChart } from "recharts"
+import { TrendingUp } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
@@ -54,7 +55,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                                     <TabsTrigger
                                         key={tab}
                                         value={tab}
-                                        className="capitalize rounded-full data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/20 transition-all duration-300 px-4"
+                                        className="capitalize rounded-full data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-500/20 transition-all duration-300 px-3 sm:px-4"
                                     >
                                         {tab}
                                     </TabsTrigger>
@@ -64,7 +65,16 @@ export function RevenueChart({ data }: RevenueChartProps) {
                     </div>
                 </CardHeader>
                 <CardContent className="relative z-10">
-                    <div className="h-[400px] w-full mt-4">
+                    <div className="mt-4 h-[300px] w-full sm:h-[400px]">
+                        {currentConfig.data.length === 0 ? (
+                            <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-white/10 text-center">
+                                <TrendingUp className="mb-3 h-10 w-10 text-zinc-600" />
+                                <p className="font-orbitron text-sm font-bold text-white">No revenue yet</p>
+                                <p className="mt-1 max-w-xs text-sm text-zinc-500">
+                                    Completed orders will appear here as they come in.
+                                </p>
+                            </div>
+                        ) : (
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={currentConfig.data}>
                                 <defs>
@@ -125,6 +135,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
+                        )}
                     </div>
                 </CardContent>
             </Card>

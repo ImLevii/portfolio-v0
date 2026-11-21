@@ -1,5 +1,7 @@
 import { getAllProjects, getProjectsSection } from "@/lib/projects"
 import { ProjectsManager } from "@/components/admin/projects-manager"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
+import { FolderKanban } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -20,10 +22,11 @@ export default async function ProjectsAdminPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold font-orbitron text-white neon-text-glow">Projects</h1>
-                <p className="text-gray-400 mt-1">Control the &quot;My Projects&quot; section on the homepage.</p>
-            </div>
+            <AdminPageHeader
+                title="Projects"
+                description={<>Control the &quot;My Projects&quot; section on the homepage.</>}
+                icon={FolderKanban}
+            />
 
             {loadError ? (
                 <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-5 text-red-300">{loadError}</div>

@@ -1,8 +1,7 @@
 import { db } from "@/lib/db"
-import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, Mail, Calendar, Shield, Key, ShoppingBag, Package } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Mail, Calendar, Shield, Key, ShoppingBag, Package } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import {
     Card,
     CardContent,
@@ -66,29 +65,27 @@ export default async function CustomerDetailsPage({ params }: CustomerDetailsPag
     }
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-white/10">
-                    <Link href="/admin/customers">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Link>
-                </Button>
-                <div>
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-bold font-orbitron text-white">{customer.name || "Customer Details"}</h1>
+        <div className="space-y-6">
+            <AdminPageHeader
+                title={customer.name || "Customer Details"}
+                description={
+                    <span className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{customer.email}</span>
+                    </span>
+                }
+                backHref="/admin/customers"
+                actions={
+                    <>
                         <CustomerEditForm customer={customer} />
                         <DeleteCustomerButton
                             customerId={customer.id}
                             customerName={customer.name || customer.email || "Unknown"}
                             redirectAfter
                         />
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-400 mt-1">
-                        <Mail className="h-4 w-4" />
-                        <span>{customer.email}</span>
-                    </div>
-                </div>
-            </div>
+                    </>
+                }
+            />
 
             <Tabs defaultValue="overview" className="space-y-6">
                 <TabsList className="bg-black/40 border border-gray-800/60 backdrop-blur-xl p-1 rounded-xl">

@@ -1,99 +1,163 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingBag, Settings, LogOut, Package, Menu, X, Users, Snowflake, MessageSquare, HeadphonesIcon, Megaphone, LayoutGrid, FolderKanban } from "lucide-react"
+import {
+    CreditCard,
+    FolderKanban,
+    GalleryHorizontalEnd,
+    Headphones,
+    LayoutDashboard,
+    LogOut,
+    Megaphone,
+    MessageSquare,
+    Package,
+    ShoppingBag,
+    Snowflake,
+    Tags,
+    TicketPercent,
+    Users,
+    X,
+    type LucideIcon,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { handleSignOut } from "@/app/actions"
 
-export function AdminSidebar() {
-    const pathname = usePathname()
-    const [isOpen, setIsOpen] = useState(false)
+type NavLink = { href: string; label: string; icon: LucideIcon }
 
-    const links = [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/products", label: "Products", icon: ShoppingBag },
-        { href: "/admin/categories", label: "Categories", icon: LayoutGrid },
-        { href: "/admin/chat", label: "Live Chat", icon: MessageSquare },
-        { href: "/admin/sponsored", label: "Sponsored", icon: Megaphone },
-        { href: "/admin/orders", label: "Orders", icon: Package },
-        { href: "/admin/customers", label: "Users & Roles", icon: Users },
-        { href: "/admin/support", label: "Support Hub", icon: HeadphonesIcon },
-        { href: "/admin/projects", label: "Projects", icon: FolderKanban },
-        { href: "/admin/carousel", label: "Carousel", icon: LayoutDashboard }, // Added Carousel link
-        { href: "/admin/coupons", label: "Coupons", icon: Package },
-        { href: "/admin/seasonal", label: "Seasonal Effects", icon: Snowflake },
-        { href: "/admin/settings/payments", label: "Payment Settings", icon: Settings },
-    ]
+// One icon per destination, grouped so the list scans quickly
+const sections: { title: string; links: NavLink[] }[] = [
+    {
+        title: "Overview",
+        links: [{ href: "/admin", label: "Dashboard", icon: LayoutDashboard }],
+    },
+    {
+        title: "Store",
+        links: [
+            { href: "/admin/products", label: "Products", icon: ShoppingBag },
+            { href: "/admin/categories", label: "Categories", icon: Tags },
+            { href: "/admin/orders", label: "Orders", icon: Package },
+            { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
+            { href: "/admin/settings/payments", label: "Payment Settings", icon: CreditCard },
+        ],
+    },
+    {
+        title: "Community",
+        links: [
+            { href: "/admin/customers", label: "Users & Roles", icon: Users },
+            { href: "/admin/chat", label: "Live Chat", icon: MessageSquare },
+            { href: "/admin/sponsored", label: "Sponsored", icon: Megaphone },
+            { href: "/admin/support", label: "Support Hub", icon: Headphones },
+        ],
+    },
+    {
+        title: "Site",
+        links: [
+            { href: "/admin/projects", label: "Projects", icon: FolderKanban },
+            { href: "/admin/carousel", label: "Carousel", icon: GalleryHorizontalEnd },
+            { href: "/admin/seasonal", label: "Seasonal Effects", icon: Snowflake },
+        ],
+    },
+]
+
+/** Dashboard matches exactly; other sections stay highlighted on their sub-pages (e.g. /admin/products/123). */
+export function isAdminLinkActive(pathname: string | null, href: string) {
+    if (!pathname) return false
+    if (href === "/admin") return pathname === "/admin"
+    return pathname === href || pathname.startsWith(`${href}/`)
+}
+
+export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+    const pathname = usePathname()
 
     return (
         <>
-            {/* Mobile Toggle Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="fixed top-4 left-4 z-50 p-2 bg-black/50 backdrop-blur-md border border-white/10 rounded-lg md:hidden text-white"
+            {/* Mobile overlay */}
+            <div
+                aria-hidden="true"
+                onClick={onClose}
+                className={cn(
+                    "fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity duration-300 md:hidden",
+                    open ? "opacity-100" : "pointer-events-none opacity-0"
+                )}
+            />
+
+            <aside
+                className={cn(
+                    "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/5 bg-black/80 backdrop-blur-xl transition-transform duration-300 ease-in-out md:translate-x-0",
+                    open ? "translate-x-0" : "-translate-x-full"
+                )}
             >
-                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-
-            {/* Overlay */}
-            {isOpen && (
-                <div
-                    className="fixed inset-0 bg-black/80 z-30 md:hidden backdrop-blur-sm"
-                    onClick={() => setIsOpen(false)}
-                />
-            )}
-
-            <aside className={cn(
-                "w-64 border-r border-white/5 bg-black/80 backdrop-blur-xl fixed h-full z-40 transition-transform duration-300 ease-in-out md:translate-x-0",
-                isOpen ? "translate-x-0" : "-translate-x-full"
-            )}>
-                <div className="p-6 border-b border-white/10">
-                    <Link href="/admin" className="text-2xl font-bold font-orbitron text-white group">
-                        ADMIN<span className="text-green-500 group-hover:text-green-400 transition-colors">.PANEL</span>
+                {/* Brand — same height as the top bar so their borders line up */}
+                <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/5 px-6">
+                    <Link href="/admin" className="group font-orbitron text-2xl font-bold text-white">
+                        ADMIN<span className="text-green-500 transition-colors group-hover:text-green-400">.PANEL</span>
                     </Link>
-                </div>
-                <nav className="p-4 space-y-2">
-                    {links.map((link) => {
-                        const Icon = link.icon
-                        const isActive = pathname === link.href
-                        return (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={cn(
-                                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden",
-                                    isActive
-                                        ? "bg-emerald-500/10 text-emerald-400 neon-text-glow"
-                                        : "hover:bg-white/5 text-gray-400 hover:text-white"
-                                )}
-                            >
-                                {isActive && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-emerald-500 rounded-r-full neon-glow" />
-                                )}
-                                <Icon className={cn("h-5 w-5 transition-transform group-hover:scale-110", isActive && "text-emerald-500")} />
-                                <span className="font-medium">{link.label}</span>
-
-                                {isActive && (
-                                    <div className="absolute inset-0 bg-emerald-500/5 blur-xl -z-10" />
-                                )}
-                            </Link>
-                        )
-                    })}
-
                     <button
-                        onClick={() => handleSignOut()}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all duration-300 mt-8 border-t border-white/10 pt-4 group text-left"
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Close menu"
+                        className="-mr-2 flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-white/5 hover:text-white md:hidden"
                     >
-                        <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                        <span>Sign Out</span>
+                        <X className="h-5 w-5" />
                     </button>
+                </div>
+
+                <nav className="flex-1 overflow-y-auto px-3 py-4">
+                    {sections.map((section, i) => (
+                        <div key={section.title} className={cn(i > 0 && "mt-6")}>
+                            <p className="mb-2 px-3 font-orbitron text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                                {section.title}
+                            </p>
+                            <ul className="space-y-1">
+                                {section.links.map((link) => {
+                                    const Icon = link.icon
+                                    const isActive = isAdminLinkActive(pathname, link.href)
+                                    return (
+                                        <li key={link.href}>
+                                            <Link
+                                                href={link.href}
+                                                aria-current={isActive ? "page" : undefined}
+                                                className={cn(
+                                                    "group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300",
+                                                    isActive
+                                                        ? "bg-emerald-500/10 text-emerald-400 neon-text-glow"
+                                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
+                                                )}
+                                            >
+                                                {isActive && (
+                                                    <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-emerald-500 neon-glow" />
+                                                )}
+                                                <Icon
+                                                    className={cn(
+                                                        "h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110",
+                                                        isActive && "text-emerald-500"
+                                                    )}
+                                                />
+                                                <span>{link.label}</span>
+                                            </Link>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </div>
+                    ))}
                 </nav>
 
-                {/* Decorative background element */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-green-900/10 to-transparent pointer-events-none" />
-            </aside >
+                <div className="shrink-0 border-t border-white/5 p-3">
+                    <button
+                        type="button"
+                        onClick={() => handleSignOut()}
+                        className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-gray-400 transition-all duration-300 hover:bg-red-500/10 hover:text-red-400"
+                    >
+                        <LogOut className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:-translate-x-1" />
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+
+                {/* Decorative glow */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-green-900/10 to-transparent" />
+            </aside>
         </>
     )
 }

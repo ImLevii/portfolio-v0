@@ -1,7 +1,8 @@
 import { Suspense } from "react"
 import { getSponsoredMessages } from "@/actions/sponsored"
 import { SponsoredMessageList } from "@/components/admin/sponsored/sponsored-message-list"
-import { Loader2 } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
+import { Loader2, Megaphone } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -16,16 +17,12 @@ export default async function SponsoredMessagesPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold font-orbitron text-white neon-text-glow">
-                    Live Chat <span className="text-emerald-500">Inventory</span>
-                </h1>
-                <p className="text-zinc-400">
-                    Control what appears in the live chat stream.
-                </p>
-            </div>
-
-            <div className="h-px bg-white/10 my-6" />
+            <AdminPageHeader
+                title={<>Live Chat <span className="text-emerald-500">Inventory</span></>}
+                description="Control what appears in the live chat stream."
+                icon={Megaphone}
+                accent="pink"
+            />
 
             <Suspense fallback={
                 <div className="flex items-center justify-center p-20">

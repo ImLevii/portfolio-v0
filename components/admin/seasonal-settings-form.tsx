@@ -40,7 +40,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
         <div className="space-y-8 max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Visual Configuration */}
-                <Card className="bg-black/40 border-white/5 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                <Card className="bg-black/40 border-gray-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     <CardHeader className="relative z-10">
                         <CardTitle className="flex items-center gap-3 text-xl">
@@ -55,7 +55,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                     </CardHeader>
                     <CardContent className="space-y-8 relative z-10">
                         <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white-[0.07]">
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white/[0.07]">
                                 <div className="flex items-center justify-between">
                                     <div className="space-y-1">
                                         <Label className="text-base text-zinc-200">Effect Mode</Label>
@@ -152,11 +152,11 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                     </CardContent>
 
                     {/* Decorative blurred blob */}
-                    <div className="absolute -top-20 -right-20 h-40 w-40 bg-blue-500/20 rounded-full blur-[50px] pointer-events-none" />
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.14),transparent_55%)]" />
                 </Card>
 
                 {/* Audio Configuration */}
-                <Card className="bg-black/40 border-white/5 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                <Card className="bg-black/40 border-gray-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     <CardHeader className="relative z-10">
                         <CardTitle className="flex items-center gap-3 text-xl">
@@ -170,7 +170,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-8 relative z-10">
-                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white-[0.07]">
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white/[0.07]">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <Label className="text-base text-zinc-200">Enable Music</Label>
@@ -196,7 +196,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white-[0.07]">
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4 transition-colors hover:bg-white/[0.07]">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <Label className="text-base text-zinc-200">Shop Ambience</Label>
@@ -273,7 +273,7 @@ export function SeasonalSettingsForm({ settings: initialSettings }: SeasonalSett
                     </CardContent>
 
                     {/* Decorative blurred blob */}
-                    <div className="absolute -bottom-20 -left-20 h-40 w-40 bg-purple-500/20 rounded-full blur-[50px] pointer-events-none" />
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(168,85,247,0.14),transparent_55%)]" />
                 </Card>
             </div>
 

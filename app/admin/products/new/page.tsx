@@ -1,4 +1,6 @@
+import { ShoppingBag } from "lucide-react"
 import { ProductForm } from "@/components/admin/product-form"
+import { AdminPageHeader } from "@/components/admin/admin-page-header"
 import { createProduct } from "../actions"
 
 import { db } from "@/lib/db"
@@ -9,8 +11,14 @@ export default async function NewProductPage() {
     })
 
     return (
-        <div className="space-y-8">
-            <h1 className="text-4xl font-bold font-orbitron text-white neon-text-glow">New Product</h1>
+        <div className="space-y-6">
+            <AdminPageHeader
+                title="New Product"
+                description="Add a product to the shop."
+                icon={ShoppingBag}
+                accent="orange"
+                backHref="/admin/products"
+            />
             <ProductForm action={createProduct} categories={categories} />
         </div>
     )

@@ -27,7 +27,7 @@ export default async function TicketDetailPage({ params }: PageProps) {
     }
 
     return (
-        <div className="space-y-4 h-[calc(100vh-120px)] flex flex-col">
+        <div className="flex h-[calc(100dvh-7rem)] flex-col space-y-4 lg:h-[calc(100dvh-8rem)]">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-zinc-800 pb-4 shrink-0">
                 <div className="flex items-center gap-3">

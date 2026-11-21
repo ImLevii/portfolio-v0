@@ -53,7 +53,7 @@ export function StatsCard({ title, value, icon: Icon, trend, color }: StatsCardP
 
     return (
         <div className={cn(
-            "relative overflow-hidden rounded-xl border border-gray-800/60 bg-black/40 p-6 backdrop-blur-xl transition-all duration-300 group hover:scale-[1.02]",
+            "relative h-full overflow-hidden rounded-xl border border-gray-800/60 bg-black/40 p-6 backdrop-blur-xl transition-all duration-300 group hover:scale-[1.02]",
             styles.border,
             styles.shadow
         )}>
