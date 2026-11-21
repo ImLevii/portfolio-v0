@@ -14,6 +14,11 @@ const glassStyle = {
   boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)',
 }
 
+// Shared by StatusPill and LinkButton so every pill in a row renders at the same size.
+// Fixed height (not padding) keeps them equal regardless of dot vs. icon vs. text metrics.
+const pillClass = "inline-flex items-center gap-1.5 h-6 sm:h-7 px-2 sm:px-3 rounded-md border font-bold whitespace-nowrap"
+const pillLabelClass = "uppercase font-bold tracking-wider text-[9px] sm:text-xs leading-none font-orbitron"
+
 function StatusPill({ status }: { status: SiteStatus }) {
   const isOnline = status === 'online'
   const isOffline = status === 'offline'
@@ -24,10 +29,7 @@ function StatusPill({ status }: { status: SiteStatus }) {
   const statusBorder = isOnline ? 'rgba(34,197,94,0.35)' : isOffline ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.12)'
 
   return (
-    <div
-      className="inline-flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md bg-white/[0.07] border font-bold"
-      style={{ ...glassStyle, borderColor: statusBorder }}
-    >
+    <div className={`${pillClass} bg-white/[0.07]`} style={{ ...glassStyle, borderColor: statusBorder }}>
       <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2 flex-shrink-0">
         {isOnline && (
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: dotColor }} />
@@ -35,7 +37,7 @@ function StatusPill({ status }: { status: SiteStatus }) {
         <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2" style={{ backgroundColor: dotColor }} />
       </span>
       <span
-        className="uppercase font-bold tracking-wider text-[9px] sm:text-xs font-orbitron"
+        className={pillLabelClass}
         style={{ color: statusColor, textShadow: isOnline || isOffline ? `0 0 8px ${statusGlow}` : 'none' }}
       >
         {statusLabel}
@@ -45,23 +47,26 @@ function StatusPill({ status }: { status: SiteStatus }) {
 }
 
 function LinkButton({ href, icon: Icon, label }: { href: string; icon: LucideIcon; label: string }) {
+  // globals.css gives every <a> a 44px min-height on mobile for tap targets. The <a> keeps that
+  // (invisible) tap area while the visible pill inside matches StatusPill's size exactly.
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 cursor-pointer font-bold"
-      style={glassStyle}
+      className="group/link inline-flex items-center rounded-md focus-visible:outline-none"
     >
-      <Icon
-        className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0"
-        style={{ color: '#ef4444', filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.8))' }}
-      />
       <span
-        className="uppercase font-bold tracking-wider text-[9px] sm:text-xs font-orbitron"
-        style={{ color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.8)' }}
+        className={`${pillClass} bg-white/10 border-white/20 transition-colors duration-300 group-hover/link:bg-white/15 group-hover/link:border-white/30 group-focus-visible/link:ring-2 group-focus-visible/link:ring-red-500/60`}
+        style={glassStyle}
       >
-        {label}
+        <Icon
+          className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0"
+          style={{ color: '#ef4444', filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.8))' }}
+        />
+        <span className={pillLabelClass} style={{ color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.8)' }}>
+          {label}
+        </span>
       </span>
     </a>
   )
