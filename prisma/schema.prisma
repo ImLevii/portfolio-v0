@@ -1,6 +1,7 @@
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 generator client {
@@ -173,7 +174,7 @@ model CarouselItem {
 model SiteSettings {
   id        String   @id @default(cuid())
   key       String   @unique // e.g., "seasonal-effects", "general-settings"
-  value     String   @db.LongText // JSON stringified configuration
+  value     String   @db.Text // JSON stringified configuration
   updatedAt DateTime @updatedAt
 }
 
