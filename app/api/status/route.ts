@@ -34,24 +34,36 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Private address not allowed" }, { status: 400 })
     }
 
+    // HEAD is cheapest, but some servers drop it, so fall back to GET before calling a site offline
+    const result = (await ping(parsedUrl.origin, 'HEAD')) ?? (await ping(parsedUrl.origin, 'GET'))
+
+    // Let the CDN share results briefly so every homepage view doesn't re-ping the sites
+    const headers = { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' }
+
+    // Any HTTP response (200, 301, 403, 404, 500…) means the server is reachable
+    return result
+        ? NextResponse.json({ status: 'online', code: result.status }, { headers })
+        : NextResponse.json({ status: 'offline' }, { headers })
+}
+
+// Must not start with "Mozilla/": bot-protection layers (e.g. SiteGround's) drop connections from
+// non-browser clients that claim to be a browser, which made live sites show as offline.
+const USER_AGENT = 'levik.dev-status/1.0 (+https://levik.dev)'
+
+/** Returns the response status, or null if the request failed (DNS, refused, reset, TLS, timeout). */
+async function ping(url: string, method: 'HEAD' | 'GET'): Promise<{ status: number } | null> {
     try {
-        const controller = new AbortController()
-        const timer = setTimeout(() => controller.abort(), 8000)
-
-        const response = await fetch(parsedUrl.origin, {
-            method: 'HEAD',
-            signal: controller.signal,
+        const response = await fetch(url, {
+            method,
             redirect: 'follow',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; StatusBot/1.0)'
-            }
+            cache: 'no-store',
+            signal: AbortSignal.timeout(5000),
+            headers: { 'User-Agent': USER_AGENT },
         })
-
-        clearTimeout(timer)
-
-        // Any HTTP response (200, 301, 403, 404, 500…) means the server is reachable
-        return NextResponse.json({ status: 'online', code: response.status })
+        // Only the status matters; don't download the page body
+        await response.body?.cancel().catch(() => {})
+        return { status: response.status }
     } catch {
-        return NextResponse.json({ status: 'offline' })
+        return null
     }
 }
